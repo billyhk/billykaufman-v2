@@ -15,53 +15,56 @@ const TITLES = [
 
 function RotatingTitle() {
   const [idx, setIdx] = useState(0);
-
   useEffect(() => {
-    const timer = setInterval(() => setIdx((i) => (i + 1) % TITLES.length), 3000);
-    return () => clearInterval(timer);
+    const t = setInterval(() => setIdx((i) => (i + 1) % TITLES.length), 3000);
+    return () => clearInterval(t);
   }, []);
-
   return (
-    <div className="h-10 overflow-hidden">
+    <div className="h-8 overflow-hidden">
       <AnimatePresence mode="wait">
-        <motion.h2
+        <motion.p
           key={idx}
-          initial={{ y: 24, opacity: 0 }}
+          initial={{ y: 20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -24, opacity: 0 }}
-          transition={{ duration: 0.35, ease: "easeOut" }}
-          className="text-2xl md:text-3xl text-blue-200 font-medium"
+          exit={{ y: -20, opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="text-lg md:text-xl text-blue-300 font-medium tracking-wide"
         >
           {TITLES[idx]}
-        </motion.h2>
+        </motion.p>
       </AnimatePresence>
     </div>
   );
 }
 
-function InteractiveName() {
+function AnimatedName() {
   const rawX = useMotionValue(0);
   const rawY = useMotionValue(0);
-
-  const rotateY = useSpring(useTransform(rawX, [-1, 1], [-18, 18]), { stiffness: 100, damping: 18 });
-  const rotateX = useSpring(useTransform(rawY, [-1, 1], [10, -10]), { stiffness: 100, damping: 18 });
+  const rotateY = useSpring(useTransform(rawX, [-1, 1], [-12, 12]), { stiffness: 100, damping: 20 });
+  const rotateX = useSpring(useTransform(rawY, [-1, 1], [6, -6]), { stiffness: 100, damping: 20 });
 
   useEffect(() => {
-    const handleMouseMove = (e: MouseEvent) => {
+    const onMove = (e: MouseEvent) => {
       rawX.set((e.clientX / window.innerWidth - 0.5) * 2);
       rawY.set((e.clientY / window.innerHeight - 0.5) * 2);
     };
-    window.addEventListener("mousemove", handleMouseMove);
-    return () => window.removeEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mousemove", onMove);
+    return () => window.removeEventListener("mousemove", onMove);
   }, [rawX, rawY]);
 
   return (
-    <div style={{ perspective: 600 }}>
+    <div style={{ perspective: 800 }}>
       <motion.h1
-        style={{ rotateX, rotateY, transformStyle: "preserve-3d" }}
-        className="name-shimmer text-5xl md:text-7xl font-bold leading-tight mb-4 cursor-default select-none"
+        style={{
+          rotateX,
+          rotateY,
+          transformStyle: "preserve-3d",
+          fontSize: "clamp(3.5rem, 12vw, 9rem)",
+          lineHeight: 1.0,
+        } as React.CSSProperties}
+        className="name-shimmer font-bold leading-none cursor-default select-none"
       >
-        Billy Kaufman
+        Billy<br />Kaufman
       </motion.h1>
     </div>
   );
@@ -69,12 +72,11 @@ function InteractiveName() {
 
 const container = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.12 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
 };
-
 const item = {
   hidden: { opacity: 0, y: 24 },
-  show: { opacity: 1, y: 0, transition: { duration: 0.5, ease: [0.25, 0.1, 0.25, 1] as const } },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.25, 0.1, 0.25, 1] as const } },
 };
 
 export default function HeroContent() {
@@ -83,56 +85,55 @@ export default function HeroContent() {
       variants={container}
       initial="hidden"
       animate="show"
-      className="relative z-10 px-6 text-center md:text-left max-w-2xl"
+      className="relative z-10 w-full max-w-5xl px-8 md:px-12"
     >
-      <motion.p variants={item} className="text-blue-200 text-lg font-medium mb-2 tracking-widest uppercase">
+      <motion.p variants={item} className="text-white/40 text-sm tracking-[0.2em] uppercase mb-3">
         Hi, I&apos;m
       </motion.p>
 
-      <motion.div variants={item}>
-        <InteractiveName />
+      <motion.div variants={item} className="mb-5">
+        <AnimatedName />
       </motion.div>
 
-      <motion.div variants={item} className="mb-8">
+      <motion.div variants={item} className="mb-7">
         <RotatingTitle />
       </motion.div>
 
-      {/* CTAs */}
-      <motion.div variants={item} className="flex flex-wrap gap-4 justify-center md:justify-start mb-10">
+      <motion.div variants={item} className="flex flex-wrap gap-3 mb-7">
         <a
           href={RESUME_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-6 py-3 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-lg transition-colors"
+          className="px-5 py-2.5 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-lg transition-colors text-sm"
         >
           Download Resume
         </a>
         <a
           href="mailto:billyhkaufman@gmail.com"
-          className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/20 transition-colors backdrop-blur-sm"
+          className="px-5 py-2.5 bg-white/8 hover:bg-white/15 text-white font-semibold rounded-lg border border-white/15 transition-colors text-sm"
         >
           Hire Me
         </a>
         <Link
-          href="/about"
-          className="px-6 py-3 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/20 transition-colors backdrop-blur-sm"
+          href="#about"
+          onClick={(e) => { e.preventDefault(); document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }); }}
+          className="px-5 py-2.5 bg-white/8 hover:bg-white/15 text-white font-semibold rounded-lg border border-white/15 transition-colors text-sm"
         >
           About Me
         </Link>
       </motion.div>
 
-      {/* Social links */}
-      <motion.div variants={item} className="flex flex-wrap gap-6 justify-center md:justify-start">
+      <motion.div variants={item} className="flex gap-5">
         {socialLinks.map(({ Icon, href, displayName, label }) => (
           <a
             key={label}
             href={href}
             target={href.startsWith("mailto") ? undefined : "_blank"}
             rel="noopener noreferrer"
-            className="flex items-center gap-2 text-white/70 hover:text-white transition-colors group"
+            className="flex items-center gap-2 text-white/50 hover:text-white transition-colors group"
           >
-            <Icon size={22} className="group-hover:text-blue-300 transition-colors" />
-            <span className="text-sm hidden md:inline">{displayName}</span>
+            <Icon size={18} className="group-hover:text-blue-300 transition-colors" />
+            <span className="text-xs hidden md:inline">{displayName}</span>
           </a>
         ))}
       </motion.div>

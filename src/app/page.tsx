@@ -2,10 +2,10 @@ import HeroContent from "@/components/HeroContent";
 import DepthSection from "@/components/ocean/DepthSection";
 import DepthLabel from "@/components/ocean/DepthLabel";
 import { OceanCanvas, ProjectsGallery } from "@/components/ClientOnly";
+import ClientsGrid from "@/components/ClientsGrid";
 import { bioData, RESUME_URL } from "@/data/bio";
 import { skillsData } from "@/data/skills";
 import { toolsData } from "@/data/tools";
-import { clientsData } from "@/data/clients";
 import { experienceData } from "@/data/experience";
 import Image from "next/image";
 
@@ -17,7 +17,7 @@ export default function HomePage() {
       <main className="relative z-10">
 
         {/* ── HERO ─────────────────────────────────────── */}
-        <section id="home" className="min-h-screen flex items-center justify-center px-6">
+        <section id="home" className="min-h-screen flex items-center pt-16">
           <HeroContent />
         </section>
 
@@ -50,22 +50,12 @@ export default function HomePage() {
               alt="Headshot of Billy Kaufman"
               width={240}
               height={240}
+              style={{ height: "auto" }}
               className="rounded-2xl object-cover shadow-xl ring-2 ring-white/10 self-start"
             />
           </div>
 
-          {/* Clients */}
-          <div className="mt-16">
-            <h3 className="text-xl font-bold text-white mb-6 text-center">Clients</h3>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {clientsData.map((c) => (
-                <div key={c.title} className="bg-white/5 border border-white/10 rounded-xl p-4 backdrop-blur-sm">
-                  <p className="text-white font-semibold text-sm">{c.title}</p>
-                  <p className="text-white/50 text-xs mt-1 leading-relaxed">{c.description}</p>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ClientsGrid />
         </DepthSection>
 
         {/* ── EXPERIENCE ───────────────────────────────── */}
