@@ -43,7 +43,7 @@ export default function NavBar() {
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <button
             onClick={() => scrollTo("#home")}
-            className="text-white font-bold text-lg tracking-wide hover:text-blue-300 transition-colors z-50"
+            className="text-white font-bold text-lg tracking-wide hover:text-blue-300 transition-colors z-50 cursor-pointer"
           >
             BK
           </button>
@@ -60,7 +60,7 @@ export default function NavBar() {
                     active === id
                       ? "text-blue-300 border-b border-blue-300 pb-0.5"
                       : "text-white/70 hover:text-white"
-                  }`}
+                  } cursor-pointer`}
                 >
                   {label}
                 </button>
@@ -70,7 +70,7 @@ export default function NavBar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden text-white p-1 z-50 relative"
+            className="md:hidden text-white p-1 z-50 relative cursor-pointer"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle menu"
           >
@@ -97,7 +97,7 @@ export default function NavBar() {
             <motion.div key="drawer" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 32 }} className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-slate-900/95 backdrop-blur-xl border-l border-white/10 flex flex-col md:hidden">
               <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
                 <span className="text-white font-bold text-lg tracking-wide">Menu</span>
-                <button onClick={() => setMobileOpen(false)} className="text-white/60 hover:text-white transition-colors"><HiX size={22} /></button>
+                <button onClick={() => setMobileOpen(false)} className="text-white/60 hover:text-white transition-colors cursor-pointer"><HiX size={22} /></button>
               </div>
               <div className="flex flex-col px-6 pt-6 gap-1 flex-1">
                 {navLinks.map(({ href, label }, i) => (
@@ -108,7 +108,7 @@ export default function NavBar() {
                         active === href.replace("#", "")
                           ? "bg-blue-500/15 text-blue-300 border border-blue-500/20"
                           : "text-white/70 hover:text-white hover:bg-white/5"
-                      }`}
+                      } cursor-pointer`}
                     >
                       {label}
                     </button>

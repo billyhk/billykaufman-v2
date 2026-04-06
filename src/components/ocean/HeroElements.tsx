@@ -1,7 +1,6 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
-import { Float } from "@react-three/drei";
 import { useRef, useEffect, useMemo } from "react";
 import * as THREE from "three";
 
