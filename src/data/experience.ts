@@ -8,6 +8,7 @@ export type ExperienceEntry = {
   accentColor: string;
   logoFit?: "cover" | "contain";
   logoPadding?: string;
+  logoBg?: string;
 };
 
 export const experienceData: ExperienceEntry[] = [
@@ -21,6 +22,9 @@ export const experienceData: ExperienceEntry[] = [
     dateRange: "Dec 2025 – Present",
     logoSrc: "/images/zapier-logo-sm.png",
     accentColor: "#ff4a00",
+    logoFit: "contain",
+    logoPadding: "p-2",
+    logoBg: "#ffffff",
   },
   {
     institutionName: "Concertiv",
@@ -32,6 +36,8 @@ export const experienceData: ExperienceEntry[] = [
     dateRange: "Oct 2022 – Dec 2025",
     logoSrc: "/images/concertiv-logo-sm.png",
     accentColor: "#d79760",
+    logoFit: "contain",
+    logoBg: "#ffffff",
   },
   {
     institutionName: "Ruckus Marketing",
@@ -41,10 +47,11 @@ export const experienceData: ExperienceEntry[] = [
     description2:
       "I worked closely with project managers, backend developers, and an internal design team to produce modern web apps with React that are as pleasant to use as they are aesthetically captivating.",
     dateRange: "Oct 2021 – Oct 2022",
-    logoSrc: "/images/ruckus-logo-nyc.png",
+    logoSrc: "/images/ruckus-logo.svg",
     accentColor: "#ff8300",
     logoFit: "contain",
     logoPadding: "p-1",
+    logoBg: "#000000",
   },
   {
     institutionName: "LookFar Labs",
@@ -57,6 +64,7 @@ export const experienceData: ExperienceEntry[] = [
     logoSrc: "/images/lfl-logo-sm.png",
     accentColor: "#aaaaaa",
     logoFit: "contain",
+    logoBg: "#ffffff",
   },
   {
     institutionName: "Gretrix",
@@ -69,6 +77,7 @@ export const experienceData: ExperienceEntry[] = [
     logoSrc: "/images/gx-logo.png",
     accentColor: "#b2dbef",
     logoFit: "contain",
+    logoBg: "#ffffff",
   },
   {
     institutionName: "Freelance Web Developer",
@@ -104,5 +113,6 @@ export const experienceData: ExperienceEntry[] = [
     logoSrc: "/images/um-logo.jpg",
     accentColor: "#dce5df",
     logoFit: "contain",
+    logoBg: "#000000",
   },
 ];
