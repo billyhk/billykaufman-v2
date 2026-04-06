@@ -2,7 +2,9 @@
 
 import { useFrame, useThree } from "@react-three/fiber";
 import { useRef, useMemo, useEffect, useState } from "react";
+import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
+import HeroElements from "./HeroElements";
 
 // Depth color stops: surface → abyss
 const DEPTH_COLORS = [
@@ -25,18 +27,16 @@ function lerpColor(t: number): THREE.Color {
 function Bubbles({ count = 1800 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
 
-  const { positions, speeds, sizes } = useMemo(() => {
+  const { positions, speeds } = useMemo(() => {
     const positions = new Float32Array(count * 3);
     const speeds = new Float32Array(count);
-    const sizes = new Float32Array(count);
     for (let i = 0; i < count; i++) {
       positions[i * 3 + 0] = (Math.random() - 0.5) * 30;
       positions[i * 3 + 1] = (Math.random() - 0.5) * 80;
       positions[i * 3 + 2] = (Math.random() - 0.5) * 20;
       speeds[i] = 0.005 + Math.random() * 0.015;
-      sizes[i] = 0.5 + Math.random() * 2.5;
     }
-    return { positions, speeds, sizes };
+    return { positions, speeds };
   }, [count]);
 
   useFrame(() => {
@@ -44,10 +44,7 @@ function Bubbles({ count = 1800 }: { count?: number }) {
     const pos = ref.current.geometry.attributes.position.array as Float32Array;
     for (let i = 0; i < count; i++) {
       pos[i * 3 + 1] += speeds[i];
-      // wrap: when bubble rises past top, reset to bottom
-      if (pos[i * 3 + 1] > 40) {
-        pos[i * 3 + 1] = -40;
-      }
+      if (pos[i * 3 + 1] > 40) pos[i * 3 + 1] = -40;
     }
     ref.current.geometry.attributes.position.needsUpdate = true;
   });
@@ -55,29 +52,14 @@ function Bubbles({ count = 1800 }: { count?: number }) {
   return (
     <points ref={ref}>
       <bufferGeometry>
-        <bufferAttribute
-          attach="attributes-position"
-          args={[positions, 3]}
-        />
-        <bufferAttribute
-          attach="attributes-size"
-          args={[sizes, 1]}
-        />
+        <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial
-        size={0.05}
-        color="#7dd3fc"
-        transparent
-        opacity={0.18}
-        sizeAttenuation
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
+      <pointsMaterial size={0.05} color="#7dd3fc" transparent opacity={0.18} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
     </points>
   );
 }
 
-// ── Bioluminescent specks (glow deeper) ──────────────────────────────────────
+// ── Bioluminescent specks ─────────────────────────────────────────────────────
 function BioParticles({ count = 600 }: { count?: number }) {
   const ref = useRef<THREE.Points>(null);
 
@@ -85,7 +67,7 @@ function BioParticles({ count = 600 }: { count?: number }) {
     const arr = new Float32Array(count * 3);
     for (let i = 0; i < count; i++) {
       arr[i * 3 + 0] = (Math.random() - 0.5) * 40;
-      arr[i * 3 + 1] = -20 - Math.random() * 60; // lower half only
+      arr[i * 3 + 1] = -20 - Math.random() * 60;
       arr[i * 3 + 2] = (Math.random() - 0.5) * 20;
     }
     return arr;
@@ -102,19 +84,10 @@ function BioParticles({ count = 600 }: { count?: number }) {
       <bufferGeometry>
         <bufferAttribute attach="attributes-position" args={[positions, 3]} />
       </bufferGeometry>
-      <pointsMaterial
-        size={0.06}
-        color="#4ade80"
-        transparent
-        opacity={0.25}
-        sizeAttenuation
-        depthWrite={false}
-        blending={THREE.AdditiveBlending}
-      />
+      <pointsMaterial size={0.06} color="#4ade80" transparent opacity={0.25} sizeAttenuation depthWrite={false} blending={THREE.AdditiveBlending} />
     </points>
   );
 }
-
 
 // ── Main scene ────────────────────────────────────────────────────────────────
 export default function OceanScene() {
@@ -128,7 +101,6 @@ export default function OceanScene() {
       const el = document.documentElement;
       const progress = el.scrollTop / (el.scrollHeight - el.clientHeight);
       setScrollProgress(isNaN(progress) ? 0 : progress);
-      // camera travels -60 units over full scroll
       targetCamY.current = -progress * 60;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -136,22 +108,29 @@ export default function OceanScene() {
   }, []);
 
   useFrame(() => {
-    // smooth camera follow
     currentCamY.current = THREE.MathUtils.lerp(currentCamY.current, targetCamY.current, 0.06);
     camera.position.y = currentCamY.current;
-
-    // update background color
-    const color = lerpColor(scrollProgress);
-    gl.setClearColor(color, 1);
+    gl.setClearColor(lerpColor(scrollProgress), 1);
   });
 
   return (
     <>
-      <ambientLight intensity={0.4} color="#bae6fd" />
-      <directionalLight position={[5, 20, 5]} intensity={0.6} color="#e0f2fe" />
+      <ambientLight intensity={0.6} color="#bae6fd" />
+      <directionalLight position={[5, 10, 5]} intensity={2} color="#ffffff" />
+      <directionalLight position={[-5, -2, 3]} intensity={1} color="#7dd3fc" />
+      <pointLight position={[0, 2, 4]} intensity={4} color="#38bdf8" distance={16} />
+      <HeroElements />
       <Bubbles />
       <BioParticles />
       <fog attach="fog" args={["#020817", 30, 80]} />
+      <EffectComposer>
+        <Bloom
+          intensity={1.4}
+          luminanceThreshold={0.2}
+          luminanceSmoothing={0.9}
+          mipmapBlur
+        />
+      </EffectComposer>
     </>
   );
 }

@@ -17,7 +17,7 @@ export default function HomePage() {
       <main className="relative z-10">
 
         {/* ── HERO ─────────────────────────────────────── */}
-        <section id="home" className="min-h-screen flex items-center justify-center px-6">
+        <section id="home" className="min-h-screen flex items-center pt-16">
           <HeroContent />
         </section>
 
@@ -50,6 +50,7 @@ export default function HomePage() {
               alt="Headshot of Billy Kaufman"
               width={240}
               height={240}
+              style={{ height: "auto" }}
               className="rounded-2xl object-cover shadow-xl ring-2 ring-white/10 self-start"
             />
           </div>
