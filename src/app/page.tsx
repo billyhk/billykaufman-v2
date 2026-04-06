@@ -30,10 +30,11 @@ export default function HomePage() {
               <p className="text-blue-200 text-lg">{bioData.title}</p>
               <p className="text-white/75 leading-relaxed">{bioData.paragraphs[0]}</p>
               <p className="text-white/75 leading-relaxed">
-                Strong engineering professional with a full-stack engineering certificate from{" "}
+                {bioData.paragraphs[1].split("General Assembly")[0]}
                 <a href={bioData.generalAssemblyUrl} target="_blank" rel="noopener noreferrer" className="text-blue-300 underline underline-offset-2">
                   General Assembly
-                </a>.
+                </a>
+                {bioData.paragraphs[1].split("General Assembly")[1]}
               </p>
               <p className="text-white/75 leading-relaxed">{bioData.paragraphs[2]}</p>
               <div className="flex flex-wrap gap-3 pt-2">
@@ -69,7 +70,7 @@ export default function HomePage() {
             <div className="space-y-8">
               {experienceData.map((entry) => (
                 <div key={entry.institutionName} className="flex gap-6">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full bg-slate-800/80 border-2 border-white/20 overflow-hidden flex items-center justify-center z-10 backdrop-blur-sm">
+                  <div className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden flex items-center justify-center z-10 backdrop-blur-sm" style={{ backgroundColor: entry.logoBg ?? "rgba(15,23,42,0.8)" }}>
                     {entry.logoSrc ? (
                       <Image
                         src={entry.logoSrc}
