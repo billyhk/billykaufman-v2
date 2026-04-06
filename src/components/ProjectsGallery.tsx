@@ -147,7 +147,7 @@ export default function ProjectsGallery() {
       </div>
 
       {/* Grid */}
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
+      <div className={`grid gap-8 ${filtered.length === 1 ? "grid-cols-1 max-w-2xl mx-auto w-full" : "grid-cols-1 lg:grid-cols-2"}`}>
         {filtered.map((project) => (
           <ProjectCard key={project.key} project={project} />
         ))}

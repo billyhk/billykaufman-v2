@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { motion, AnimatePresence, useMotionValue, useTransform, useSpring } from "framer-motion";
+import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
 import { useEffect, useState } from "react";
 import { socialLinks } from "@/data/social";
 import { RESUME_URL } from "@/data/bio";
@@ -11,29 +11,43 @@ const TITLES = [
   "Full-Stack Developer",
   "React Specialist",
   "TypeScript Enthusiast",
+  "Amateur Distance Runner",
+  "Puzzled Chess Player",
+  "Symphonic Drum Beater 🥁",
 ];
 
-function RotatingTitle() {
-  const [idx, setIdx] = useState(0);
+function TypingTitle() {
+  const [titleIdx, setTitleIdx] = useState(0);
+  const [displayed, setDisplayed] = useState("");
+  const [deleting, setDeleting] = useState(false);
+
   useEffect(() => {
-    const t = setInterval(() => setIdx((i) => (i + 1) % TITLES.length), 3000);
-    return () => clearInterval(t);
-  }, []);
+    const current = TITLES[titleIdx];
+    const done = displayed.length === current.length;
+    const empty = displayed.length === 0;
+
+    if (deleting && empty) {
+      setDeleting(false);
+      setTitleIdx((i) => (i + 1) % TITLES.length);
+      return;
+    }
+
+    const phase = deleting ? "deleting" : done ? "pausing" : "typing";
+    const phases = {
+      typing:   { delay: 60,   next: () => setDisplayed(current.slice(0, displayed.length + 1)) },
+      pausing:  { delay: 1800, next: () => setDeleting(true) },
+      deleting: { delay: 35,   next: () => setDisplayed(displayed.slice(0, -1)) },
+    };
+    const { delay, next } = phases[phase];
+    const timeout = setTimeout(next, delay);
+    return () => clearTimeout(timeout);
+  }, [displayed, deleting, titleIdx]);
+
   return (
-    <div className="h-8 overflow-hidden">
-      <AnimatePresence mode="wait">
-        <motion.p
-          key={idx}
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          exit={{ y: -20, opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="text-lg md:text-xl text-blue-300 font-medium tracking-wide"
-        >
-          {TITLES[idx]}
-        </motion.p>
-      </AnimatePresence>
-    </div>
+    <p className="text-lg md:text-xl text-blue-300 font-medium tracking-wide h-8">
+      {displayed}
+      <span className="animate-pulse">|</span>
+    </p>
   );
 }
 
@@ -96,7 +110,7 @@ export default function HeroContent() {
       </motion.div>
 
       <motion.div variants={item} className="mb-7">
-        <RotatingTitle />
+        <TypingTitle />
       </motion.div>
 
       <motion.div variants={item} className="flex flex-wrap gap-3 mb-7">
