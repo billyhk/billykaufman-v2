@@ -13,7 +13,7 @@ export default function DepthSection({ id, children, className = "" }: DepthSect
   return (
     <section
       id={id}
-      className={`relative min-h-screen flex items-center justify-center px-6 ${className}`}
+      className={`relative py-24 flex items-center justify-center px-6 ${className}`}
     >
       <motion.div
         initial={{ opacity: 0, y: 40 }}
