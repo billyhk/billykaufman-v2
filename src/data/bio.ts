@@ -14,4 +14,5 @@ export const bioData = {
   generalAssemblyUrl:
     "https://generalassemb.ly/education/software-engineering-immersive-remote",
   headshotSrc: "/images/headshot.jpg",
+  highlights: ["NYC", `${new Date().getFullYear() - 2020}+ yrs`, "Full-stack"],
 };

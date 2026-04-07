@@ -14,7 +14,7 @@ export default function AboutSection() {
           <p className="text-blue-200 text-lg">{bioData.title}</p>
 
           <div className="flex flex-wrap gap-2 py-1">
-            {["NYC", "8+ yrs", "Full-stack"].map((label) => (
+            {bioData.highlights.map((label) => (
               <span key={label} className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/6 border border-white/12 text-white/70">
                 {label}
               </span>
