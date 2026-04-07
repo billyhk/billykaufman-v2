@@ -15,11 +15,11 @@ export type ExperienceEntry = {
 export const experienceData: ExperienceEntry[] = [
   {
     institutionName: "Zapier",
-    title: "Software Engineer",
+    title: "Software Engineer III",
     description1:
       "Zapier is the automation platform connecting 7,000+ apps for millions of users, and a leader in bringing AI-powered automation to non-technical teams.",
     description2:
-      "On the Interfaces team as a Software Engineer III, building and evolving the form and workflow products that power how customers design and automate complex integrations. Working across a highly modular TypeScript and React codebase with a strong emphasis on accessibility, testing, and code quality at scale.",
+      "On the Interfaces team, building and evolving the form and workflow products that power how customers design and automate complex integrations. Working across a highly modular TypeScript and React codebase with a strong emphasis on accessibility, testing, and code quality at scale.",
     dateRange: "Dec 2025 – Present",
     logoSrc: "/images/zapier-logo-sm.png",
     accentColor: "#ff4a00",
