@@ -3,21 +3,22 @@
 import { motion, type Variants } from "framer-motion";
 import { skillsData } from "@/data/skills";
 import { toolsData } from "@/data/tools";
+import { ACCENT_BLUE, CAT_BLUE, CAT_GREEN, CAT_ORANGE, CAT_PURPLE, CAT_YELLOW, CAT_CYAN } from "@/constants/colors";
 
 const TOOL_COLORS: Record<string, string> = {
-  "IDE":              "#3b82f6",
-  "Version Control":  "#10b981",
-  "Project Mgmt":     "#f97316",
-  "Design":           "#a855f7",
+  "IDE":              CAT_BLUE,
+  "Version Control":  CAT_GREEN,
+  "Project Mgmt":     CAT_ORANGE,
+  "Design":           CAT_PURPLE,
 };
 
 const CATEGORY_COLORS: Record<string, string> = {
-  "Frontend":            "#3b82f6",
-  "Backend":             "#10b981",
-  "Cloud & DevOps":      "#f97316",
-  "AI & Modern Tooling": "#a855f7",
-  "Testing":             "#eab308",
-  "Documentation":       "#06b6d4",
+  "Frontend":            CAT_BLUE,
+  "Backend":             CAT_GREEN,
+  "Cloud & DevOps":      CAT_ORANGE,
+  "AI & Modern Tooling": CAT_PURPLE,
+  "Testing":             CAT_YELLOW,
+  "Documentation":       CAT_CYAN,
 };
 
 const cardVariants: Variants = {
@@ -35,7 +36,7 @@ export default function SkillsSection() {
       {/* Skill categories */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
         {skillsData.map((category, i) => {
-          const color = CATEGORY_COLORS[category.heading] ?? "#93c5fd";
+          const color = CATEGORY_COLORS[category.heading] ?? ACCENT_BLUE;
           return (
             <motion.div
               key={category.heading}
@@ -77,7 +78,7 @@ export default function SkillsSection() {
       {/* Tools */}
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
         {toolsData.map((tool, i) => {
-          const color = TOOL_COLORS[tool.title] ?? "#93c5fd";
+          const color = TOOL_COLORS[tool.title] ?? ACCENT_BLUE;
           return (
             <motion.div
               key={tool.title}

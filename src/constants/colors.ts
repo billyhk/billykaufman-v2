@@ -4,6 +4,15 @@
 export const ACCENT_BLUE   = "#93c5fd"; // blue-300
 export const ACCENT_PURPLE = "#c4b5fd"; // purple-300
 
+// ── Category / section accent colors ─────────────────────────────────────────
+// Shared between SkillsSection CATEGORY_COLORS and TOOL_COLORS maps.
+export const CAT_BLUE   = "#3b82f6"; // blue-500   — Frontend, IDE
+export const CAT_GREEN  = "#10b981"; // emerald-500 — Backend, Version Control
+export const CAT_ORANGE = "#f97316"; // orange-500  — Cloud & DevOps, Project Mgmt
+export const CAT_PURPLE = "#a855f7"; // purple-500  — AI & Modern Tooling, Design
+export const CAT_YELLOW = "#eab308"; // yellow-500  — Testing
+export const CAT_CYAN   = "#06b6d4"; // cyan-500    — Documentation
+
 // ── Gradients ─────────────────────────────────────────────────────────────────
 export const GRADIENT_PROGRESS = `linear-gradient(90deg, ${ACCENT_BLUE}, ${ACCENT_PURPLE}, ${ACCENT_BLUE})`;
 export const GRADIENT_SHIMMER  = `linear-gradient(90deg, #fff 0%, ${ACCENT_BLUE} 40%, ${ACCENT_PURPLE} 70%, ${ACCENT_BLUE} 100%)`;
