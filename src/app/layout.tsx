@@ -9,7 +9,7 @@ const raleway = Raleway({
 });
 
 export const metadata: Metadata = {
-  title: "Billy Kaufman — Software Engineer",
+  title: "Billy Kaufman — SWE",
   description:
     "Full-stack web engineer in NYC. TypeScript, React, Python, Django, AWS.",
 };

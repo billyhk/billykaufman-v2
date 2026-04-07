@@ -74,7 +74,7 @@ export default function HomePage() {
 
           <div className="relative">
             <div className="absolute left-5 top-0 bottom-0 w-px bg-white/10" />
-            <div className="space-y-8">
+            <div className="space-y-5">
               {experienceData.map((entry) => (
                 <div key={entry.institutionName} className="flex gap-6">
                   <div className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden flex items-center justify-center z-10 backdrop-blur-sm" style={{ backgroundColor: entry.logoBg ?? "rgba(15,23,42,0.8)" }}>
@@ -90,7 +90,7 @@ export default function HomePage() {
                       <span className="text-xs text-white/40 font-bold">{entry.institutionName.charAt(0)}</span>
                     )}
                   </div>
-                  <div className="flex-1 rounded-2xl p-5 border border-white/10 backdrop-blur-sm" style={{ backgroundColor: `${entry.accentColor}12` }}>
+                  <div className="flex-1 rounded-2xl p-4 border border-white/10 backdrop-blur-sm" style={{ backgroundColor: `${entry.accentColor}12` }}>
                     <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 mb-3">
                       <div>
                         <p className="text-white font-bold">{entry.title}</p>
