@@ -1,14 +1,11 @@
-export type Tool = {
+export type ToolCategory = {
   title: string;
-  copy: string;
+  items: string[];
 };
 
-export const toolsData: Tool[] = [
-  { title: "Operating System", copy: "MacOS" },
-  { title: "IDE", copy: "Visual Studio Code" },
-  { title: "Version Control System", copy: "Git, Github, Gitlab, Bitbucket" },
-  {
-    title: "Project Management Software",
-    copy: "Jira, Aha!, Asana, Clickup",
-  },
+export const toolsData: ToolCategory[] = [
+  { title: "IDE",              items: ["Cursor", "VS Code"] },
+  { title: "Version Control",  items: ["Git", "GitHub", "GitLab", "Bitbucket"] },
+  { title: "Project Mgmt",     items: ["Jira", "Linear", "Asana", "ClickUp"] },
+  { title: "Design",           items: ["Figma", "Storybook"] },
 ];
