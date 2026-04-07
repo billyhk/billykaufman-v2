@@ -135,10 +135,10 @@ export default function HomePage() {
           <p className="text-blue-300 text-lg mb-10">What I bring to the table</p>
 
           {/* Skill categories */}
-          <div className="flex flex-col gap-6 mb-12">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
             {skillsData.map((category) => (
-              <div key={category.heading} className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
-                <h3 className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-4">{category.heading}</h3>
+              <div key={category.heading} className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
+                <h3 className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-3">{category.heading}</h3>
                 <div className="flex flex-wrap gap-2">
                   {category.skills.map((skill) => (
                     <span key={skill} className="px-3 py-1.5 rounded-full text-sm font-medium text-white/85 bg-white/8 border border-white/10 hover:border-blue-400/40 hover:text-white transition-colors">

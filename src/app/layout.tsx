@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
 import NavBar from "@/components/NavBar";
+import ScrollProgress from "@/components/ScrollProgress";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -22,6 +23,7 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${raleway.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-slate-950 text-white">
+        <ScrollProgress />
         <NavBar />
         {children}
       </body>
