@@ -23,7 +23,7 @@ export const projectsData: Project[] = [
     title: "Bloomberg B2B Campaign Banners",
     client: "Bloomberg LP",
     technologies: ["HTML5", "CSS3", "CSS Keyframe Animations", "3D Transforms", "Radial Gradients"],
-    description: "Engineered 48 HTML5 display ad banners for Bloomberg's B2B marketing campaign — 8 messaging variations across 6 IAB standard sizes. All animations and 3D transforms hand-written in CSS without a single JavaScript animation library.",
+    description: "Engineered 48 HTML5 display ad banners for Bloomberg's B2B marketing campaign: 8 messaging variations across 6 IAB standard sizes. All animations and 3D transforms hand-written in CSS without a single JavaScript animation library.",
     images: [],
     banners: [
       { label: "300×250", width: 300, height: 250, src: "/bloomberg/300x250.html" },
@@ -38,9 +38,9 @@ export const projectsData: Project[] = [
     key: "page_note",
     title: "PageNote",
     client: "Personal Project",
-    technologies: ["CropperJS", "FabricJS"],
+    technologies: ["Chrome Extension API", "JavaScript", "CropperJS", "FabricJS"],
     description:
-      "This personal project was inspired by my developer communication workflow. On an engineering team, I found myself sending annotated screenshots, but in doing so had to work with a screenshot app and a separate editor to add annotations. Then I would separately attach a note to elaborate on the observation. This handy chrome extension packs all of those functionalities into one lightweight tool.",
+      "Built to scratch my own itch: dev teams waste time bouncing between screenshot tools, image editors, and message threads just to say \"look at this.\" PageNote collapses all of that into a single Chrome extension. Capture, crop, annotate, and share without leaving the browser. MIT licensed and open source on GitHub.",
     images: [
       "/images/project-images/PageNote/01 extension pop up\.jpg",
       "/images/project-images/PageNote/02 cropper\.jpg",
@@ -57,10 +57,11 @@ export const projectsData: Project[] = [
       "TailwindCSS",
       "GraphQL",
       "Wordpress (headless)",
-      "Dynamic data generation with Wordpress plugins CPT-UI and Advanced Custom Fields (ACFs)",
+      "CPT-UI",
+      "Advanced Custom Fields",
     ],
     description:
-      "Sebpo is a digital service provider that needed to reflect their technical prowess with a new and improved version of their old, stale, traditional Wordpress build. Gatsby was the perfect framework for this project because it provided seamless data delivery from Wordpress to offer the same content-control the client was used to, but paired with the luster of a fully custom user interface.",
+      "Engineered the original sebpo.com frontend as a headless Gatsby + WordPress stack, giving the team full content control through a familiar CMS while delivering a fully custom UI. GraphQL powered the data layer; ACFs and CPT-UI drove dynamic page generation. The UI was later ported to a WordPress rebuild, and much of the design and component work carried over to the live site.",
     images: [
       "/images/project-images/sebpo/01 home\.jpg",
       "/images/project-images/sebpo/02 services index\.jpg",
@@ -70,6 +71,7 @@ export const projectsData: Project[] = [
       "/images/project-images/sebpo/07 job detail\.jpg",
       "/images/project-images/sebpo/06 contact us\.jpg",
     ],
+    deployment: "https://sebpo.com",
   },
   {
     key: "verify",
@@ -79,10 +81,11 @@ export const projectsData: Project[] = [
       "ReactJS",
       "Redux",
       "TailwindCSS",
-      "StripeAPI and NodeJS for payment-handler server-side operations",
+      "Stripe API",
+      "Node.js",
     ],
     description:
-      "This site serves as both a marketing platform for Verify's identity-verification services, AND as an access point for the service itself. Verify Faces is a web application that empowers employers with the ability to unveil any and all public-information on prospective and current employees. This application integrates Verify's patented facial recognition software, which can parse images as well as videos.",
+      "Marketing site and live product in one. Verifyfaces.com lets employers run background checks powered by Verify's patented facial recognition engine, with search by name, image, or video upload. Built the full frontend in React/Redux and handled payment flows via a Node.js/Stripe backend.",
     images: [
       "/images/project-images/verify/01 home\.jpg",
       "/images/project-images/verify/02 search by img or vid\.jpg",
@@ -92,14 +95,15 @@ export const projectsData: Project[] = [
       "/images/project-images/verify/06 lets connect form\.jpg",
       "/images/project-images/verify/07 terms page\.jpg",
     ],
+    deployment: "https://verifyfaces.com",
   },
   {
     key: "westrock",
-    title: "Westrock",
+    title: "Westrock Coffee",
     client: "Westrock Coffee",
-    technologies: ["JavaScript", "Shopify (Headless)", "{{ Liquid }}", "SCSS"],
+    technologies: ["JavaScript", "SCSS", "CMS Integration"],
     description:
-      "Westrock Coffee requested a marketing website to advertise their B2C and B2B coffee distribution services. This application was built as a modularized, micro-frontend architecture. Dynamic data is provided to Liquid templates via Advanced Custom Fields in order to incorporate a headless Shopify backend.",
+      "Built the UI for westrockcoffee.com, a marketing site advertising Westrock's B2C and B2B coffee distribution services. Architected as a modular, component-driven frontend integrated with a CMS backend so the marketing team could manage content without touching code.",
     images: [
       "/images/project-images/westrock/01 home\.jpg",
       "/images/project-images/westrock/02 capabilities innovation\.jpg",
@@ -109,6 +113,7 @@ export const projectsData: Project[] = [
       "/images/project-images/westrock/06 retail\.jpg",
       "/images/project-images/westrock/07 global\.jpg",
     ],
+    deployment: "https://westrockcoffee.com",
   },
   {
     key: "the_collective",
@@ -117,14 +122,14 @@ export const projectsData: Project[] = [
     technologies: [
       "ReactJS",
       "TypeScript",
-      "React-Context",
+      "React Context",
       "TailwindCSS",
-      "Formik/Yup",
-      "React-Table",
-      "PapaParse (client-side CSV-import validation)",
+      "Formik / Yup",
+      "React Table",
+      "PapaParse",
     ],
     description:
-      "This web application served as a purchasing agent for the construction industry. The platform can be used to create vendors that can receive orders, or to only place orders to vendors created by other users.",
+      "Enterprise procurement platform for the construction industry. Vendors and buyers operate in the same system: companies can register as suppliers, place orders against other vendors, or both. Complex multi-step requisition flows, role-based access, client-side CSV import with validation, and sortable/filterable data tables throughout. Deployed behind an enterprise paywall.",
     images: [
       "/images/project-images/collective/01 login\.jpg",
       "/images/project-images/collective/02a dashboard\.jpg",
@@ -142,12 +147,14 @@ export const projectsData: Project[] = [
     technologies: [
       "ReactJS",
       "SCSS",
-      "Material-Design-Bootstrap",
-      "AWS On-The-Fly Image Optimization",
-      "Java Spring Boot / MySQL / Spring Security",
+      "Material Design Bootstrap",
+      "AWS Image Optimization",
+      "Java Spring Boot",
+      "MySQL",
+      "Spring Security",
     ],
     description:
-      "Digital art gallery for prominent Cuban-American artist, Joel Spector. The artist's family commissioned this web-app project after he passed away. Users can view 88 of his works in high definition, and admin users can update the database of indexed works.",
+      "Commissioned by my best friend's family to preserve and share the legacy of Cuban-American artist Joel Spector after his passing. The gallery showcases 88 of his works in high definition with AWS on-the-fly image optimization, and includes a password-protected admin panel for the family to manage the collection.",
     images: [
       "/images/project-images/jspect/jspect-home\.jpg",
       "/images/project-images/jspect/jspect-works\.jpg",
