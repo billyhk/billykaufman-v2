@@ -5,8 +5,7 @@ import { OceanCanvas, ProjectsGallery } from "@/components/ClientOnly";
 import ClientsGrid from "@/components/ClientsGrid";
 import { bioData, RESUME_URL, IS_OPEN_TO_WORK } from "@/data/bio";
 import { socialLinks } from "@/data/social";
-import { skillsData } from "@/data/skills";
-import { toolsData } from "@/data/tools";
+import SkillsSection from "@/components/SkillsSection";
 import { experienceData } from "@/data/experience";
 import Image from "next/image";
 import ExperienceTimeline from "@/components/ExperienceTimeline";
@@ -124,35 +123,7 @@ export default function HomePage() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Skills & Tools</h2>
           <p className="text-blue-300 text-lg mb-10">What I bring to the table</p>
 
-          {/* Skill categories */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-12">
-            {skillsData.map((category) => (
-              <div key={category.heading} className="bg-white/5 border border-white/10 rounded-2xl p-5 backdrop-blur-sm">
-                <h3 className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-3">{category.heading}</h3>
-                <div className="flex flex-wrap gap-2">
-                  {category.skills.map((skill) => (
-                    <span key={skill} className="px-3 py-1.5 rounded-full text-sm font-medium text-white/85 bg-white/8 border border-white/10 hover:border-blue-400/40 hover:text-white transition-colors">
-                      {skill}
-                    </span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
-
-          {/* Tools */}
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
-            {toolsData.map((tool) => (
-              <div key={tool.title} className="bg-white/5 border border-white/10 rounded-xl px-4 py-4 backdrop-blur-sm">
-                <p className="text-white/40 text-xs uppercase tracking-widest mb-3">{tool.title}</p>
-                <div className="flex flex-col gap-1.5">
-                  {tool.items.map((item) => (
-                    <span key={item} className="text-white text-sm font-medium">{item}</span>
-                  ))}
-                </div>
-              </div>
-            ))}
-          </div>
+          <SkillsSection />
 
           {/* Contact */}
           <div className="pt-16 pb-20 border-t border-white/10">
@@ -210,9 +181,6 @@ export default function HomePage() {
 
       </main>
 
-      {/* <footer className="relative z-10">
-        <CoralSlalom />
-      </footer> */}
     </>
   );
 }
