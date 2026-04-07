@@ -8,6 +8,8 @@ import { skillsData } from "@/data/skills";
 import { toolsData } from "@/data/tools";
 import { experienceData } from "@/data/experience";
 import Image from "next/image";
+import FishEat from "@/components/FishEat";
+import SeaFloorHop from "@/components/SeaFloorHop";
 
 export default function HomePage() {
   return (
@@ -163,7 +165,8 @@ export default function HomePage() {
           </div>
 
           {/* Contact */}
-          <div className="text-center py-16 border-t border-white/10">
+          <div className="text-center pt-16 pb-20 border-t border-white/10">
+            <DepthLabel depth="~3800m" />
             <p className="text-white/40 text-sm tracking-widest uppercase mb-3">— Abyss reached —</p>
             <h3 className="text-3xl font-bold text-white mb-4">Let&apos;s work together</h3>
             <p className="text-white/60 mb-8 max-w-md mx-auto">You&apos;ve made it to the bottom. If you&apos;re still here, we should probably talk.</p>
@@ -171,9 +174,25 @@ export default function HomePage() {
               Get in touch
             </a>
           </div>
+
+          {/* Fish eat fish — desktop only */}
+          <div className="hidden md:block border-t border-white/10 pt-8 pb-2">
+            <p className="text-white/30 text-xs text-center tracking-widest uppercase mb-6">Eat or be eaten</p>
+            <FishEat />
+          </div>
+
+          {/* Sea floor hop — mobile only */}
+          <div className="block md:hidden border-t border-white/10 pt-8 pb-2">
+            <p className="text-white/30 text-xs text-center tracking-widest uppercase mb-6">Hop or be squished</p>
+            <SeaFloorHop />
+          </div>
         </DepthSection>
 
       </main>
+
+      {/* <footer className="relative z-10">
+        <CoralSlalom />
+      </footer> */}
     </>
   );
 }
