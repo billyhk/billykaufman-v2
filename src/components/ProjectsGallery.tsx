@@ -55,7 +55,7 @@ function FeaturedPanel({ project, onPrev, onNext }: { project: Project; onPrev: 
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col h-full">
       {/* Media */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         {project.banners
           ? <BannerShowcase banners={project.banners} />
           : <ImageCarousel images={project.images} title={project.title} />
@@ -66,7 +66,7 @@ function FeaturedPanel({ project, onPrev, onNext }: { project: Project; onPrev: 
       <div className="p-6 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3 mb-1">
           <h3 className="text-white font-bold text-xl">{project.title}</h3>
-          <div className="flex gap-3 flex-shrink-0">
+          <div className="flex gap-3 shrink-0">
             {project.sourceCode && (
               <a href={project.sourceCode} target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-colors" aria-label="Source code">
                 <FaGithub size={18} />
@@ -112,7 +112,7 @@ function FilmstripItem({ project, active, onClick }: { project: Project; active:
   return (
     <button
       onClick={onClick}
-      className={`w-full flex-shrink-0 group text-left transition-all duration-200 rounded-xl overflow-hidden border cursor-pointer ${
+      className={`w-full shrink-0 group text-left transition-all duration-200 rounded-xl overflow-hidden border cursor-pointer ${
         active
           ? "border-blue-400/60 bg-white/8 shadow-lg shadow-blue-500/10"
           : "border-white/8 bg-white/3 hover:border-white/20 hover:bg-white/6"
@@ -136,7 +136,7 @@ function FilmstripItem({ project, active, onClick }: { project: Project; active:
       </div>
 
       {/* Label — fixed height so all items align */}
-      <div className="px-3 py-2.5 h-[52px] flex flex-col justify-center">
+      <div className="px-3 py-2.5 h-13 flex flex-col justify-center">
         <p className={`text-xs font-semibold leading-tight line-clamp-1 transition-colors ${active ? "text-white" : "text-white/55 group-hover:text-white/80"}`}>
           {project.title}
         </p>
@@ -198,11 +198,11 @@ export default function ProjectsGallery() {
 
       {/* ── Filmstrip ── */}
       {/* Mobile: horizontal scroll row. Desktop: vertical scrollable column. */}
-      <div ref={filmstripRef} className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:w-56 xl:w-64 pb-2 lg:pb-0 lg:max-h-[640px] flex-shrink-0"
+      <div ref={filmstripRef} className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:w-56 xl:w-64 pb-2 lg:pb-0 lg:max-h-[640px] shrink-0"
         style={{ scrollbarWidth: "none" }}
       >
         {projectsData.map((p, i) => (
-          <div key={p.key} ref={el => { itemRefs.current[i] = el; }} className="w-44 lg:w-auto flex-shrink-0">
+          <div key={p.key} ref={el => { itemRefs.current[i] = el; }} className="w-44 lg:w-auto shrink-0">
             <FilmstripItem project={p} active={i === activeIdx} onClick={() => setActiveIdx(i)} />
           </div>
         ))}

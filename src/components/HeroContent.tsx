@@ -26,17 +26,16 @@ function TypingTitle() {
     const done = displayed.length === current.length;
     const empty = displayed.length === 0;
 
-    if (deleting && empty) {
-      setDeleting(false);
-      setTitleIdx((i) => (i + 1) % TITLES.length);
-      return;
-    }
+    const phase = deleting && empty ? "switching"
+      : deleting ? "deleting"
+      : done     ? "pausing"
+      :             "typing";
 
-    const phase = deleting ? "deleting" : done ? "pausing" : "typing";
     const phases = {
-      typing:   { delay: 60,   next: () => setDisplayed(current.slice(0, displayed.length + 1)) },
-      pausing:  { delay: 1800, next: () => setDeleting(true) },
-      deleting: { delay: 35,   next: () => setDisplayed(displayed.slice(0, -1)) },
+      typing:    { delay: 60,   next: () => setDisplayed(current.slice(0, displayed.length + 1)) },
+      pausing:   { delay: 1800, next: () => setDeleting(true) },
+      deleting:  { delay: 35,   next: () => setDisplayed(displayed.slice(0, -1)) },
+      switching: { delay: 100,  next: () => { setDeleting(false); setTitleIdx((i) => (i + 1) % TITLES.length); } },
     };
     const { delay, next } = phases[phase];
     const timeout = setTimeout(next, delay);

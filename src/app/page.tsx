@@ -80,8 +80,8 @@ export default function HomePage() {
             </div>
 
             {/* Headshot with glow ring */}
-            <div className="relative self-start flex-shrink-0">
-              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-blue-400/20 to-purple-400/20 blur-md" />
+            <div className="relative self-start shrink-0">
+              <div className="absolute -inset-1 rounded-2xl bg-linear-to-br from-blue-400/20 to-purple-400/20 blur-md" />
               <div className="relative">
                 <Image
                   src={bioData.headshotSrc}
