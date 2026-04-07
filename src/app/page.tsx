@@ -9,6 +9,7 @@ import { skillsData } from "@/data/skills";
 import { toolsData } from "@/data/tools";
 import { experienceData } from "@/data/experience";
 import Image from "next/image";
+import ExperienceTimeline from "@/components/ExperienceTimeline";
 import FishEat from "@/components/FishEat";
 import SeaFloorHop from "@/components/SeaFloorHop";
 
@@ -106,52 +107,7 @@ export default function HomePage() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Experience</h2>
           <p className="text-blue-300 text-lg mb-10">My journey so far</p>
 
-          <div className="relative">
-            <div className="absolute left-5 top-0 bottom-0 w-px bg-white/10" />
-            <div className="space-y-5">
-              {experienceData.map((entry) => (
-                <div key={entry.institutionName} className="flex gap-6">
-                  <div className="flex-shrink-0 w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden flex items-center justify-center z-10 backdrop-blur-sm" style={{ backgroundColor: entry.logoBg ?? "rgba(15,23,42,0.8)" }}>
-                    {entry.logoSrc ? (
-                      <Image
-                        src={entry.logoSrc}
-                        alt={entry.institutionName}
-                        width={40}
-                        height={40}
-                        className={`w-full h-full ${entry.logoFit === "contain" ? "object-contain" : "object-cover"} ${entry.logoPadding ?? ""}`}
-                      />
-                    ) : (
-                      <span className="text-xs text-white/40 font-bold">{entry.institutionName.charAt(0)}</span>
-                    )}
-                  </div>
-                  <div className="flex-1 rounded-2xl p-4 border border-white/10 backdrop-blur-sm" style={{ backgroundColor: `${entry.accentColor}12` }}>
-                    <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-1 mb-3">
-                      <div>
-                        <p className="text-white font-bold">{entry.title}</p>
-                        <p className="text-white/60 text-sm">{entry.institutionName}</p>
-                      </div>
-                      <span className="text-xs font-medium px-2.5 py-1 rounded-full border whitespace-nowrap self-start" style={{ borderColor: `${entry.accentColor}60`, color: entry.accentColor, backgroundColor: `${entry.accentColor}15` }}>
-                        {entry.dateRange}
-                      </span>
-                    </div>
-                    <p className="text-white/70 text-sm leading-relaxed mb-1">{entry.description1}</p>
-                    {entry.description2 && <p className="text-white/50 text-sm leading-relaxed">{entry.description2}</p>}
-                    {entry.link && (
-                      <a
-                        href={entry.link.href}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-block mt-2 text-xs font-medium underline underline-offset-2 transition-colors"
-                        style={{ color: entry.accentColor }}
-                      >
-                        {entry.link.label} ↗
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
-          </div>
+          <ExperienceTimeline />
         </DepthSection>
 
         {/* ── PROJECTS ─────────────────────────────────── */}

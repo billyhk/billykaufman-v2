@@ -156,9 +156,25 @@ export default function ProjectsGallery() {
   const next    = () => setActiveIdx((i) => (i === total - 1 ? 0 : i + 1));
   const project = projectsData[activeIdx];
 
+  const filmstripRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
   useEffect(() => {
-    itemRefs.current[activeIdx]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+    const container = filmstripRef.current;
+    const item = itemRefs.current[activeIdx];
+    if (!container || !item) return;
+
+    const containerBox = container.getBoundingClientRect();
+    const itemBox = item.getBoundingClientRect();
+    const isVertical = container.scrollHeight > container.clientHeight;
+
+    if (isVertical) {
+      const offset = itemBox.top - containerBox.top - containerBox.height / 2 + itemBox.height / 2;
+      container.scrollBy({ top: offset, behavior: "smooth" });
+    } else {
+      const offset = itemBox.left - containerBox.left - containerBox.width / 2 + itemBox.width / 2;
+      container.scrollBy({ left: offset, behavior: "smooth" });
+    }
   }, [activeIdx]);
 
   return (
@@ -182,7 +198,7 @@ export default function ProjectsGallery() {
 
       {/* ── Filmstrip ── */}
       {/* Mobile: horizontal scroll row. Desktop: vertical scrollable column. */}
-      <div className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:w-56 xl:w-64 pb-2 lg:pb-0 lg:max-h-[640px] flex-shrink-0"
+      <div ref={filmstripRef} className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:w-56 xl:w-64 pb-2 lg:pb-0 lg:max-h-[640px] flex-shrink-0"
         style={{ scrollbarWidth: "none" }}
       >
         {projectsData.map((p, i) => (
