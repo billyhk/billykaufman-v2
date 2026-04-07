@@ -100,6 +100,17 @@ export default function HomePage() {
                     </div>
                     <p className="text-white/70 text-sm leading-relaxed mb-1">{entry.description1}</p>
                     {entry.description2 && <p className="text-white/50 text-sm leading-relaxed">{entry.description2}</p>}
+                    {entry.link && (
+                      <a
+                        href={entry.link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block mt-2 text-xs font-medium underline underline-offset-2 transition-colors"
+                        style={{ color: entry.accentColor }}
+                      >
+                        {entry.link.label} ↗
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
