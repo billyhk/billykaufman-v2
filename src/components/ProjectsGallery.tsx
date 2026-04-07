@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { useState } from "react";
 import { projectsData, type Project } from "@/data/projects";
+import BannerShowcase from "./BannerShowcase";
 import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -73,7 +74,10 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
 function ProjectCard({ project }: { project: Project }) {
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col">
-      <ImageCarousel images={project.images} title={project.title} />
+      {project.banners
+        ? <BannerShowcase banners={project.banners} />
+        : <ImageCarousel images={project.images} title={project.title} />
+      }
       <div className="p-6 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3 mb-1">
           <h3 className="text-white font-bold text-xl">{project.title}</h3>
@@ -153,7 +157,9 @@ export default function ProjectsGallery() {
       {/* Grid */}
       <div className={`grid gap-8 ${filtered.length === 1 ? "grid-cols-1 max-w-2xl mx-auto w-full" : "grid-cols-1 lg:grid-cols-2"}`}>
         {filtered.map((project) => (
-          <ProjectCard key={project.key} project={project} />
+          <div key={project.key} className={project.banners ? "lg:col-span-2" : ""}>
+            <ProjectCard project={project} />
+          </div>
         ))}
       </div>
     </div>

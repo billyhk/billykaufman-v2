@@ -1,3 +1,10 @@
+export type BannerSize = {
+  label: string;
+  width: number;
+  height: number;
+  src: string;
+};
+
 export type Project = {
   key: string;
   title: string;
@@ -5,11 +12,28 @@ export type Project = {
   technologies: string[];
   description: string;
   images: string[];
+  banners?: BannerSize[];
   sourceCode?: string;
   deployment?: string;
 };
 
 export const projectsData: Project[] = [
+  {
+    key: "bloomberg",
+    title: "Bloomberg B2B Campaign Banners",
+    client: "Bloomberg LP",
+    technologies: ["HTML5", "CSS3", "CSS Keyframe Animations", "3D Transforms", "Radial Gradients"],
+    description: "Engineered 48 HTML5 display ad banners for Bloomberg's B2B marketing campaign — 8 messaging variations across 6 IAB standard sizes. All animations and 3D transforms hand-written in CSS without a single JavaScript animation library.",
+    images: [],
+    banners: [
+      { label: "300×250", width: 300, height: 250, src: "/bloomberg/300x250.html" },
+      { label: "728×90",  width: 728, height: 90,  src: "/bloomberg/728x90.html"  },
+      { label: "160×600", width: 160, height: 600, src: "/bloomberg/160x600.html" },
+      { label: "320×100", width: 320, height: 100, src: "/bloomberg/320x100.html" },
+      { label: "300×50",  width: 300, height: 50,  src: "/bloomberg/300x50.html"  },
+      { label: "320×50",  width: 320, height: 50,  src: "/bloomberg/320x50.html"  },
+    ],
+  },
   {
     key: "page_note",
     title: "PageNote",
