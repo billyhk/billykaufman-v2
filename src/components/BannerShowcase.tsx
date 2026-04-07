@@ -66,6 +66,9 @@ export default function BannerShowcase({ banners }: { banners: BannerSize[] }) {
             style={{ border: "none", display: "block", overflow: "hidden", background: "transparent" }}
             sandbox="allow-scripts allow-same-origin"
           />
+          {/* Transparent overlay so parent document keeps receiving mousemove events,
+              preventing the fish cursor from freezing when entering the iframe */}
+          <div style={{ position: "absolute", inset: 0 }} />
         </div>
       </div>
     </div>
