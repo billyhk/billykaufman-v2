@@ -116,6 +116,23 @@ export const projectsData: Project[] = [
     deployment: "https://westrockcoffee.com",
   },
   {
+    key: "pharmacare",
+    title: "PharmaCare Marketplace",
+    client: "PharmaCare",
+    technologies: ["React", "Redux", "Node.js", "PostgreSQL", "REST API"],
+    description:
+      "Full-stack B2B pharmaceutical marketplace connecting independent pharmacies with wholesale drug suppliers. Buyers can browse by NDC number, compare prices across anonymous sellers, track products on a watchlist with stock/price notifications, and check out with Stripe. Sellers post single or bulk CSV listings and manage inventory from a unified dashboard.",
+    images: [
+      "/images/project-images/pharmacare/01 login.jpg",
+      "/images/project-images/pharmacare/02 dashboard.jpg",
+      "/images/project-images/pharmacare/03 marketplace.jpg",
+      "/images/project-images/pharmacare/04 cart.jpg",
+      "/images/project-images/pharmacare/05 checkout.jpg",
+      "/images/project-images/pharmacare/06 order confirmation.jpg",
+      "/images/project-images/pharmacare/07 post listing.jpg",
+    ],
+  },
+  {
     key: "the_collective",
     title: "The Collective",
     client: "G&G Holdings",
