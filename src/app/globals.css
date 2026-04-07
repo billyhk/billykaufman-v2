@@ -5,8 +5,9 @@
   --accent-purple: #5d0089;
 }
 
-html {
+html, body {
   scroll-behavior: smooth;
+  overflow-x: hidden;
 }
 
 section[id] {

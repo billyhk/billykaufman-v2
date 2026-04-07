@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { motion, useMotionValue, useTransform, useSpring } from "framer-motion";
-import { useEffect, useState } from "react";
+import { motion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import { socialLinks } from "@/data/social";
 import { RESUME_URL } from "@/data/bio";
 
@@ -51,35 +51,194 @@ function TypingTitle() {
   );
 }
 
-function AnimatedName() {
-  const rawX = useMotionValue(0);
-  const rawY = useMotionValue(0);
-  const rotateY = useSpring(useTransform(rawX, [-1, 1], [-12, 12]), { stiffness: 100, damping: 20 });
-  const rotateX = useSpring(useTransform(rawY, [-1, 1], [6, -6]), { stiffness: 100, damping: 20 });
+// ── Particle physics constants ────────────────────────────────────────────────
+const SPRING_K  = 0.055;
+const DAMPING   = 0.82;
+const REPEL_R   = 110;
+const REPEL_F   = 7;
+const STEP      = 5;   // logical px between samples — controls particle density
 
+// Shimmer palette matching .name-shimmer gradient
+const COLORS = [
+  "rgba(255,255,255,0.92)",
+  "rgba(147,197,253,0.92)",
+  "rgba(196,181,253,0.92)",
+];
+
+type Particle = {
+  x: number; y: number;
+  homeX: number; homeY: number;
+  vx: number; vy: number;
+};
+
+function NameParticles() {
+  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef    = useRef<HTMLCanvasElement>(null);
+  const particles    = useRef<Particle[]>([]);
+  const mouse        = useRef({ x: -9999, y: -9999 });
+  const rafId        = useRef(0);
+
+  // Track mouse in canvas-local coordinates
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
-      rawX.set((e.clientX / window.innerWidth - 0.5) * 2);
-      rawY.set((e.clientY / window.innerHeight - 0.5) * 2);
+      const rect = canvasRef.current?.getBoundingClientRect();
+      if (!rect) return;
+      mouse.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
     };
-    window.addEventListener("mousemove", onMove);
+    window.addEventListener("mousemove", onMove, { passive: true });
     return () => window.removeEventListener("mousemove", onMove);
-  }, [rawX, rawY]);
+  }, []);
+
+  useEffect(() => {
+    let alive = true;
+    let resizeTimer: ReturnType<typeof setTimeout>;
+
+    const build = () => {
+      const container = containerRef.current;
+      const canvas    = canvasRef.current;
+      if (!container || !canvas) return;
+
+      const dpr        = window.devicePixelRatio || 1;
+      // Canvas spans full viewport so particles can scatter beyond the content column
+      const VW         = window.innerWidth;
+      // Text starts at the container's left offset from the viewport
+      const textOffsetX = container.getBoundingClientRect().left;
+
+      // Match CSS: clamp(3.5rem, 12vw, 9rem) with 16px base
+      const contentW = container.offsetWidth;
+      const fontSize = Math.max(56, Math.min(contentW * 0.12, 144));
+      const lineH    = fontSize * 1.08;
+      const H        = lineH * 2 + 12;
+
+      canvas.width        = Math.round(VW * dpr);
+      canvas.height       = Math.round(H * dpr);
+      canvas.style.width  = `${VW}px`;
+      canvas.style.height = `${H}px`;
+      // Break out of parent padding to reach viewport left edge
+      canvas.style.position = "absolute";
+      canvas.style.left     = `-${textOffsetX}px`;
+      canvas.style.top      = "0";
+      container.style.height = `${H}px`;
+
+      // Render text to offscreen canvas to sample particle home positions.
+      // Text is drawn at textOffsetX so particle coords are in viewport space.
+      const off    = document.createElement("canvas");
+      off.width    = canvas.width;
+      off.height   = canvas.height;
+      const offCtx = off.getContext("2d")!;
+      offCtx.scale(dpr, dpr);
+      offCtx.font          = `800 ${fontSize}px Raleway, Inter, sans-serif`;
+      offCtx.fillStyle     = "#fff";
+      offCtx.textBaseline  = "top";
+      offCtx.fillText("Billy",   textOffsetX, 0);
+      offCtx.fillText("Kaufman", textOffsetX, lineH);
+
+      const { data } = offCtx.getImageData(0, 0, off.width, off.height);
+      const ps: Particle[] = [];
+
+      // Sample in logical px; non-text pixels (alpha=0) are skipped cheaply
+      for (let ly = 0; ly < H; ly += STEP) {
+        for (let lx = 0; lx < VW; lx += STEP) {
+          const px = Math.round(lx * dpr);
+          const py = Math.round(ly * dpr);
+          const i  = (py * off.width + px) * 4;
+          if (data[i + 3] > 100) {
+            ps.push({ x: lx, y: ly, homeX: lx, homeY: ly, vx: 0, vy: 0 });
+          }
+        }
+      }
+
+      particles.current = ps;
+    };
+
+    const scheduleRebuild = () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(build, 120);
+    };
+
+    const ro = new ResizeObserver(scheduleRebuild);
+    if (containerRef.current) ro.observe(containerRef.current);
+    window.addEventListener("resize", scheduleRebuild);
+
+    const animate = () => {
+      if (!alive) return;
+      const canvas = canvasRef.current;
+      if (!canvas) { rafId.current = requestAnimationFrame(animate); return; }
+
+      const ctx = canvas.getContext("2d")!;
+      const dpr = window.devicePixelRatio || 1;
+      const W   = canvas.width / dpr;
+      const mx  = mouse.current.x;
+      const my  = mouse.current.y;
+      const t   = performance.now() * 0.001;
+
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      ctx.save();
+      ctx.scale(dpr, dpr);
+
+      // Group particles into color bands for batch rendering
+      const groups: Particle[][] = COLORS.map(() => []);
+
+      for (const p of particles.current) {
+        // Repulsion
+        const dx   = p.x - mx;
+        const dy   = p.y - my;
+        const dist = Math.sqrt(dx * dx + dy * dy);
+        if (dist < REPEL_R && dist > 0) {
+          const force = (1 - dist / REPEL_R) * REPEL_F;
+          p.vx += (dx / dist) * force;
+          p.vy += (dy / dist) * force;
+        }
+
+        // Spring back home
+        p.vx += (p.homeX - p.x) * SPRING_K;
+        p.vy += (p.homeY - p.y) * SPRING_K;
+        p.vx *= DAMPING;
+        p.vy *= DAMPING;
+        p.x  += p.vx;
+        p.y  += p.vy;
+
+        // Animated shimmer: color band shifts right over time
+        const raw = ((p.homeX / W) * 2 + t * 0.35) % 1;
+        const ci  = ((Math.floor(raw * COLORS.length) % COLORS.length) + COLORS.length) % COLORS.length;
+        groups[ci].push(p);
+      }
+
+      // One fill() call per color = good perf
+      for (let c = 0; c < COLORS.length; c++) {
+        if (groups[c].length === 0) continue;
+        ctx.fillStyle = COLORS[c];
+        ctx.beginPath();
+        for (const p of groups[c]) {
+          ctx.moveTo(p.x + 1.5, p.y);
+          ctx.arc(p.x, p.y, 1.5, 0, Math.PI * 2);
+        }
+        ctx.fill();
+      }
+
+      ctx.restore();
+      rafId.current = requestAnimationFrame(animate);
+    };
+
+    document.fonts.ready.then(() => {
+      if (!alive) return;
+      build();
+      animate();
+    });
+
+    return () => {
+      alive = false;
+      clearTimeout(resizeTimer);
+      ro.disconnect();
+      window.removeEventListener("resize", scheduleRebuild);
+      cancelAnimationFrame(rafId.current);
+    };
+  }, []);
 
   return (
-    <div style={{ perspective: 800 }}>
-      <motion.h1
-        style={{
-          rotateX,
-          rotateY,
-          transformStyle: "preserve-3d",
-          fontSize: "clamp(3.5rem, 12vw, 9rem)",
-          lineHeight: 1.0,
-        } as React.CSSProperties}
-        className="name-shimmer font-bold leading-none cursor-default select-none"
-      >
-        Billy<br />Kaufman
-      </motion.h1>
+    <div ref={containerRef} style={{ position: "relative", width: "100%" }}>
+      <canvas ref={canvasRef} style={{ display: "block" }} />
+      <h1 className="sr-only">Billy Kaufman</h1>
     </div>
   );
 }
@@ -106,7 +265,7 @@ export default function HeroContent() {
       </motion.p>
 
       <motion.div variants={item} className="mb-5">
-        <AnimatedName />
+        <NameParticles />
       </motion.div>
 
       <motion.div variants={item} className="mb-7">
