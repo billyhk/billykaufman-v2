@@ -266,7 +266,16 @@ export default function HeroContent() {
       </motion.p>
 
       <motion.div variants={item} className="mb-5">
-        <NameParticles />
+        {/* Particle canvas — desktop only */}
+        <div className="hidden md:block">
+          <NameParticles />
+        </div>
+        {/* Static text — mobile only */}
+        <div className="block md:hidden pointer-events-none select-none">
+          <h1 className="name-shimmer font-extrabold leading-tight" style={{ fontSize: "clamp(3rem, 16vw, 5rem)", fontFamily: "Raleway, Inter, sans-serif" }}>
+            Billy<br />Kaufman
+          </h1>
+        </div>
       </motion.div>
 
       <motion.div variants={item} className="mb-7">
