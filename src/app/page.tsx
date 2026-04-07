@@ -53,7 +53,8 @@ export default function HomePage() {
                 width={240}
                 height={240}
                 style={{ height: "auto" }}
-                className="rounded-2xl object-cover shadow-xl ring-2 ring-white/10 opacity-85"
+                priority
+              className="rounded-2xl object-cover shadow-xl ring-2 ring-white/10 opacity-85"
               />
               {/* Ocean tint overlay */}
               <div className="absolute inset-0 rounded-2xl bg-blue-950/30 mix-blend-multiply pointer-events-none" />

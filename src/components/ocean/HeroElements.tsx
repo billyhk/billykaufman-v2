@@ -257,12 +257,18 @@ function CursorFish() {
         window.getComputedStyle(e.target as Element).cursor === "pointer";
     };
     window.addEventListener("mousemove", onMove);
-    document.body.style.cursor = "none";
     return () => {
       window.removeEventListener("mousemove", onMove);
       document.body.style.cursor = "";
     };
   }, []);
+
+  // Only hide cursor once the model + animation are ready
+  useEffect(() => {
+    if (!mixer || !animations[0]) return;
+    document.body.style.cursor = "none";
+    return () => { document.body.style.cursor = ""; };
+  }, [mixer, animations]);
 
   useFrame((_, delta) => {
     if (!fishRef.current) return;
