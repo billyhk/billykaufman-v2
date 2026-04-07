@@ -1,46 +1,50 @@
-export type Skill = {
+export type SkillCategory = {
   heading: string;
-  logoSrc: string;
-  bodyList: string[];
+  skills: string[];
 };
 
-export const skillsData: Skill[] = [
+export const skillsData: SkillCategory[] = [
   {
-    heading: "TypeScript",
-    logoSrc: "/images/ts-logo.svg",
-    bodyList: [
-      "Strongly Typed JavaScript!",
-      "Typesafe, API-Driven, React Application Development",
-      "Unit Testing with Jest & Vitest",
-      `ES6 / ES${new Date().getFullYear()}+`,
+    heading: "Frontend",
+    skills: [
+      "React", "Next.js", "TypeScript", "JavaScript",
+      "Tailwind CSS", "CSS / SCSS", "Framer Motion", "GSAP",
+      "Three.js", "React Three Fiber", "Responsive Design",
     ],
   },
   {
-    heading: "Styling & Animation",
-    logoSrc: "/images/tailwind-logo.svg",
-    bodyList: [
-      "Advanced CSS Processing",
-      "CSS-Modules | TailwindCSS | SCSS | CSS-in-JS",
-      "Animations with Framer Motion and GSAP",
-      "Implementation of Modern Design Trends and -morphisms",
+    heading: "Backend",
+    skills: [
+      "Python", "Django", "Node.js", "REST API Design",
+      "PostgreSQL", "GraphQL", "WebSockets", "Auth / OAuth",
     ],
   },
   {
-    heading: "Headless CMS",
-    logoSrc: "/images/gatsby-logo.svg",
-    bodyList: [
-      "Wordpress-Templating with GatsbyJS & GraphQL",
-      "Source Data from Multiple APIs",
-      "No-Code content-management for clients via Custom Post Types and Advanced Custom Fields",
+    heading: "Cloud & DevOps",
+    skills: [
+      "AWS (S3, EC2, Lambda, Bedrock)", "GitHub Actions",
+      "GitLab CI/CD", "Docker", "Vercel",
     ],
   },
   {
-    heading: "Other...",
-    logoSrc: "",
-    bodyList: [
-      "CMS Development with Wordpress, Shopify, Wix, Squarespace, Etc.",
-      "SVGs: Optimization, Integration, Animation",
-      "Deployment with Amazon Web Services",
+    heading: "AI & Modern Tooling",
+    skills: [
+      "Claude / Claude Code", "Cursor", "AWS Bedrock",
+      "Prompt Engineering", "LLM Integration",
+    ],
+  },
+  {
+    heading: "Testing",
+    skills: [
+      "Jest", "Vitest", "React Testing Library",
+      "Playwright", "E2E Testing", "Integration Testing",
+    ],
+  },
+  {
+    heading: "Documentation",
+    skills: [
+      "ADRs", "PRDs", "UML Diagrams",
+      "API Documentation", "Technical Specs", "Runbooks",
     ],
   },
 ];

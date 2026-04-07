@@ -100,6 +100,17 @@ export default function HomePage() {
                     </div>
                     <p className="text-white/70 text-sm leading-relaxed mb-1">{entry.description1}</p>
                     {entry.description2 && <p className="text-white/50 text-sm leading-relaxed">{entry.description2}</p>}
+                    {entry.link && (
+                      <a
+                        href={entry.link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="inline-block mt-2 text-xs font-medium underline underline-offset-2 transition-colors"
+                        style={{ color: entry.accentColor }}
+                      >
+                        {entry.link.label} ↗
+                      </a>
+                    )}
                   </div>
                 </div>
               ))}
@@ -121,26 +132,32 @@ export default function HomePage() {
           <h2 className="text-3xl md:text-4xl font-bold text-white mb-2">Skills & Tools</h2>
           <p className="text-blue-300 text-lg mb-10">What I bring to the table</p>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-5 mb-12">
-            {skillsData.map((skill) => (
-              <div key={skill.heading} className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
-                <h3 className="text-white font-bold text-lg mb-3">{skill.heading}</h3>
-                <ul className="space-y-1.5">
-                  {skill.bodyList.map((item) => (
-                    <li key={item} className="text-white/65 text-sm flex items-start gap-2">
-                      <span className="text-blue-400 mt-0.5">•</span>{item}
-                    </li>
+          {/* Skill categories */}
+          <div className="flex flex-col gap-6 mb-12">
+            {skillsData.map((category) => (
+              <div key={category.heading} className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-sm">
+                <h3 className="text-white/50 text-xs font-semibold uppercase tracking-widest mb-4">{category.heading}</h3>
+                <div className="flex flex-wrap gap-2">
+                  {category.skills.map((skill) => (
+                    <span key={skill} className="px-3 py-1.5 rounded-full text-sm font-medium text-white/85 bg-white/8 border border-white/10 hover:border-blue-400/40 hover:text-white transition-colors">
+                      {skill}
+                    </span>
                   ))}
-                </ul>
+                </div>
               </div>
             ))}
           </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-16">
+          {/* Tools */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-16">
             {toolsData.map((tool) => (
-              <div key={tool.title} className="bg-white/5 border border-white/10 rounded-xl px-5 py-4 flex items-center justify-between backdrop-blur-sm">
-                <span className="text-white/50 text-sm">{tool.title}</span>
-                <span className="text-white text-sm font-semibold">{tool.copy}</span>
+              <div key={tool.title} className="bg-white/5 border border-white/10 rounded-xl px-4 py-4 backdrop-blur-sm">
+                <p className="text-white/40 text-xs uppercase tracking-widest mb-3">{tool.title}</p>
+                <div className="flex flex-col gap-1.5">
+                  {tool.items.map((item) => (
+                    <span key={item} className="text-white text-sm font-medium">{item}</span>
+                  ))}
+                </div>
               </div>
             ))}
           </div>

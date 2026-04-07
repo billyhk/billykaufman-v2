@@ -204,7 +204,7 @@ useGLTF.preload("/models/clownfish_cursor.glb");
 function CursorFish() {
   const fishRef = useRef<THREE.Group>(null);
   const lightRef = useRef<THREE.PointLight>(null);
-  const { camera } = useThree();
+  const { camera, size } = useThree();
   const { scene, animations } = useGLTF("/models/clownfish_cursor.glb");
   const { mixer } = useAnimations(animations, fishRef);
 
@@ -310,7 +310,7 @@ function CursorFish() {
   return (
     <group ref={fishRef}>
       <group rotation={[0, Math.PI / 2, Math.PI]}>
-        <primitive object={scene} scale={2} />
+        <primitive object={scene} scale={Math.min(5, Math.max(2, 2160 / size.height))} />
       </group>
       <pointLight ref={lightRef} color="#ff6b35" intensity={0} distance={3} decay={2} />
     </group>
