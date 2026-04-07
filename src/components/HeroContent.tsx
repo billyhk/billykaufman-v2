@@ -99,8 +99,9 @@ function NameParticles() {
       if (!container || !canvas) return;
 
       const dpr        = window.devicePixelRatio || 1;
-      // Canvas spans full viewport so particles can scatter beyond the content column
-      const VW         = window.innerWidth;
+      // Canvas spans full viewport so particles can scatter beyond the content column.
+      // Use clientWidth (excludes scrollbar) to avoid creating horizontal overflow.
+      const VW         = document.documentElement.clientWidth;
       // Text starts at the container's left offset from the viewport
       const textOffsetX = container.getBoundingClientRect().left;
 
