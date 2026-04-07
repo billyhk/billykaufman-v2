@@ -1,3 +1,5 @@
+export const IS_OPEN_TO_WORK = false;
+
 export const RESUME_URL =
   "https://drive.google.com/file/d/1BjiVdF9hSQRF0q6-_mT_N3f30Qr67wLL/view?usp=sharing";
 
