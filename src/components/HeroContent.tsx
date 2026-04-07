@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { socialLinks } from "@/data/social";
 import { RESUME_URL } from "@/data/bio";
+import { PARTICLE_COLORS } from "@/constants/colors";
 
 const TITLES = [
   "Software Engineer",
@@ -26,17 +27,16 @@ function TypingTitle() {
     const done = displayed.length === current.length;
     const empty = displayed.length === 0;
 
-    if (deleting && empty) {
-      setDeleting(false);
-      setTitleIdx((i) => (i + 1) % TITLES.length);
-      return;
-    }
+    const phase = deleting && empty ? "switching"
+      : deleting ? "deleting"
+      : done     ? "pausing"
+      :             "typing";
 
-    const phase = deleting ? "deleting" : done ? "pausing" : "typing";
     const phases = {
-      typing:   { delay: 60,   next: () => setDisplayed(current.slice(0, displayed.length + 1)) },
-      pausing:  { delay: 1800, next: () => setDeleting(true) },
-      deleting: { delay: 35,   next: () => setDisplayed(displayed.slice(0, -1)) },
+      typing:    { delay: 60,   next: () => setDisplayed(current.slice(0, displayed.length + 1)) },
+      pausing:   { delay: 1800, next: () => setDeleting(true) },
+      deleting:  { delay: 35,   next: () => setDisplayed(displayed.slice(0, -1)) },
+      switching: { delay: 100,  next: () => { setDeleting(false); setTitleIdx((i) => (i + 1) % TITLES.length); } },
     };
     const { delay, next } = phases[phase];
     const timeout = setTimeout(next, delay);
@@ -58,12 +58,8 @@ const REPEL_R   = 110;
 const REPEL_F   = 7;
 const STEP      = 5;   // logical px between samples — controls particle density
 
-// Shimmer palette matching .name-shimmer gradient
-const COLORS = [
-  "rgba(255,255,255,0.92)",
-  "rgba(147,197,253,0.92)",
-  "rgba(196,181,253,0.92)",
-];
+// Shimmer palette — see constants/colors.ts
+const COLORS = PARTICLE_COLORS;
 
 type Particle = {
   x: number; y: number;

@@ -22,18 +22,6 @@ export function DominosLogo({ className }: { className?: string }) {
   );
 }
 
-export function CgHoldingsLogo({ className }: { className?: string }) {
-  return (
-    <Image
-      src="/images/cg-holdings-logo.jpg"
-      alt="C&G Holdings"
-      width={120}
-      height={120}
-      className={`object-contain brightness-0 invert opacity-80 ${className ?? ""}`}
-      style={{ height: "auto" }}
-    />
-  );
-}
 
 export function WestrockLogo({ className }: { className?: string }) {
   return (

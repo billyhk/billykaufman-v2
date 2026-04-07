@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { projectsData, type Project } from "@/data/projects";
 import BannerShowcase from "./BannerShowcase";
 import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { BloombergLogo } from "./ClientLogos";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ── Image carousel (unchanged) ────────────────────────────────────────────────
+// ── Image carousel ────────────────────────────────────────────────────────────
 function ImageCarousel({ images, title }: { images: string[]; title: string }) {
   const [idx, setIdx] = useState(0);
   const prev = () => setIdx((i) => (i === 0 ? images.length - 1 : i - 1));
@@ -55,7 +55,7 @@ function FeaturedPanel({ project, onPrev, onNext }: { project: Project; onPrev: 
   return (
     <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col h-full">
       {/* Media */}
-      <div className="flex-shrink-0">
+      <div className="shrink-0">
         {project.banners
           ? <BannerShowcase banners={project.banners} />
           : <ImageCarousel images={project.images} title={project.title} />
@@ -66,7 +66,7 @@ function FeaturedPanel({ project, onPrev, onNext }: { project: Project; onPrev: 
       <div className="p-6 flex flex-col flex-1">
         <div className="flex items-start justify-between gap-3 mb-1">
           <h3 className="text-white font-bold text-xl">{project.title}</h3>
-          <div className="flex gap-3 flex-shrink-0">
+          <div className="flex gap-3 shrink-0">
             {project.sourceCode && (
               <a href={project.sourceCode} target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-colors" aria-label="Source code">
                 <FaGithub size={18} />
@@ -107,13 +107,12 @@ function FeaturedPanel({ project, onPrev, onNext }: { project: Project; onPrev: 
 
 // ── Filmstrip item ────────────────────────────────────────────────────────────
 function FilmstripItem({ project, active, onClick }: { project: Project; active: boolean; onClick: () => void }) {
-  // Only use static image files — exclude iframe HTML banners
   const thumb = project.images[0] ?? null;
 
   return (
     <button
       onClick={onClick}
-      className={`w-full flex-shrink-0 group text-left transition-all duration-200 rounded-xl overflow-hidden border cursor-pointer ${
+      className={`w-full shrink-0 group text-left transition-all duration-200 rounded-xl overflow-hidden border cursor-pointer ${
         active
           ? "border-blue-400/60 bg-white/8 shadow-lg shadow-blue-500/10"
           : "border-white/8 bg-white/3 hover:border-white/20 hover:bg-white/6"
@@ -125,7 +124,7 @@ function FilmstripItem({ project, active, onClick }: { project: Project; active:
           {thumb ? (
             <Image src={thumb} alt={project.title} fill className={`object-cover transition-opacity duration-200 ${active ? "opacity-90" : "opacity-50 group-hover:opacity-70"}`} />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-950 to-indigo-950 px-6">
+            <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-950 to-indigo-950 px-6">
               {project.key === "bloomberg"
                 ? <BloombergLogo className="w-full max-h-8 object-contain opacity-80" />
                 : <span className="text-white/20 text-2xl font-bold">{project.client.charAt(0)}</span>
@@ -137,7 +136,7 @@ function FilmstripItem({ project, active, onClick }: { project: Project; active:
       </div>
 
       {/* Label — fixed height so all items align */}
-      <div className="px-3 py-2.5 h-[52px] flex flex-col justify-center">
+      <div className="px-3 py-2.5 h-13 flex flex-col justify-center">
         <p className={`text-xs font-semibold leading-tight line-clamp-1 transition-colors ${active ? "text-white" : "text-white/55 group-hover:text-white/80"}`}>
           {project.title}
         </p>
@@ -157,6 +156,27 @@ export default function ProjectsGallery() {
   const next    = () => setActiveIdx((i) => (i === total - 1 ? 0 : i + 1));
   const project = projectsData[activeIdx];
 
+  const filmstripRef = useRef<HTMLDivElement>(null);
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+
+  useEffect(() => {
+    const container = filmstripRef.current;
+    const item = itemRefs.current[activeIdx];
+    if (!container || !item) return;
+
+    const containerBox = container.getBoundingClientRect();
+    const itemBox = item.getBoundingClientRect();
+    const isVertical = container.scrollHeight > container.clientHeight;
+
+    if (isVertical) {
+      const offset = itemBox.top - containerBox.top - containerBox.height / 2 + itemBox.height / 2;
+      container.scrollBy({ top: offset, behavior: "smooth" });
+    } else {
+      const offset = itemBox.left - containerBox.left - containerBox.width / 2 + itemBox.width / 2;
+      container.scrollBy({ left: offset, behavior: "smooth" });
+    }
+  }, [activeIdx]);
+
   return (
     <div className="flex flex-col lg:flex-row gap-5">
 
@@ -165,10 +185,10 @@ export default function ProjectsGallery() {
         <AnimatePresence mode="wait">
           <motion.div
             key={project.key}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.22 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
             className="h-full"
           >
             <FeaturedPanel project={project} onPrev={prev} onNext={next} />
@@ -178,11 +198,11 @@ export default function ProjectsGallery() {
 
       {/* ── Filmstrip ── */}
       {/* Mobile: horizontal scroll row. Desktop: vertical scrollable column. */}
-      <div className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:w-56 xl:w-64 pb-2 lg:pb-0 lg:max-h-[640px] flex-shrink-0"
+      <div ref={filmstripRef} className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:w-56 xl:w-64 pb-2 lg:pb-0 lg:max-h-160 shrink-0"
         style={{ scrollbarWidth: "none" }}
       >
         {projectsData.map((p, i) => (
-          <div key={p.key} className="w-44 lg:w-auto flex-shrink-0">
+          <div key={p.key} ref={el => { itemRefs.current[i] = el; }} className="w-44 lg:w-auto shrink-0">
             <FilmstripItem project={p} active={i === activeIdx} onClick={() => setActiveIdx(i)} />
           </div>
         ))}

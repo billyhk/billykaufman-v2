@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
+import { GAME_BG_TOP, GAME_BG_BOTTOM, GAME_BUBBLE_DIM, GAME_HUD_CYAN, GAME_OVERLAY, GAME_DEATH_TEXT, GAME_DEATH_SUBTEXT } from "@/constants/colors";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const H                = 420;
@@ -435,12 +436,12 @@ export default function FishEat() {
 
       // Background
       const bg = ctx.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, "rgb(2, 10, 30)");
-      bg.addColorStop(1, "rgb(1, 4, 16)");
+      bg.addColorStop(0, GAME_BG_TOP);
+      bg.addColorStop(1, GAME_BG_BOTTOM);
       ctx.fillStyle = bg; ctx.fillRect(0, 0, cw, H);
 
       // Bubbles
-      ctx.fillStyle = "rgba(103,232,249,0.06)";
+      ctx.fillStyle = GAME_BUBBLE_DIM;
       for (let i = 0; i < 8; i++) {
         const bx = ((i * 137 + t * 20) % cw);
         const by = H - ((t * (10 + i * 3)) % (H + 20));
@@ -521,7 +522,7 @@ export default function FishEat() {
       // HUD
       ctx.font = "bold 13px monospace"; ctx.textAlign = "left";
       if (stateRef.current === "playing") {
-        ctx.fillStyle = "rgba(103,232,249,0.7)";
+        ctx.fillStyle = GAME_HUD_CYAN;
         ctx.fillText(`${score.current} eaten`, 14, 22);
       }
       if (stateRef.current === "idle") {
@@ -533,11 +534,11 @@ export default function FishEat() {
       }
       if (stateRef.current === "dead") {
         ctx.textAlign = "center";
-        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.fillStyle = GAME_OVERLAY;
         ctx.fillRect(cw / 2 - 160, H / 2 - 36, 320, 72);
-        ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.font = "bold 15px monospace";
+        ctx.fillStyle = GAME_DEATH_TEXT; ctx.font = "bold 15px monospace";
         ctx.fillText(`You got eaten!  Score: ${score.current}`, cw / 2, H / 2 - 8);
-        ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.font = "12px monospace";
+        ctx.fillStyle = GAME_DEATH_SUBTEXT; ctx.font = "12px monospace";
         ctx.fillText("Click to try again", cw / 2, H / 2 + 16);
       }
 
