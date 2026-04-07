@@ -42,9 +42,9 @@ export const projectsData: Project[] = [
     description:
       "This personal project was inspired by my developer communication workflow. On an engineering team, I found myself sending annotated screenshots, but in doing so had to work with a screenshot app and a separate editor to add annotations. Then I would separately attach a note to elaborate on the observation. This handy chrome extension packs all of those functionalities into one lightweight tool.",
     images: [
-      "/images/project-images/PageNote/01 extension pop up.png",
-      "/images/project-images/PageNote/02 cropper.png",
-      "/images/project-images/PageNote/03 editor.png",
+      "/images/project-images/PageNote/01 extension pop up\.jpg",
+      "/images/project-images/PageNote/02 cropper\.jpg",
+      "/images/project-images/PageNote/03 editor\.jpg",
     ],
     sourceCode: "https://github.com/billyhk/PageNote",
   },
@@ -62,13 +62,13 @@ export const projectsData: Project[] = [
     description:
       "Sebpo is a digital service provider that needed to reflect their technical prowess with a new and improved version of their old, stale, traditional Wordpress build. Gatsby was the perfect framework for this project because it provided seamless data delivery from Wordpress to offer the same content-control the client was used to, but paired with the luster of a fully custom user interface.",
     images: [
-      "/images/project-images/sebpo/01 home.png",
-      "/images/project-images/sebpo/02 services index.png",
-      "/images/project-images/sebpo/03 our process.png",
-      "/images/project-images/sebpo/04 case studies.png",
-      "/images/project-images/sebpo/05 news index.png",
-      "/images/project-images/sebpo/07 job detail.png",
-      "/images/project-images/sebpo/06 contact us.png",
+      "/images/project-images/sebpo/01 home\.jpg",
+      "/images/project-images/sebpo/02 services index\.jpg",
+      "/images/project-images/sebpo/03 our process\.jpg",
+      "/images/project-images/sebpo/04 case studies\.jpg",
+      "/images/project-images/sebpo/05 news index\.jpg",
+      "/images/project-images/sebpo/07 job detail\.jpg",
+      "/images/project-images/sebpo/06 contact us\.jpg",
     ],
   },
   {
@@ -84,13 +84,13 @@ export const projectsData: Project[] = [
     description:
       "This site serves as both a marketing platform for Verify's identity-verification services, AND as an access point for the service itself. Verify Faces is a web application that empowers employers with the ability to unveil any and all public-information on prospective and current employees. This application integrates Verify's patented facial recognition software, which can parse images as well as videos.",
     images: [
-      "/images/project-images/verify/01 home.png",
-      "/images/project-images/verify/02 search by img or vid.png",
-      "/images/project-images/verify/03 search by name.png",
-      "/images/project-images/verify/04 about hero.png",
-      "/images/project-images/verify/05 why verify.png",
-      "/images/project-images/verify/06 lets connect form.png",
-      "/images/project-images/verify/07 terms page.png",
+      "/images/project-images/verify/01 home\.jpg",
+      "/images/project-images/verify/02 search by img or vid\.jpg",
+      "/images/project-images/verify/03 search by name\.jpg",
+      "/images/project-images/verify/04 about hero\.jpg",
+      "/images/project-images/verify/05 why verify\.jpg",
+      "/images/project-images/verify/06 lets connect form\.jpg",
+      "/images/project-images/verify/07 terms page\.jpg",
     ],
   },
   {
@@ -101,13 +101,13 @@ export const projectsData: Project[] = [
     description:
       "Westrock Coffee requested a marketing website to advertise their B2C and B2B coffee distribution services. This application was built as a modularized, micro-frontend architecture. Dynamic data is provided to Liquid templates via Advanced Custom Fields in order to incorporate a headless Shopify backend.",
     images: [
-      "/images/project-images/westrock/01 home.png",
-      "/images/project-images/westrock/02 capabilities innovation.png",
-      "/images/project-images/westrock/03 capabilities contact form.png",
-      "/images/project-images/westrock/04 animated card.png",
-      "/images/project-images/westrock/05 svg timeline.png",
-      "/images/project-images/westrock/06 retail.png",
-      "/images/project-images/westrock/07 global.png",
+      "/images/project-images/westrock/01 home\.jpg",
+      "/images/project-images/westrock/02 capabilities innovation\.jpg",
+      "/images/project-images/westrock/03 capabilities contact form\.jpg",
+      "/images/project-images/westrock/04 animated card\.jpg",
+      "/images/project-images/westrock/05 svg timeline\.jpg",
+      "/images/project-images/westrock/06 retail\.jpg",
+      "/images/project-images/westrock/07 global\.jpg",
     ],
   },
   {
@@ -126,13 +126,13 @@ export const projectsData: Project[] = [
     description:
       "This web application served as a purchasing agent for the construction industry. The platform can be used to create vendors that can receive orders, or to only place orders to vendors created by other users.",
     images: [
-      "/images/project-images/collective/01 login.png",
-      "/images/project-images/collective/02a dashboard.png",
-      "/images/project-images/collective/02b company-details.png",
-      "/images/project-images/collective/3 users can have vendors that receive orders, or only use the platform to place orders -- filtered-vendors-list.png",
-      "/images/project-images/collective/04a create requisition for placing orders with other vendors.png",
-      "/images/project-images/collective/04b requisitions are broken down into orders.png",
-      "/images/project-images/collective/04c order-details.png",
+      "/images/project-images/collective/01 login\.jpg",
+      "/images/project-images/collective/02a dashboard\.jpg",
+      "/images/project-images/collective/02b company-details\.jpg",
+      "/images/project-images/collective/3 users can have vendors that receive orders, or only use the platform to place orders -- filtered-vendors-list\.jpg",
+      "/images/project-images/collective/04a create requisition for placing orders with other vendors\.jpg",
+      "/images/project-images/collective/04b requisitions are broken down into orders\.jpg",
+      "/images/project-images/collective/04c order-details\.jpg",
     ],
   },
   {
@@ -149,11 +149,11 @@ export const projectsData: Project[] = [
     description:
       "Digital art gallery for prominent Cuban-American artist, Joel Spector. The artist's family commissioned this web-app project after he passed away. Users can view 88 of his works in high definition, and admin users can update the database of indexed works.",
     images: [
-      "/images/project-images/jspect/jspect-home.png",
-      "/images/project-images/jspect/jspect-works.png",
-      "/images/project-images/jspect/jspect-detail.png",
-      "/images/project-images/jspect/jspect-form.png",
-      "/images/project-images/jspect/jspect-table.png",
+      "/images/project-images/jspect/jspect-home\.jpg",
+      "/images/project-images/jspect/jspect-works\.jpg",
+      "/images/project-images/jspect/jspect-detail\.jpg",
+      "/images/project-images/jspect/jspect-form\.jpg",
+      "/images/project-images/jspect/jspect-table\.jpg",
     ],
   },
 ];
