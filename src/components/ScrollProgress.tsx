@@ -17,7 +17,7 @@ export default function ScrollProgress() {
   }, []);
 
   return (
-    <div className="fixed top-0 left-0 right-0 h-[5] z-100 bg-white/5">
+    <div className="fixed top-0 left-0 right-0 h-[2] z-100 bg-white/5">
       <div
         className="h-full"
         style={{
