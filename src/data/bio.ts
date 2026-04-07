@@ -11,5 +11,5 @@ export const bioData = {
   ],
   generalAssemblyUrl:
     "https://generalassemb.ly/education/software-engineering-immersive-remote",
-  headshotSrc: "/images/picture-of-self.png",
+  headshotSrc: "/images/headshot.jpg",
 };

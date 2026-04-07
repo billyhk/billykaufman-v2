@@ -118,7 +118,7 @@ export default function HeroContent() {
           href={RESUME_URL}
           target="_blank"
           rel="noopener noreferrer"
-          className="px-5 py-2.5 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-lg transition-colors text-sm"
+          className="btn-cta px-5 py-2.5 font-semibold rounded-lg text-sm"
         >
           Download Resume
         </a>

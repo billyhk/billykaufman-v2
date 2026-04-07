@@ -27,8 +27,12 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
             src={images[idx]}
             alt={`${title} screenshot ${idx + 1}`}
             fill
-            className="object-cover"
+            className="object-cover opacity-85"
           />
+          {/* Ocean tint */}
+          <div className="absolute inset-0 bg-blue-950/25 mix-blend-multiply pointer-events-none" />
+          {/* Edge vignette */}
+          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(2,8,23,0.6) 100%)" }} />
         </motion.div>
       </AnimatePresence>
 

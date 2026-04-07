@@ -1,6 +1,7 @@
 "use client";
 
 import { useFrame, useThree } from "@react-three/fiber";
+import { useGLTF, useAnimations } from "@react-three/drei";
 import { useRef, useEffect, useMemo } from "react";
 import * as THREE from "three";
 
@@ -87,23 +88,23 @@ function CursorSparks() {
     for (let s = 0; s < spawnCount; s++) {
       const idx = nextIdx.current % MAX_SPARKS;
       sparks.current[idx] = {
-        x: worldX + (Math.random() - 0.5) * 0.2,
-        y: worldY + (Math.random() - 0.5) * 0.2,
+        x: worldX + (Math.random() - 0.5) * 0.3,
+        y: worldY + (Math.random() - 0.5) * 0.3,
         z: 2,
-        vx: (Math.random() - 0.5) * 0.8,
-        vy: 0.4 + Math.random() * 0.8,
+        vx: (Math.random() - 0.5) * 0.08,
+        vy: 0.05 + Math.random() * 0.12,
         age: 0,
       };
       nextIdx.current++;
     }
 
-    // Update all sparks
+    // Update all bubbles
     for (let i = 0; i < MAX_SPARKS; i++) {
       const sp = sparks.current[i];
-      sp.age += delta * 1.2;
+      sp.age += delta * 0.5; // slower fade = longer life
       sp.x += sp.vx * delta;
       sp.y += sp.vy * delta;
-      sp.vy -= delta * 0.3; // slight gravity
+      // no gravity — bubbles float up steadily
 
       positions[i * 3 + 0] = sp.x;
       positions[i * 3 + 1] = sp.y;
@@ -129,16 +130,16 @@ function CursorSparks() {
         <bufferAttribute attach="attributes-opacity" args={[opacities, 1]} />
       </bufferGeometry>
       <pointsMaterial
-        size={0.22}
+        size={0.1}
         map={sprite}
         alphaMap={sprite}
-        color="#67e8f9"
+        color="#bae6fd"
         transparent
-        opacity={0.85}
+        opacity={0.45}
         alphaTest={0.001}
         sizeAttenuation
         depthWrite={false}
-        blending={THREE.AdditiveBlending}
+        blending={THREE.NormalBlending}
       />
     </points>
   );
@@ -197,6 +198,125 @@ function HeroOrbs() {
   );
 }
 
+// ── Cursor fish ───────────────────────────────────────────────────────────────
+useGLTF.preload("/models/clownfish_cursor.glb");
+
+function CursorFish() {
+  const fishRef = useRef<THREE.Group>(null);
+  const lightRef = useRef<THREE.PointLight>(null);
+  const { camera } = useThree();
+  const { scene, animations } = useGLTF("/models/clownfish_cursor.glb");
+  const { mixer } = useAnimations(animations, fishRef);
+
+  const _vec = useMemo(() => new THREE.Vector3(), []);
+  const _dir = useMemo(() => new THREE.Vector3(), []);
+  const cursor = useRef({ x: 0, y: 0 });
+  const prevWorld = useRef(new THREE.Vector2());
+  const smoothAngle = useRef(0);
+  const isClickable = useRef(false);
+  const glow = useRef(0);
+  const scrollProgress = useRef(0);
+  const actionRef = useRef<THREE.AnimationAction | null>(null);
+
+  // Cache materials for glow updates
+  const mats = useMemo(() => {
+    const out: THREE.MeshStandardMaterial[] = [];
+    scene.traverse((obj) => {
+      if (obj instanceof THREE.Mesh && obj.material) {
+        out.push(obj.material as THREE.MeshStandardMaterial);
+      }
+    });
+    return out;
+  }, [scene]);
+
+  useEffect(() => {
+    if (!mixer || !animations[0]) return;
+    const swimClip = THREE.AnimationUtils.subclip(animations[0], "swim", 171, 212, 30);
+    const action = mixer.clipAction(swimClip);
+    action.setLoop(THREE.LoopRepeat, Infinity);
+    action.clampWhenFinished = false;
+    action.play();
+    actionRef.current = action;
+    return () => { action.stop(); };
+  }, [mixer, animations]);
+
+  useEffect(() => {
+    const onScroll = () => {
+      const el = document.documentElement;
+      scrollProgress.current = el.scrollTop / (el.scrollHeight - el.clientHeight) || 0;
+    };
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  useEffect(() => {
+    const onMove = (e: MouseEvent) => {
+      cursor.current.x = (e.clientX / window.innerWidth) * 2 - 1;
+      cursor.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      isClickable.current =
+        window.getComputedStyle(e.target as Element).cursor === "pointer";
+    };
+    window.addEventListener("mousemove", onMove);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      document.body.style.cursor = "";
+    };
+  }, []);
+
+  // Only hide cursor once the model + animation are ready
+  useEffect(() => {
+    if (!mixer || !animations[0]) return;
+    document.body.style.cursor = "none";
+    return () => { document.body.style.cursor = ""; };
+  }, [mixer, animations]);
+
+  useFrame((_, delta) => {
+    if (!fishRef.current) return;
+
+    _vec.set(cursor.current.x, cursor.current.y, 0.5).unproject(camera);
+    _dir.copy(_vec).sub(camera.position).normalize();
+    const t = (2 - camera.position.z) / _dir.z;
+    const wx = camera.position.x + _dir.x * t;
+    const wy = camera.position.y + _dir.y * t;
+
+    const vx = wx - prevWorld.current.x;
+    const vy = wy - prevWorld.current.y;
+    const speed = Math.min(Math.sqrt(vx * vx + vy * vy) / delta, 150);
+    prevWorld.current.set(wx, wy);
+
+    if (speed > 0.3) {
+      const target = Math.atan2(vy, vx);
+      let diff = target - smoothAngle.current;
+      while (diff >  Math.PI) diff -= Math.PI * 2;
+      while (diff < -Math.PI) diff += Math.PI * 2;
+      smoothAngle.current += diff * Math.min(delta * 12, 1);
+    }
+
+    fishRef.current.position.set(wx, wy, 2);
+    fishRef.current.rotation.z = smoothAngle.current;
+
+    // Lerp glow toward target
+    glow.current = THREE.MathUtils.lerp(glow.current, isClickable.current ? 1 : 0, delta * 8);
+    for (const mat of mats) mat.emissiveIntensity = glow.current * 2.5;
+    if (lightRef.current) lightRef.current.intensity = glow.current * 4;
+
+    // Slow animation with depth — 1.0 at surface, 0.25 at abyss
+    if (actionRef.current) {
+      const targetSpeed = THREE.MathUtils.lerp(1.0, 0.25, scrollProgress.current);
+      actionRef.current.timeScale = THREE.MathUtils.lerp(actionRef.current.timeScale, targetSpeed, delta * 2);
+    }
+  });
+
+  return (
+    <group ref={fishRef}>
+      <group rotation={[0, Math.PI / 2, Math.PI]}>
+        <primitive object={scene} scale={2} />
+      </group>
+      <pointLight ref={lightRef} color="#ff6b35" intensity={0} distance={3} decay={2} />
+    </group>
+  );
+}
+
 // ── Export ────────────────────────────────────────────────────────────────────
 export default function HeroElements() {
   const isTouch = typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches;
@@ -204,7 +324,7 @@ export default function HeroElements() {
   return (
     <>
       <HeroOrbs />
-      {!isTouch && <CursorSparks />}
+      {!isTouch && <CursorFish />}
     </>
   );
 }

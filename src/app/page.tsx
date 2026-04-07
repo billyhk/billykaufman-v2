@@ -38,7 +38,7 @@ export default function HomePage() {
               </p>
               <p className="text-white/75 leading-relaxed">{bioData.paragraphs[2]}</p>
               <div className="flex flex-wrap gap-3 pt-2">
-                <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" className="px-5 py-2.5 bg-blue-500 hover:bg-blue-400 text-white font-semibold rounded-lg transition-colors text-sm">
+                <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" className="btn-cta px-5 py-2.5 font-semibold rounded-lg text-sm">
                   Download Resume
                 </a>
                 <a href="mailto:billyhkaufman@gmail.com" className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/20 transition-colors text-sm">
@@ -46,14 +46,19 @@ export default function HomePage() {
                 </a>
               </div>
             </div>
-            <Image
-              src={bioData.headshotSrc}
-              alt="Headshot of Billy Kaufman"
-              width={240}
-              height={240}
-              style={{ height: "auto" }}
-              className="rounded-2xl object-cover shadow-xl ring-2 ring-white/10 self-start"
-            />
+            <div className="relative self-start flex-shrink-0">
+              <Image
+                src={bioData.headshotSrc}
+                alt="Headshot of Billy Kaufman"
+                width={240}
+                height={240}
+                style={{ height: "auto" }}
+                priority
+              className="rounded-2xl object-cover shadow-xl ring-2 ring-white/10 opacity-85"
+              />
+              {/* Ocean tint overlay */}
+              <div className="absolute inset-0 rounded-2xl bg-blue-950/30 mix-blend-multiply pointer-events-none" />
+            </div>
           </div>
 
           <ClientsGrid />
@@ -145,7 +150,7 @@ export default function HomePage() {
             <p className="text-white/40 text-sm tracking-widest uppercase mb-3">— Abyss reached —</p>
             <h3 className="text-3xl font-bold text-white mb-4">Let&apos;s work together</h3>
             <p className="text-white/60 mb-8 max-w-md mx-auto">You&apos;ve made it to the bottom. If you&apos;re still here, we should probably talk.</p>
-            <a href="mailto:billyhkaufman@gmail.com" className="px-8 py-4 bg-blue-500 hover:bg-blue-400 text-white font-bold rounded-xl transition-colors text-lg">
+            <a href="mailto:billyhkaufman@gmail.com" className="btn-cta px-8 py-4 font-bold rounded-xl text-lg">
               Get in touch
             </a>
           </div>
