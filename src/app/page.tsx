@@ -3,13 +3,33 @@ import DepthSection from "@/components/ocean/DepthSection";
 import DepthLabel from "@/components/ocean/DepthLabel";
 import { OceanCanvas, ProjectsGallery } from "@/components/ClientOnly";
 import ClientsGrid from "@/components/ClientsGrid";
-import { bioData, RESUME_URL } from "@/data/bio";
+import { bioData, RESUME_URL, IS_OPEN_TO_WORK } from "@/data/bio";
+import { socialLinks } from "@/data/social";
 import { skillsData } from "@/data/skills";
 import { toolsData } from "@/data/tools";
 import { experienceData } from "@/data/experience";
 import Image from "next/image";
 import FishEat from "@/components/FishEat";
 import SeaFloorHop from "@/components/SeaFloorHop";
+
+function EmploymentStatus() {
+  if (IS_OPEN_TO_WORK) {
+    return (
+      <span className="flex items-center gap-2 text-sm text-white/60">
+        <span className="relative flex h-2 w-2">
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-green-400 opacity-75" />
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-green-400" />
+        </span>
+        Open to new opportunities
+      </span>
+    );
+  }
+  return (
+    <span className="text-sm text-white/60">
+      {experienceData[0].title} at {experienceData[0].institutionName}
+    </span>
+  );
+}
 
 export default function HomePage() {
   return (
@@ -30,6 +50,16 @@ export default function HomePage() {
             <div className="flex-1 space-y-4">
               <h2 className="text-3xl md:text-4xl font-bold text-white">About Me</h2>
               <p className="text-blue-200 text-lg">{bioData.title}</p>
+
+              {/* Stat chips */}
+              <div className="flex flex-wrap gap-2 py-1">
+                {["NYC", "8+ yrs", "Full-stack"].map((label) => (
+                  <span key={label} className="flex items-center gap-1.5 px-3 py-1 rounded-full text-xs font-medium bg-white/6 border border-white/12 text-white/70">
+                    {label}
+                  </span>
+                ))}
+              </div>
+
               <p className="text-white/75 leading-relaxed">{bioData.paragraphs[0]}</p>
               <p className="text-white/75 leading-relaxed">
                 {bioData.paragraphs[1].split("General Assembly")[0]}
@@ -48,18 +78,22 @@ export default function HomePage() {
                 </a>
               </div>
             </div>
+
+            {/* Headshot with glow ring */}
             <div className="relative self-start flex-shrink-0">
-              <Image
-                src={bioData.headshotSrc}
-                alt="Headshot of Billy Kaufman"
-                width={240}
-                height={240}
-                style={{ height: "auto" }}
-                priority
-              className="rounded-2xl object-cover shadow-xl ring-2 ring-white/10 opacity-85"
-              />
-              {/* Ocean tint overlay */}
-              <div className="absolute inset-0 rounded-2xl bg-blue-950/30 mix-blend-multiply pointer-events-none" />
+              <div className="absolute -inset-1 rounded-2xl bg-gradient-to-br from-blue-400/20 to-purple-400/20 blur-md" />
+              <div className="relative">
+                <Image
+                  src={bioData.headshotSrc}
+                  alt="Headshot of Billy Kaufman"
+                  width={240}
+                  height={240}
+                  style={{ height: "auto" }}
+                  priority
+                  className="rounded-2xl object-cover shadow-xl ring-1 ring-white/15 opacity-90"
+                />
+                <div className="absolute inset-0 rounded-2xl bg-blue-950/25 mix-blend-multiply pointer-events-none" />
+              </div>
             </div>
           </div>
 
@@ -165,14 +199,44 @@ export default function HomePage() {
           </div>
 
           {/* Contact */}
-          <div className="text-center pt-16 pb-20 border-t border-white/10">
+          <div className="pt-16 pb-20 border-t border-white/10">
             <DepthLabel depth="~3800m" />
-            <p className="text-white/40 text-sm tracking-widest uppercase mb-3">— Abyss reached —</p>
-            <h3 className="text-3xl font-bold text-white mb-4">Let&apos;s work together</h3>
-            <p className="text-white/60 mb-8 max-w-md mx-auto">You&apos;ve made it to the bottom. If you&apos;re still here, we should probably talk.</p>
-            <a href="mailto:billyhkaufman@gmail.com" className="btn-cta px-8 py-4 font-bold rounded-xl text-lg">
-              Get in touch
-            </a>
+            <div className="flex flex-col md:flex-row gap-12 items-start justify-between">
+              {/* Left: CTA */}
+              <div className="flex-1">
+                <p className="text-white/40 text-sm tracking-widest uppercase mb-3">— Abyss reached —</p>
+                <h3 className="text-3xl font-bold text-white mb-4">Let&apos;s work together</h3>
+                <p className="text-white/60 mb-8 max-w-sm">You&apos;ve made it to the bottom. If you&apos;re still here, we should probably talk.</p>
+                <a href="mailto:billyhkaufman@gmail.com" className="btn-cta px-8 py-4 font-bold rounded-xl text-lg">
+                  Get in touch
+                </a>
+              </div>
+
+              {/* Right: info + socials */}
+              <div className="flex flex-col gap-5 md:items-end">
+                {/* Status + location */}
+                <div className="flex flex-col gap-2 md:items-end">
+                  <EmploymentStatus />
+                  <span className="text-sm text-white/40">New York City</span>
+                </div>
+
+                {/* Social links */}
+                <div className="flex flex-col gap-2 md:items-end">
+                  {socialLinks.map(({ Icon, href, displayName, label }) => (
+                    <a
+                      key={label}
+                      href={href}
+                      target={href.startsWith("mailto") ? undefined : "_blank"}
+                      rel="noopener noreferrer"
+                      className="flex items-center gap-2.5 text-white/40 hover:text-white transition-colors group"
+                    >
+                      <span className="text-xs group-hover:text-blue-300 transition-colors">{displayName}</span>
+                      <Icon size={15} className="group-hover:text-blue-300 transition-colors" />
+                    </a>
+                  ))}
+                </div>
+              </div>
+            </div>
           </div>
 
           {/* Fish eat fish — desktop only */}
