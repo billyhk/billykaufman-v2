@@ -1,4 +1,5 @@
 import { ImageResponse } from "next/og";
+import { ACCENT_BLUE, GRADIENT_OG_BG, GRADIENT_SHIMMER } from "@/constants/colors";
 
 export const runtime = "edge";
 export const alt = "Billy Kaufman — Software Engineer";
@@ -16,7 +17,7 @@ export default function OGImage() {
           flexDirection: "column",
           alignItems: "flex-start",
           justifyContent: "center",
-          background: "linear-gradient(135deg, #020a1e 0%, #01040f 60%, #050d1a 100%)",
+          background: GRADIENT_OG_BG,
           padding: "80px",
           fontFamily: "serif",
           position: "relative",
@@ -37,16 +38,16 @@ export default function OGImage() {
 
         {/* Name */}
         <div style={{ display: "flex", flexDirection: "column", marginBottom: 24 }}>
-          <span style={{ fontSize: 100, fontWeight: 800, lineHeight: 1.0, background: "linear-gradient(90deg, #fff 0%, #93c5fd 40%, #c4b5fd 70%, #93c5fd 100%)", backgroundClip: "text", color: "transparent" }}>
+          <span style={{ fontSize: 100, fontWeight: 800, lineHeight: 1.0, background: GRADIENT_SHIMMER, backgroundClip: "text", color: "transparent" }}>
             Billy
           </span>
-          <span style={{ fontSize: 100, fontWeight: 800, lineHeight: 1.0, background: "linear-gradient(90deg, #fff 0%, #93c5fd 40%, #c4b5fd 70%, #93c5fd 100%)", backgroundClip: "text", color: "transparent" }}>
+          <span style={{ fontSize: 100, fontWeight: 800, lineHeight: 1.0, background: GRADIENT_SHIMMER, backgroundClip: "text", color: "transparent" }}>
             Kaufman
           </span>
         </div>
 
         {/* Title */}
-        <span style={{ fontSize: 28, color: "#93c5fd", fontWeight: 500, letterSpacing: "0.02em" }}>
+        <span style={{ fontSize: 28, color: ACCENT_BLUE, fontWeight: 500, letterSpacing: "0.02em" }}>
           Software Engineer · NYC
         </span>
 
@@ -60,7 +61,7 @@ export default function OGImage() {
                 borderRadius: 999,
                 border: "1px solid rgba(147,197,253,0.25)",
                 background: "rgba(147,197,253,0.08)",
-                color: "#93c5fd",
+                color: ACCENT_BLUE,
                 fontSize: 16,
                 display: "flex",
               }}

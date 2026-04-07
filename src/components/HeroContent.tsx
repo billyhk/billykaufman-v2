@@ -5,6 +5,7 @@ import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { socialLinks } from "@/data/social";
 import { RESUME_URL } from "@/data/bio";
+import { PARTICLE_COLORS } from "@/constants/colors";
 
 const TITLES = [
   "Software Engineer",
@@ -57,12 +58,8 @@ const REPEL_R   = 110;
 const REPEL_F   = 7;
 const STEP      = 5;   // logical px between samples — controls particle density
 
-// Shimmer palette matching .name-shimmer gradient
-const COLORS = [
-  "rgba(255,255,255,0.92)",
-  "rgba(147,197,253,0.92)",
-  "rgba(196,181,253,0.92)",
-];
+// Shimmer palette — see constants/colors.ts
+const COLORS = PARTICLE_COLORS;
 
 type Particle = {
   x: number; y: number;

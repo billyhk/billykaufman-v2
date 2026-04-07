@@ -124,7 +124,7 @@ function FilmstripItem({ project, active, onClick }: { project: Project; active:
           {thumb ? (
             <Image src={thumb} alt={project.title} fill className={`object-cover transition-opacity duration-200 ${active ? "opacity-90" : "opacity-50 group-hover:opacity-70"}`} />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-950 to-indigo-950 px-6">
+            <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-950 to-indigo-950 px-6">
               {project.key === "bloomberg"
                 ? <BloombergLogo className="w-full max-h-8 object-contain opacity-80" />
                 : <span className="text-white/20 text-2xl font-bold">{project.client.charAt(0)}</span>
@@ -198,7 +198,7 @@ export default function ProjectsGallery() {
 
       {/* ── Filmstrip ── */}
       {/* Mobile: horizontal scroll row. Desktop: vertical scrollable column. */}
-      <div ref={filmstripRef} className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:w-56 xl:w-64 pb-2 lg:pb-0 lg:max-h-[640px] shrink-0"
+      <div ref={filmstripRef} className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:w-56 xl:w-64 pb-2 lg:pb-0 lg:max-h-160 shrink-0"
         style={{ scrollbarWidth: "none" }}
       >
         {projectsData.map((p, i) => (

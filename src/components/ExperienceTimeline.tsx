@@ -3,6 +3,7 @@
 import Image from "next/image";
 import { motion } from "framer-motion";
 import { experienceData } from "@/data/experience";
+import { DARK_LOGO_BG } from "@/constants/colors";
 
 export default function ExperienceTimeline() {
   return (
@@ -20,7 +21,7 @@ export default function ExperienceTimeline() {
           >
             <div
               className="shrink-0 w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden flex items-center justify-center z-10 backdrop-blur-sm"
-              style={{ backgroundColor: entry.logoBg ?? "rgba(15,23,42,0.8)" }}
+              style={{ backgroundColor: entry.logoBg ?? DARK_LOGO_BG }}
             >
               {entry.logoSrc ? (
                 <Image

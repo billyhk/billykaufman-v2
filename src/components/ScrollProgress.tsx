@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { GRADIENT_PROGRESS } from "@/constants/colors";
 
 export default function ScrollProgress() {
   const [progress, setProgress] = useState(0);
@@ -21,7 +22,7 @@ export default function ScrollProgress() {
         className="h-full"
         style={{
           width: `${progress * 100}%`,
-          background: "linear-gradient(90deg, #93c5fd, #c4b5fd, #93c5fd)",
+          background: GRADIENT_PROGRESS,
           transition: "width 60ms linear",
         }}
       />

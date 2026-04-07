@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useCallback } from "react";
+import { GAME_BG_TOP, GAME_BG_BOTTOM, GAME_BUBBLE_DIM, GAME_HUD_CYAN, GAME_OVERLAY, GAME_DEATH_TEXT, GAME_DEATH_SUBTEXT } from "@/constants/colors";
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 const H             = 200;
@@ -248,12 +249,12 @@ export default function SeaFloorHop() {
 
       // Background
       const bg = ctx.createLinearGradient(0, 0, 0, H);
-      bg.addColorStop(0, "rgb(2, 12, 35)");
-      bg.addColorStop(1, "rgb(4, 18, 12)");
+      bg.addColorStop(0, GAME_BG_TOP);
+      bg.addColorStop(1, GAME_BG_BOTTOM);
       ctx.fillStyle = bg; ctx.fillRect(0, 0, cw, H);
 
       // Distant bubbles
-      ctx.fillStyle = "rgba(103,232,249,0.05)";
+      ctx.fillStyle = GAME_BUBBLE_DIM;
       for (let i = 0; i < 6; i++) {
         ctx.beginPath();
         ctx.arc((i*173 + t*15) % cw, H - ((t*(8+i*2)) % (H+10)), 1.5 + (i%3)*0.5, 0, Math.PI*2);
@@ -325,7 +326,7 @@ export default function SeaFloorHop() {
       // HUD
       ctx.font = "bold 12px monospace"; ctx.textAlign = "right";
       if (stateRef.current === "playing") {
-        ctx.fillStyle = "rgba(103,232,249,0.65)";
+        ctx.fillStyle = GAME_HUD_CYAN;
         ctx.fillText(`${score.current}`, cw - 12, 18);
       }
 
@@ -339,11 +340,11 @@ export default function SeaFloorHop() {
 
       if (stateRef.current === "dead") {
         ctx.textAlign = "center";
-        ctx.fillStyle = "rgba(0,0,0,0.5)";
+        ctx.fillStyle = GAME_OVERLAY;
         ctx.fillRect(cw/2 - 130, H/2 - 28, 260, 58);
-        ctx.fillStyle = "rgba(255,255,255,0.9)"; ctx.font = "bold 13px monospace";
+        ctx.fillStyle = GAME_DEATH_TEXT; ctx.font = "bold 13px monospace";
         ctx.fillText(`Squished!  Score: ${score.current}`, cw/2, H/2 - 4);
-        ctx.fillStyle = "rgba(255,255,255,0.5)"; ctx.font = "11px monospace";
+        ctx.fillStyle = GAME_DEATH_SUBTEXT; ctx.font = "11px monospace";
         ctx.fillText("Tap to try again", cw/2, H/2 + 18);
       }
 

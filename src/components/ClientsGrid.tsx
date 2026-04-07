@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { DARK_MODAL_BG } from "@/constants/colors";
 import { motion, AnimatePresence } from "framer-motion";
 import { clientsData } from "@/data/clients";
 import {
@@ -62,7 +63,7 @@ function ClientModal({
         onClick={(e) => e.stopPropagation()}
         className="relative w-full max-w-sm rounded-2xl p-6 flex flex-col items-center gap-4"
         style={{
-          backgroundColor: "rgba(10, 18, 35, 0.98)",
+          backgroundColor: DARK_MODAL_BG,
           border: `1px solid ${accentColor}50`,
           boxShadow: `0 0 40px 4px ${accentColor}20`,
         }}
