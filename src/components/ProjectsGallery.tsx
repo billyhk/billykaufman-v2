@@ -1,14 +1,14 @@
 "use client";
 
 import Image from "next/image";
-import { useState } from "react";
+import { useState, useEffect, useRef } from "react";
 import { projectsData, type Project } from "@/data/projects";
 import BannerShowcase from "./BannerShowcase";
 import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import { BloombergLogo } from "./ClientLogos";
 import { motion, AnimatePresence } from "framer-motion";
 
-// ── Image carousel (unchanged) ────────────────────────────────────────────────
+// ── Image carousel ────────────────────────────────────────────────────────────
 function ImageCarousel({ images, title }: { images: string[]; title: string }) {
   const [idx, setIdx] = useState(0);
   const prev = () => setIdx((i) => (i === 0 ? images.length - 1 : i - 1));
@@ -107,7 +107,6 @@ function FeaturedPanel({ project, onPrev, onNext }: { project: Project; onPrev: 
 
 // ── Filmstrip item ────────────────────────────────────────────────────────────
 function FilmstripItem({ project, active, onClick }: { project: Project; active: boolean; onClick: () => void }) {
-  // Only use static image files — exclude iframe HTML banners
   const thumb = project.images[0] ?? null;
 
   return (
@@ -157,6 +156,11 @@ export default function ProjectsGallery() {
   const next    = () => setActiveIdx((i) => (i === total - 1 ? 0 : i + 1));
   const project = projectsData[activeIdx];
 
+  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
+  useEffect(() => {
+    itemRefs.current[activeIdx]?.scrollIntoView({ behavior: "smooth", block: "nearest", inline: "nearest" });
+  }, [activeIdx]);
+
   return (
     <div className="flex flex-col lg:flex-row gap-5">
 
@@ -165,10 +169,10 @@ export default function ProjectsGallery() {
         <AnimatePresence mode="wait">
           <motion.div
             key={project.key}
-            initial={{ opacity: 0, y: 10 }}
-            animate={{ opacity: 1, y: 0 }}
-            exit={{ opacity: 0, y: -10 }}
-            transition={{ duration: 0.22 }}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            transition={{ duration: 0.18 }}
             className="h-full"
           >
             <FeaturedPanel project={project} onPrev={prev} onNext={next} />
@@ -182,7 +186,7 @@ export default function ProjectsGallery() {
         style={{ scrollbarWidth: "none" }}
       >
         {projectsData.map((p, i) => (
-          <div key={p.key} className="w-44 lg:w-auto flex-shrink-0">
+          <div key={p.key} ref={el => { itemRefs.current[i] = el; }} className="w-44 lg:w-auto flex-shrink-0">
             <FilmstripItem project={p} active={i === activeIdx} onClick={() => setActiveIdx(i)} />
           </div>
         ))}
