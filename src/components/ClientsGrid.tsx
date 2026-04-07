@@ -1,8 +1,14 @@
 "use client";
 
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { DARK_MODAL_BG } from "@/constants/colors";
-import { motion, AnimatePresence } from "framer-motion";
+import {
+  motion,
+  AnimatePresence,
+  useMotionValue,
+  useSpring,
+  useMotionTemplate,
+} from "framer-motion";
 import { clientsData } from "@/data/clients";
 import {
   BloombergLogo,
@@ -30,6 +36,80 @@ const LOGO_MAP: Record<LogoKey, React.ReactNode> = {
 
 const LOGO_KEYS: LogoKey[] = ["bloomberg", "westrock", "sebpo", "pharmacare", "crs", "verify", "jnj", "dominos"];
 
+const SPRING = { stiffness: 260, damping: 24 };
+const TILT = 12; // max degrees
+
+function TiltCard({
+  logoKey,
+  title,
+  accentColor,
+  onClick,
+}: {
+  logoKey: LogoKey;
+  title: string;
+  accentColor: string;
+  onClick: () => void;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+
+  const rawX = useMotionValue(0);
+  const rawY = useMotionValue(0);
+  const glowX = useMotionValue(50);
+  const glowY = useMotionValue(50);
+
+  const rotateX = useSpring(rawX, SPRING);
+  const rotateY = useSpring(rawY, SPRING);
+
+  const glowBg = useMotionTemplate`radial-gradient(circle at ${glowX}% ${glowY}%, ${accentColor}28, transparent 65%)`;
+
+  const onMouseMove = (e: React.MouseEvent<HTMLButtonElement>) => {
+    const rect = ref.current?.getBoundingClientRect();
+    if (!rect) return;
+    const x = (e.clientX - rect.left) / rect.width;  // 0–1
+    const y = (e.clientY - rect.top)  / rect.height; // 0–1
+    rawY.set((x - 0.5) * TILT * 2);
+    rawX.set((y - 0.5) * -TILT * 2);
+    glowX.set(x * 100);
+    glowY.set(y * 100);
+  };
+
+  const onMouseLeave = () => {
+    rawX.set(0);
+    rawY.set(0);
+    glowX.set(50);
+    glowY.set(50);
+  };
+
+  return (
+    <motion.button
+      ref={ref}
+      onClick={onClick}
+      onMouseMove={onMouseMove}
+      onMouseLeave={onMouseLeave}
+      whileTap={{ scale: 0.97 }}
+      style={{
+        rotateX,
+        rotateY,
+        transformPerspective: 700,
+        backgroundColor: "rgba(255,255,255,0.05)",
+        borderColor: "rgba(255,255,255,0.1)",
+      }}
+      className="relative flex flex-col items-center justify-center gap-4 p-6 h-36 rounded-2xl border cursor-pointer focus:outline-none overflow-hidden"
+    >
+      {/* Mouse-tracked glow */}
+      <motion.div
+        className="absolute inset-0 rounded-2xl pointer-events-none"
+        style={{ background: glowBg }}
+      />
+
+      <div className="relative flex items-center justify-center w-full px-4">
+        {LOGO_MAP[logoKey]}
+      </div>
+      <p className="relative text-white/50 text-xs font-medium text-center">{title}</p>
+    </motion.button>
+  );
+}
+
 function ClientModal({
   title,
   description,
@@ -51,10 +131,7 @@ function ClientModal({
       className="fixed inset-0 z-50 flex items-center justify-center p-6 cursor-auto"
       onClick={onClose}
     >
-      {/* Backdrop */}
       <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
-
-      {/* Panel */}
       <motion.div
         initial={{ scale: 0.92, opacity: 0 }}
         animate={{ scale: 1, opacity: 1 }}
@@ -86,7 +163,6 @@ function ClientModal({
 
 export default function ClientsGrid() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
-
   const openClient = openIdx !== null ? clientsData[openIdx] : null;
 
   return (
@@ -98,21 +174,13 @@ export default function ClientsGrid() {
 
       <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
         {clientsData.map((c, i) => (
-          <motion.button
+          <TiltCard
             key={c.title}
+            logoKey={LOGO_KEYS[i]}
+            title={c.title}
+            accentColor={c.accentColor}
             onClick={() => setOpenIdx(i)}
-            whileTap={{ scale: 0.96 }}
-            className="flex flex-col items-center justify-center gap-4 p-6 h-36 rounded-2xl border cursor-pointer focus:outline-none"
-            style={{
-              backgroundColor: "rgba(255,255,255,0.05)",
-              borderColor: "rgba(255,255,255,0.1)",
-            }}
-          >
-            <div className="flex items-center justify-center w-full px-4">
-              {LOGO_MAP[LOGO_KEYS[i]]}
-            </div>
-            <p className="text-white/50 text-xs font-medium text-center">{c.title}</p>
-          </motion.button>
+          />
         ))}
       </div>
 
