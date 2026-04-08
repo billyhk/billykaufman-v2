@@ -48,6 +48,19 @@ body {
   border-color: rgba(255, 255, 255, 0.35);
 }
 
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+.marquee-track {
+  animation: marquee 30s linear infinite;
+}
+
+.marquee-track:hover {
+  animation-play-state: paused;
+}
+
 @keyframes shimmer {
   0% { background-position: -200% center; }
   100% { background-position: 200% center; }
