@@ -1,7 +1,8 @@
 import Image from "next/image";
 import DepthSection from "@/components/ocean/DepthSection";
 import DepthLabel from "@/components/ocean/DepthLabel";
-import { bioData, RESUME_URL } from "@/data/bio";
+import { bioData } from "@/data/bio";
+import ResumeButton from "@/components/ResumeButton";
 
 export default function AboutSection() {
   return (
@@ -36,9 +37,7 @@ export default function AboutSection() {
           <p className="text-white/75 leading-relaxed">{bioData.paragraphs[3]}</p>
 
           <div className="flex flex-wrap gap-3 pt-2">
-            <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" className="btn-cta px-5 py-2.5 font-semibold rounded-lg text-sm">
-              Download Resume
-            </a>
+            <ResumeButton />
             <a href="mailto:billyhkaufman@gmail.com" className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/20 transition-colors text-sm">
               Hire Me
             </a>

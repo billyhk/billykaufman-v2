@@ -1,3 +1,5 @@
+import { URLS } from "@/constants/urls";
+
 export type ExperienceEntry = {
   institutionName: string;
   title: string;
@@ -112,7 +114,7 @@ export const experienceData: ExperienceEntry[] = [
       "My dissertation applied project management frameworks to high-stakes performance auditions. Developing that kind of rigorous, structured mindset was about to influence me in a major way...",
     link: {
       label: "Read the dissertation",
-      href: "https://scholarship.miami.edu/esploro/outputs/doctoral/Utilizing-Select-Project-Management-Techniques-to/991031524184102976",
+      href: URLS.dissertation,
     },
     dateRange: "2017 – 2020",
     logoSrc: "/images/um-logo.jpg",

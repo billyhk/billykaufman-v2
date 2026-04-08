@@ -1,3 +1,5 @@
+import { URLS } from "@/constants/urls";
+
 export type BannerSize = {
   label: string;
   width: number;
@@ -46,7 +48,7 @@ export const projectsData: Project[] = [
       "/images/project-images/PageNote/02 cropper\.jpg",
       "/images/project-images/PageNote/03 editor\.jpg",
     ],
-    sourceCode: "https://github.com/billyhk/PageNote",
+    sourceCode: URLS.pageNote,
   },
   {
     key: "sebpo",
@@ -71,7 +73,7 @@ export const projectsData: Project[] = [
       "/images/project-images/sebpo/07 job detail\.jpg",
       "/images/project-images/sebpo/06 contact us\.jpg",
     ],
-    deployment: "https://sebpo.com",
+    deployment: URLS.sebpo,
   },
   {
     key: "verify",
@@ -95,7 +97,7 @@ export const projectsData: Project[] = [
       "/images/project-images/verify/06 lets connect form\.jpg",
       "/images/project-images/verify/07 terms page\.jpg",
     ],
-    deployment: "https://verifyfaces.com",
+    deployment: URLS.verify,
   },
   {
     key: "westrock",
@@ -113,7 +115,7 @@ export const projectsData: Project[] = [
       "/images/project-images/westrock/06 retail\.jpg",
       "/images/project-images/westrock/07 global\.jpg",
     ],
-    deployment: "https://westrockcoffee.com",
+    deployment: URLS.westrock,
   },
   {
     key: "pharmacare",
@@ -131,6 +133,7 @@ export const projectsData: Project[] = [
       "/images/project-images/pharmacare/06 order confirmation.jpg",
       "/images/project-images/pharmacare/07 post listing.jpg",
     ],
+    deployment: URLS.pharmacare,
   },
   {
     key: "the_collective",

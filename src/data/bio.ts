@@ -1,7 +1,8 @@
+import { URLS } from "@/constants/urls";
+
 export const IS_OPEN_TO_WORK = false;
 
-export const RESUME_URL =
-  "https://drive.google.com/file/d/1BjiVdF9hSQRF0q6-_mT_N3f30Qr67wLL/view?usp=sharing";
+export const RESUME_URL = URLS.resume;
 
 export const bioData = {
   name: "Billy Kaufman",
@@ -12,8 +13,7 @@ export const bioData = {
     "Before code, I earned a DMA in musical performance and played with orchestras. These days I channel that same obsessive attention to detail into software.",
     "When I'm not coding, I'm training for the next road running race, playing chess, and keeping the music going!"
   ],
-  generalAssemblyUrl:
-    "https://generalassemb.ly/education/software-engineering-immersive-remote",
+  generalAssemblyUrl: URLS.generalAssembly,
   headshotSrc: "/images/headshot.jpg",
   highlights: ["NYC", `${new Date().getFullYear() - 2020}+ yrs`, "Full-stack"],
 };

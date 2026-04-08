@@ -4,8 +4,8 @@ import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { socialLinks } from "@/data/social";
-import { RESUME_URL } from "@/data/bio";
 import { PARTICLE_COLORS } from "@/constants/colors";
+import ResumeButton from "@/components/ResumeButton";
 
 const TITLES = [
   "Software Engineer",
@@ -279,14 +279,7 @@ export default function HeroContent() {
       </motion.div>
 
       <motion.div variants={item} className="flex flex-wrap gap-3 mb-7">
-        <a
-          href={RESUME_URL}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="btn-cta px-5 py-2.5 font-semibold rounded-lg text-sm"
-        >
-          Download Resume
-        </a>
+        <ResumeButton />
         <a
           href="mailto:billyhkaufman@gmail.com"
           className="px-5 py-2.5 bg-white/8 hover:bg-white/15 text-white font-semibold rounded-lg border border-white/15 transition-colors text-sm"
