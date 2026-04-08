@@ -14,10 +14,10 @@ export default function ExperienceTimeline() {
           <motion.div
             key={entry.institutionName}
             className="flex gap-6"
-            initial={{ opacity: 0, x: -16 }}
-            whileInView={{ opacity: 1, x: 0 }}
+            initial={{ opacity: 0, y: 32 }}
+            whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-60px" }}
-            transition={{ duration: 0.4, delay: i * 0.07, ease: "easeOut" }}
+            transition={{ duration: 0.55, delay: i * 0.08, ease: [0.25, 0.1, 0.25, 1] }}
           >
             <div
               className="shrink-0 w-10 h-10 rounded-full border-2 border-white/20 overflow-hidden flex items-center justify-center z-10 backdrop-blur-sm"

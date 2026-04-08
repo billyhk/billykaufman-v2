@@ -21,12 +21,14 @@ const CATEGORY_COLORS: Record<string, string> = {
   "Documentation":       CAT_CYAN,
 };
 
+const EASE = [0.25, 0.1, 0.25, 1] as const;
+
 const cardVariants: Variants = {
-  hidden: { opacity: 0, y: 20 },
+  hidden: { opacity: 0, y: 28 },
   visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.4, delay: i * 0.06, ease: "easeOut" },
+    transition: { duration: 0.55, delay: i * 0.07, ease: EASE },
   }),
 };
 
