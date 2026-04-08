@@ -5,8 +5,8 @@ import { useState, useEffect, useRef } from "react";
 import { projectsData, type Project } from "@/data/projects";
 import BannerShowcase from "./BannerShowcase";
 import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { BloombergLogo } from "./ClientLogos";
 import { motion, AnimatePresence } from "framer-motion";
+import { BloombergLogo } from "./ClientLogos";
 
 // ── Image carousel ────────────────────────────────────────────────────────────
 function ImageCarousel({ images, title }: { images: string[]; title: string }) {

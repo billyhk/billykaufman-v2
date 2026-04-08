@@ -1,7 +1,6 @@
 import Image from "next/image";
 import DepthSection from "@/components/ocean/DepthSection";
 import DepthLabel from "@/components/ocean/DepthLabel";
-import ClientsGrid from "@/components/ClientsGrid";
 import { bioData, RESUME_URL } from "@/data/bio";
 
 export default function AboutSection() {
@@ -22,6 +21,8 @@ export default function AboutSection() {
           </div>
 
           <p className="text-white/75 leading-relaxed">{bioData.paragraphs[0]}</p>
+
+          {/* Linkfiy GA */}
           <p className="text-white/75 leading-relaxed">
             {bioData.paragraphs[1].split("General Assembly")[0]}
             <a href={bioData.generalAssemblyUrl} target="_blank" rel="noopener noreferrer" className="text-blue-300 underline underline-offset-2">
@@ -29,7 +30,10 @@ export default function AboutSection() {
             </a>
             {bioData.paragraphs[1].split("General Assembly")[1]}
           </p>
+
+          {/* Rest of paragraphs */}
           <p className="text-white/75 leading-relaxed">{bioData.paragraphs[2]}</p>
+          <p className="text-white/75 leading-relaxed">{bioData.paragraphs[3]}</p>
 
           <div className="flex flex-wrap gap-3 pt-2">
             <a href={RESUME_URL} target="_blank" rel="noopener noreferrer" className="btn-cta px-5 py-2.5 font-semibold rounded-lg text-sm">
@@ -58,7 +62,6 @@ export default function AboutSection() {
         </div>
       </div>
 
-      <ClientsGrid />
     </DepthSection>
   );
 }

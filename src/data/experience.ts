@@ -19,7 +19,7 @@ export const experienceData: ExperienceEntry[] = [
     description1:
       "Zapier is the automation platform connecting 7,000+ apps for millions of users, and a leader in bringing AI-powered automation to non-technical teams.",
     description2:
-      "On the Interfaces team, building and evolving the form and workflow products that power how customers design and automate complex integrations. Working across a highly modular TypeScript and React codebase with a strong emphasis on accessibility, testing, and code quality at scale.",
+      "On the Interfaces team, building and evolving the form and workflow products that power how customers design and automate complex integrations. Working across a highly modular TypeScript and React codebase in a microservice architecture with a strong emphasis on accessibility, testing, and code quality at scale.",
     dateRange: "Dec 2025 – Present",
     logoSrc: "/images/zapier-logo-sm.png",
     accentColor: "#ff4a00",
@@ -33,7 +33,7 @@ export const experienceData: ExperienceEntry[] = [
     description1:
       "B2B SaaS platform delivering procurement-as-a-service to enterprise clients, driving significant cost savings on market data, technology, insurance, and operations.",
     description2:
-      "Three years of full-stack ownership on a multi-tenant SaaS product. Highlights include designing an AI-powered contract workflow using AWS Bedrock that extracts structured data from contracts and integrates it into complex form flows, cutting manual entry time by 50%. Also owned Auth0 SSO, a custom feature flag system, AWS Step Functions data pipelines, and a large-scale React/TypeScript frontend including a customizable workflow editor.",
+      "Three years of full-stack ownership on a multi-tenant SaaS product called Concertiv360, a one-stop-shop for procurement-contract management and spend forecasting. Highlights include designing an AI-powered contract workflow using AWS Bedrock that extracts structured data from contracts and integrates it into complex form flows, cutting manual entry time by 50%. Also owned Auth0 SSO, a custom feature flag system, AWS Step Functions data pipelines, and a large-scale React/TypeScript frontend including a customizable workflow editor.",
     dateRange: "Oct 2022 – Dec 2025",
     logoSrc: "/images/concertiv-logo-sm.png",
     accentColor: "#d79760",
