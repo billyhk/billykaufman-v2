@@ -22,12 +22,11 @@ export default function SectionHeading({ title, subtitle }: { title: string; sub
       <div style={{ perspective: "900px", perspectiveOrigin: "50% 100%" }}>
         <motion.h2
           className="text-[clamp(3rem,8vw,7rem)] font-bold text-white leading-none tracking-tight mb-3"
-          // One-time fold-up on enter
-          initial={{ rotateX: 80, opacity: 0 }}
-          whileInView={{ rotateX: 0, opacity: 1 }}
+          // Diagonal fold: rises from floor while sweeping leftward
+          initial={{ rotateX: 75, rotateZ: 15, opacity: 0 }}
+          whileInView={{ rotateX: 0, rotateZ: 0, opacity: 1 }}
           viewport={{ once: true, margin: "-80px" }}
           transition={{ duration: 0.85, ease: EASE }}
-          // Continuous scroll-driven horizontal drift
           style={{ x, transformOrigin: "bottom center" }}
         >
           {title}
