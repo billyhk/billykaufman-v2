@@ -1,6 +1,7 @@
 import { FaGithub, FaLinkedin } from "react-icons/fa";
 import { MdEmail } from "react-icons/md";
 import type { IconType } from "react-icons";
+import { URLS } from "@/constants/urls";
 
 export type SocialLink = {
   Icon: IconType;
@@ -12,13 +13,13 @@ export type SocialLink = {
 export const socialLinks: SocialLink[] = [
   {
     Icon: FaGithub,
-    href: "https://github.com/billyhk",
+    href: URLS.github,
     displayName: "github.com/billyhk",
     label: "GitHub",
   },
   {
     Icon: FaLinkedin,
-    href: "https://www.linkedin.com/in/billykaufman/",
+    href: URLS.linkedin,
     displayName: "/in/billykaufman",
     label: "LinkedIn",
   },

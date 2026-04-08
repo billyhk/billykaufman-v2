@@ -169,7 +169,7 @@ function CursorFish() {
 
   return (
     <group ref={fishRef}>
-      <group rotation={[0, Math.PI / 2, Math.PI]}>
+      <group rotation={[0, Math.PI / 2, 0]}>
         <primitive object={scene} scale={Math.min(5, Math.max(2, 2160 / size.height))} />
       </group>
       <pointLight ref={lightRef} color="#ff6b35" intensity={0} distance={3} decay={2} />
