@@ -85,6 +85,7 @@ function CursorFish() {
   const actionRef    = useRef<THREE.AnimationAction | null>(null);
   const handoffStart = useRef(0);
   const introEndPos  = useRef(new THREE.Vector2(2, 0));
+  const facingDir    = useRef(1); // 1 = right, -1 = left; held with hysteresis
 
   // Cache materials for glow updates
   const mats = useRef<THREE.MeshStandardMaterial[]>([]);
@@ -268,12 +269,14 @@ function CursorFish() {
       fishRef.current.position.set(px, py, 2);
       fishRef.current.rotation.z = tiltAngle;
 
-      // 3-D turn: front-on (innerY=0) at vertical (cos≈0), side-on (±π/2) when horizontal.
-      // Sign of cos determines left vs right facing without ever flipping the outer group.
+      // 3-D turn: commit a new left/right facing only when |cos| > 0.15 (hysteresis).
+      // Vertical movement holds the last facing so the fish keeps its side profile up/down.
+      // The lerp through 0 briefly shows the fish front when direction actually reverses.
       if (innerRef.current) {
-        const horiz   = Math.abs(Math.cos(smoothAngle.current));
-        const facingY = (Math.PI / 2) * horiz * (Math.cos(smoothAngle.current) >= 0 ? 1 : -1);
-        innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, facingY, Math.min(delta * 6, 1));
+        const cosA = Math.cos(smoothAngle.current);
+        if (Math.abs(cosA) > 0.15) facingDir.current = cosA >= 0 ? 1 : -1;
+        const facingY = facingDir.current * Math.PI / 2;
+        innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, facingY, Math.min(delta * 4, 1));
       }
     }
 
