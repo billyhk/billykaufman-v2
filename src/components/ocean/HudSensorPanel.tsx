@@ -6,9 +6,8 @@ import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 
 // Must stay in sync with DepthGauge / ZoneColorSync stops
-const STOPS     = [0, 0.18, 0.38, 0.57, 0.74, 1] as const;
-// Pressure ≈ 1 ATM per 10 m of seawater
-const PRESSURES = [1, 6, 21, 51, 101, 381] as const;
+const STOPS  = [0, 0.18, 0.38, 0.57, 0.74, 1] as const;
+const DEPTHS = [0, 50, 200, 500, 1000, 3800] as const;
 
 // Must match HudBrackets SIDE so the gauge line continues from the bracket corner
 const LINE_LEFT = 18; // px from viewport left edge
@@ -29,8 +28,9 @@ export default function HudSensorPanel() {
   const noIntro = useRef(false); // true = no intro played; set in useEffect
 
   const { scrollYProgress } = useScroll();
-  const pressMV = useTransform(scrollYProgress, [...STOPS], [...PRESSURES]);
-  useMotionValueEvent(pressMV, "change", (v) => setPressure(Math.round(v)));
+  const depthMV = useTransform(scrollYProgress, [...STOPS], [...DEPTHS]);
+  // P = 1 ATM (surface) + 1 ATM per 10 m of seawater
+  useMotionValueEvent(depthMV, "change", (d) => setPressure(Math.round(1 + d / 10)));
 
   useEffect(() => {
     const introWillPlay = window.scrollY <= window.innerHeight * 0.5;
