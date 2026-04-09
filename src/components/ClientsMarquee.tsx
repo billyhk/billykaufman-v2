@@ -1,6 +1,8 @@
 "use client";
 
-import { useRef, useState } from "react";
+import { useRef, useState, useEffect } from "react";
+import { createPortal } from "react-dom";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import {
   motion,
   AnimatePresence,
@@ -135,8 +137,12 @@ const CARDS = LOGO_KEYS.map((key, i) => ({
 
 export default function ClientsMarquee() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  const [mounted, setMounted] = useState(false);
   const openClient = openIdx !== null ? clientsData[openIdx] : null;
   const openLogoKey = openIdx !== null ? LOGO_KEYS[openIdx] : null;
+
+  useEffect(() => setMounted(true), []);
+  useScrollLock(openIdx !== null);
 
   return (
     <section className="py-16 border-y border-white/8 overflow-hidden">
@@ -165,60 +171,63 @@ export default function ClientsMarquee() {
         </div>
       </div>
 
-      <AnimatePresence>
-        {openClient && openLogoKey && (
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center p-6"
-            style={{ cursor: "auto" }}
-            onClick={() => setOpenIdx(null)}
-          >
-            <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+      {mounted && createPortal(
+        <AnimatePresence>
+          {openClient && openLogoKey && (
             <motion.div
-              initial={{ scale: 0.92, opacity: 0 }}
-              animate={{ scale: 1, opacity: 1 }}
-              exit={{ scale: 0.92, opacity: 0 }}
-              transition={{ type: "spring", stiffness: 340, damping: 28 }}
-              onClick={(e) => e.stopPropagation()}
-              className="relative w-full max-w-sm rounded-2xl p-6 flex flex-col items-center gap-4"
-              style={{
-                backgroundColor: DARK_MODAL_BG,
-                border: `1px solid ${openClient.accentColor}50`,
-                boxShadow: `0 0 40px 4px ${openClient.accentColor}20`,
-              }}
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 z-[9999] flex items-center justify-center p-6"
+              style={{ cursor: "auto" }}
+              onClick={() => setOpenIdx(null)}
             >
-              <div className="flex items-center justify-center w-full px-4 py-2">
-                {LOGO_MAP[openLogoKey]}
-              </div>
-              <h3 className="text-white font-bold text-lg text-center">
-                {openClient.title}
-              </h3>
-              <p className="text-white/70 text-sm leading-relaxed text-center">
-                {openClient.description}
-              </p>
-              {openClient.domain && (
-                <a
-                  href={openClient.url ?? `https://${openClient.domain}`}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-xs transition-colors"
-                  style={{ color: openClient.accentColor }}
-                >
-                  {openClient.domain} ↗
-                </a>
-              )}
-              <button
-                onClick={() => setOpenIdx(null)}
-                className="mt-1 text-white/30 hover:text-white/60 text-xs transition-colors cursor-pointer"
+              <div className="absolute inset-0 bg-black/60 backdrop-blur-sm" />
+              <motion.div
+                initial={{ scale: 0.92, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                exit={{ scale: 0.92, opacity: 0 }}
+                transition={{ type: "spring", stiffness: 340, damping: 28 }}
+                onClick={(e) => e.stopPropagation()}
+                className="relative w-full max-w-sm rounded-2xl p-6 flex flex-col items-center gap-4"
+                style={{
+                  backgroundColor: DARK_MODAL_BG,
+                  border: `1px solid ${openClient.accentColor}50`,
+                  boxShadow: `0 0 40px 4px ${openClient.accentColor}20`,
+                }}
               >
-                Tap to close
-              </button>
+                <div className="flex items-center justify-center w-full px-4 py-2">
+                  {LOGO_MAP[openLogoKey]}
+                </div>
+                <h3 className="text-white font-bold text-lg text-center">
+                  {openClient.title}
+                </h3>
+                <p className="text-white/70 text-sm leading-relaxed text-center">
+                  {openClient.description}
+                </p>
+                {openClient.domain && (
+                  <a
+                    href={openClient.url ?? `https://${openClient.domain}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-xs transition-colors"
+                    style={{ color: openClient.accentColor }}
+                  >
+                    {openClient.domain} ↗
+                  </a>
+                )}
+                <button
+                  onClick={() => setOpenIdx(null)}
+                  className="mt-1 text-white/30 hover:text-white/60 text-xs transition-colors cursor-pointer"
+                >
+                  Tap to close
+                </button>
+              </motion.div>
             </motion.div>
-          </motion.div>
-        )}
-      </AnimatePresence>
+          )}
+        </AnimatePresence>,
+        document.body
+      )}
     </section>
   );
 }

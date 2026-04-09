@@ -53,7 +53,7 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
 // ── Featured panel ────────────────────────────────────────────────────────────
 function FeaturedPanel({ project, onPrev, onNext }: { project: Project; onPrev: () => void; onNext: () => void }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col h-full">
+    <div className="clip-tr-lg bg-white/5 border border-white/10 overflow-hidden flex flex-col h-full">
       {/* Media */}
       <div className="shrink-0">
         {project.banners
@@ -124,9 +124,9 @@ function FilmstripItem({ project, active, onClick }: { project: Project; active:
           {thumb ? (
             <Image src={thumb} alt={project.title} fill className={`object-cover transition-opacity duration-200 ${active ? "opacity-90" : "opacity-50 group-hover:opacity-70"}`} />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-950 to-indigo-950 px-6">
+            <div className={`absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-950 to-indigo-950 px-6 transition-opacity duration-200 ${active ? "opacity-90" : "opacity-50 group-hover:opacity-70"}`}>
               {project.key === "bloomberg"
-                ? <BloombergLogo className="w-full max-h-8 object-contain opacity-80" />
+                ? <BloombergLogo className="w-full max-h-8 object-contain" />
                 : <span className="text-white/20 text-2xl font-bold">{project.client.charAt(0)}</span>
               }
             </div>

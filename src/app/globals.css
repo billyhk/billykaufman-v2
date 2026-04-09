@@ -3,6 +3,7 @@
 :root {
   --accent-blue: #3a9de4;
   --accent-purple: #5d0089;
+  --zone-accent: #67e8f9; /* default: sunlight zone cyan */
 }
 
 html, body {
@@ -47,6 +48,16 @@ body {
   box-shadow: 0 0 24px rgba(99, 179, 237, 0.45);
   border-color: rgba(255, 255, 255, 0.35);
 }
+
+/* ── Irregular smooth corners — console / instrument panel aesthetic ── */
+/* Top-right prominent (sm / lg) */
+.clip-tr    { border-radius: 4px 20px 8px 6px; }
+.clip-tr-lg { border-radius: 6px 32px 12px 8px; }
+/* Bottom-left prominent (sm / lg) */
+.clip-bl    { border-radius: 8px 6px 4px 20px; }
+.clip-bl-lg { border-radius: 10px 8px 6px 32px; }
+/* Both corners prominent */
+.clip-tr-bl { border-radius: 4px 20px 8px 20px; }
 
 @keyframes marquee {
   from { transform: translateX(0); }

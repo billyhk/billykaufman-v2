@@ -282,14 +282,14 @@ export default function HeroContent() {
         <ResumeButton />
         <a
           href="mailto:billyhkaufman@gmail.com"
-          className="px-5 py-2.5 bg-white/8 hover:bg-white/15 text-white font-semibold rounded-lg border border-white/15 transition-colors text-sm"
+          className="clip-bl px-5 py-2.5 bg-white/8 hover:bg-white/15 text-white font-semibold border border-white/15 transition-colors text-sm"
         >
           Hire Me
         </a>
         <Link
           href="#about"
           onClick={(e) => { e.preventDefault(); document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }); }}
-          className="px-5 py-2.5 bg-white/8 hover:bg-white/15 text-white font-semibold rounded-lg border border-white/15 transition-colors text-sm"
+          className="clip-bl px-5 py-2.5 bg-white/8 hover:bg-white/15 text-white font-semibold border border-white/15 transition-colors text-sm"
         >
           About Me
         </Link>

@@ -8,8 +8,8 @@ import HeroElements from "./HeroElements";
 
 // Depth color stops: surface → abyss
 const DEPTH_COLORS = [
-  new THREE.Color("#0a2a4a"), // 0.0 - surface, dark ocean blue
-  new THREE.Color("#07203a"), // 0.2 - shallow
+  new THREE.Color("#12487a"), // 0.0 - surface, sunlit ocean blue
+  new THREE.Color("#0a3358"), // 0.2 - shallow
   new THREE.Color("#05172c"), // 0.4 - mid water
   new THREE.Color("#030e1e"), // 0.6 - deep
   new THREE.Color("#010810"), // 0.8 - abyss

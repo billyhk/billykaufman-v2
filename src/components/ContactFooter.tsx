@@ -11,7 +11,7 @@ export default function ContactFooter() {
           <p className="text-white/40 text-sm tracking-widest uppercase mb-3">— Abyss reached —</p>
           <h3 className="text-3xl font-bold text-white mb-4">Let&apos;s work together</h3>
           <p className="text-white/60 mb-8 max-w-sm">You&apos;ve made it to the bottom. If you&apos;re still here, we should probably talk.</p>
-          <a href="mailto:billyhkaufman@gmail.com" className="btn-cta px-8 py-4 font-bold rounded-xl text-lg">
+          <a href="mailto:billyhkaufman@gmail.com" className="btn-cta clip-tr-lg px-8 py-4 font-bold text-lg">
             Get in touch
           </a>
         </div>

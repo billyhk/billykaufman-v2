@@ -31,7 +31,7 @@ export default function BannerShowcase({ banners }: { banners: BannerSize[] }) {
           <button
             key={b.label}
             onClick={() => setActive(i)}
-            className={`px-2.5 py-1 rounded text-xs font-mono transition-colors ${
+            className={`px-2.5 py-1 rounded text-xs font-mono transition-colors cursor-pointer ${
               i === active
                 ? "bg-blue-500/30 text-blue-300 border border-blue-500/40"
                 : "text-white/40 hover:text-white/70 border border-transparent"
@@ -46,7 +46,7 @@ export default function BannerShowcase({ banners }: { banners: BannerSize[] }) {
       <div
         ref={containerRef}
         className="relative bg-black flex items-center justify-center overflow-hidden transition-[height] duration-300"
-        style={{ height: previewH }}
+        style={{ height: previewH, cursor: "default" }}
       >
         <div
           style={{
@@ -68,7 +68,7 @@ export default function BannerShowcase({ banners }: { banners: BannerSize[] }) {
           />
           {/* Transparent overlay so parent document keeps receiving mousemove events,
               preventing the fish cursor from freezing when entering the iframe */}
-          <div style={{ position: "absolute", inset: 0 }} />
+          <div style={{ position: "absolute", inset: 0, cursor: "default" }} />
         </div>
       </div>
     </div>
