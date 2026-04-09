@@ -152,9 +152,17 @@ function CursorFish() {
     // Project cursor to z=2 world plane — needed for fade handoff and cursor phase
     _vec.set(cursor.current.x, cursor.current.y, 0.5).unproject(camera);
     _dir.copy(_vec).sub(camera.position).normalize();
-    const ray_t = (2 - camera.position.z) / _dir.z;
-    const wx = camera.position.x + _dir.x * ray_t;
-    const wy = camera.position.y + _dir.y * ray_t;
+    const ray_t  = (2 - camera.position.z) / _dir.z;
+    const wx_raw = camera.position.x + _dir.x * ray_t;
+    const wy_raw = camera.position.y + _dir.y * ray_t;
+
+    // Clamp to viewport with margin so fish never disappears off an edge.
+    // tan(fov/2) * distance gives the half-extent at z=2 in world units.
+    const halfH = Math.tan(37.5 * (Math.PI / 180)) * Math.abs(camera.position.z - 2);
+    const halfW = halfH * (size.width / size.height);
+    const EDGE  = 0.9; // world-unit clearance from each viewport edge
+    const wx = THREE.MathUtils.clamp(wx_raw, -halfW + EDGE, halfW - EDGE);
+    const wy = THREE.MathUtils.clamp(wy_raw, -halfH + EDGE, halfH - EDGE);
 
     // ── Intro animation ──────────────────────────────────────────────────────
     if (!skipIntro.current && et < INTRO_TOTAL) {
