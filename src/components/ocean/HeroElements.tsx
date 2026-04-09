@@ -156,13 +156,12 @@ function CursorFish() {
     const wx_raw = camera.position.x + _dir.x * ray_t;
     const wy_raw = camera.position.y + _dir.y * ray_t;
 
-    // Clamp to viewport with margin so fish never disappears off an edge.
+    // Clamp to viewport with per-side margins.
     // tan(fov/2) * distance gives the half-extent at z=2 in world units.
     const halfH = Math.tan(37.5 * (Math.PI / 180)) * Math.abs(camera.position.z - 2);
     const halfW = halfH * (size.width / size.height);
-    const EDGE  = 0.9; // world-unit clearance from each viewport edge
-    const wx = THREE.MathUtils.clamp(wx_raw, -halfW + EDGE, halfW - EDGE);
-    const wy = THREE.MathUtils.clamp(wy_raw, -halfH + EDGE, halfH - EDGE);
+    const wx = THREE.MathUtils.clamp(wx_raw, -halfW + 0.9, halfW - 0.9); // left/right margin
+    const wy = THREE.MathUtils.clamp(wy_raw, -halfH + 0.9, halfH - 0.1); // generous top, clamp bottom
 
     // ── Intro animation ──────────────────────────────────────────────────────
     if (!skipIntro.current && et < INTRO_TOTAL) {
