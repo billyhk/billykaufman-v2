@@ -359,20 +359,21 @@ function drawPlayerFish(ctx: CanvasRenderingContext2D, x: number, y: number, siz
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function FishEat() {
-  const canvasRef   = useRef<HTMLCanvasElement>(null);
-  const stateRef    = useRef<GameState>("idle");
-  const playerX     = useRef(0);
-  const playerY     = useRef(H / 2);
-  const playerVX    = useRef(0);
-  const playerVY    = useRef(0);
-  const targetX     = useRef(0);
-  const targetY     = useRef(H / 2);
-  const playerSize  = useRef(PLAYER_INIT_SIZE);
-  const npcs        = useRef<NPC[]>([]);
-  const score       = useRef(0);
-  const rafRef      = useRef(0);
-  const W           = useRef(600);
-  const lastSpawn   = useRef(0);
+  const canvasRef      = useRef<HTMLCanvasElement>(null);
+  const stateRef       = useRef<GameState>("idle");
+  const playerX        = useRef(0);
+  const playerY        = useRef(H / 2);
+  const playerVX       = useRef(0);
+  const playerVY       = useRef(0);
+  const targetX        = useRef(0);
+  const targetY        = useRef(H / 2);
+  const playerSize     = useRef(PLAYER_INIT_SIZE);
+  const npcs           = useRef<NPC[]>([]);
+  const score          = useRef(0);
+  const rafRef         = useRef(0);
+  const W              = useRef(600);
+  const lastSpawn      = useRef(0);
+  const cursorInCanvas = useRef(false);
 
   const reset = useCallback(() => {
     const w = W.current;
@@ -402,11 +403,15 @@ export default function FishEat() {
     const ro = new ResizeObserver(setSize);
     ro.observe(canvas);
 
+    // Global mousemove so target updates even when cursor leaves the canvas
     const onMouseMove = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
       targetX.current = e.clientX - rect.left;
       targetY.current = e.clientY - rect.top;
     };
+
+    const onMouseEnter = () => { cursorInCanvas.current = true; };
+    const onMouseLeave = () => { cursorInCanvas.current = false; };
 
     const onClick = (e: MouseEvent) => {
       const rect = canvas.getBoundingClientRect();
@@ -420,7 +425,9 @@ export default function FishEat() {
       }
     };
 
-    canvas.addEventListener("mousemove", onMouseMove);
+    window.addEventListener("mousemove", onMouseMove);
+    canvas.addEventListener("mouseenter", onMouseEnter);
+    canvas.addEventListener("mouseleave", onMouseLeave);
     canvas.addEventListener("click", onClick);
 
     const ctx = canvas.getContext("2d")!;
@@ -457,10 +464,13 @@ export default function FishEat() {
         playerVX.current = playerX.current - prevX;
         playerVY.current = playerY.current - prevY;
 
-        // Clamp
+        // Clamp only while cursor is inside — outside the canvas the fish swims freely
+        // toward the cursor, visually exiting through the edge (canvas clips it)
         const ps = playerSize.current;
-        playerX.current = Math.max(ps, Math.min(cw - ps, playerX.current));
-        playerY.current = Math.max(ps, Math.min(H  - ps, playerY.current));
+        if (cursorInCanvas.current) {
+          playerX.current = Math.max(ps, Math.min(cw - ps, playerX.current));
+          playerY.current = Math.max(ps, Math.min(H  - ps, playerY.current));
+        }
 
         // Continuous spawning — burst more when pool is sparse
         if (now - lastSpawn.current > SPAWN_INTERVAL_MS && npcs.current.length < MAX_NPC_CAP) {
@@ -493,8 +503,12 @@ export default function FishEat() {
           if (npc.y > H + EDGE_PAD) npc.y = -EDGE_PAD;
         }
 
-        // Collision
-        npcs.current = npcs.current.filter(npc => {
+        // Collision — suspended while player has escaped the canvas
+        const playerEscaped =
+          playerX.current < -ps || playerX.current > cw + ps ||
+          playerY.current < -ps || playerY.current > H  + ps;
+
+        if (!playerEscaped) npcs.current = npcs.current.filter(npc => {
           const cdist  = Math.hypot(playerX.current - npc.x, playerY.current - npc.y);
           const overlap = cdist < ps * 0.8 + npc.size * 0.8;
           if (!overlap) return true;
@@ -549,7 +563,9 @@ export default function FishEat() {
     rafRef.current = requestAnimationFrame(tick);
     return () => {
       cancelAnimationFrame(rafRef.current);
-      canvas.removeEventListener("mousemove", onMouseMove);
+      window.removeEventListener("mousemove", onMouseMove);
+      canvas.removeEventListener("mouseenter", onMouseEnter);
+      canvas.removeEventListener("mouseleave", onMouseLeave);
       canvas.removeEventListener("click", onClick);
       ro.disconnect();
     };
