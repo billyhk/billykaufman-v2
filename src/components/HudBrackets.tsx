@@ -86,13 +86,22 @@ function Corner({
 
 export default function HudBrackets() {
   return (
-    <div className="fixed inset-0 z-50 pointer-events-none select-none">
+    <div className="fixed inset-0 z-50 pointer-events-none select-none overflow-hidden">
       {/* Top brackets: nav border is the H-arm, so only dot + V-arm needed */}
       <Corner topPx={NAV_H}    left  delay={0}   noHArm />
       <Corner topPx={NAV_H}    right delay={0.5} noHArm />
       {/* Bottom brackets stay at viewport corners */}
       <Corner bottomPx={BTM_INSET} left  delay={1}   />
       <Corner bottomPx={BTM_INSET} right delay={1.5} />
+
+      {/* Scan line — slow sweep, barely visible, adds life to the HUD */}
+      <motion.div
+        className="absolute left-0 right-0 h-px"
+        style={{ background: "var(--zone-accent)", opacity: 0.04 }}
+        initial={{ top: "-1%" }}
+        animate={{ top: "101%" }}
+        transition={{ duration: 10, ease: "linear", repeat: Infinity, repeatDelay: 6 }}
+      />
     </div>
   );
 }
