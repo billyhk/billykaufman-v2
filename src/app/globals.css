@@ -61,7 +61,7 @@ body {
 
 /* ── Custom scrollbar — HUD aesthetic, picks up zone-accent color ── */
 ::-webkit-scrollbar       { width: 4px; }
-::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); }
 ::-webkit-scrollbar-thumb {
   background: color-mix(in srgb, var(--zone-accent) 45%, transparent);
   border-radius: 2px;
@@ -71,7 +71,7 @@ body {
 }
 
 /* Firefox */
-html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--zone-accent) 45%, transparent) transparent; }
+html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--zone-accent) 45%, transparent) rgba(255,255,255,0.04); }
 
 @keyframes marquee {
   from { transform: translateX(0); }
