@@ -33,17 +33,19 @@ export default function SectionHeading({ title, subtitle }: { title: string; sub
         </motion.h2>
       </div>
 
-      <motion.p
-        className="text-lg opacity-75"
-        style={{ color: "var(--zone-accent)" }}
-        initial={{ opacity: 0 }}
-        whileInView={{ opacity: 1 }}
-        viewport={{ once: true, margin: "-80px" }}
-        transition={{ duration: 0.5, delay: 0.2, ease: EASE }}
-        style={{ x }}
-      >
-        {subtitle}
-      </motion.p>
+      {/* Slot container — clips the subtitle so it rises up from below */}
+      <div style={{ overflow: "hidden" }}>
+        <motion.p
+          className="text-lg opacity-75"
+          style={{ x, color: "var(--zone-accent)" }}
+          initial={{ y: "100%" }}
+          whileInView={{ y: "0%" }}
+          viewport={{ once: true, margin: "-80px" }}
+          transition={{ duration: 0.6, delay: 0.25, ease: EASE }}
+        >
+          {subtitle}
+        </motion.p>
+      </div>
     </div>
   );
 }

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
+import { useScrollLock } from "@/hooks/useScrollLock";
 import { HiMenu, HiX } from "react-icons/hi";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { socialLinks } from "@/data/social";
@@ -61,6 +62,8 @@ export default function NavBar() {
   const depthMV = useTransform(scrollYProgress, [...DEPTH_STOPS], [...DEPTH_VALS]);
   useMotionValueEvent(depthMV, "change", (v) => setDepth(Math.round(v)));
 
+  useScrollLock(mobileOpen);
+
   // Section spy
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -90,7 +93,7 @@ export default function NavBar() {
           </button>
 
           {/* Desktop nav */}
-          <div className="hidden md:flex items-center gap-6 flex-1 justify-end">
+          <div className="hidden lg:flex items-center gap-6 flex-1 justify-end">
 
             {/* Zone name — live, far left of link group */}
             <span
@@ -141,7 +144,7 @@ export default function NavBar() {
 
           {/* Mobile hamburger */}
           <button
-            className="md:hidden text-white p-1 z-50 relative cursor-pointer"
+            className="lg:hidden text-white p-1 z-50 relative cursor-pointer"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle menu"
           >
@@ -164,33 +167,51 @@ export default function NavBar() {
       <AnimatePresence>
         {mobileOpen && (
           <>
-            <motion.div key="backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={() => setMobileOpen(false)} />
-            <motion.div key="drawer" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 32 }} className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-slate-900/95 backdrop-blur-xl border-l border-white/10 flex flex-col md:hidden">
-              <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
-                <span className="text-white font-bold text-lg tracking-wide">Menu</span>
-                <button onClick={() => setMobileOpen(false)} className="text-white/60 hover:text-white transition-colors cursor-pointer"><HiX size={22} /></button>
+            <motion.div key="backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} />
+            <motion.div key="drawer" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 32 }} className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-[rgba(2,8,23,0.97)] backdrop-blur-xl border-l flex flex-col lg:hidden" style={{ borderColor: "color-mix(in srgb, var(--zone-accent) 25%, transparent)" }}>
+
+              {/* Header */}
+              <div className="h-16 flex items-center justify-between px-5 shrink-0 border-b" style={{ borderColor: "color-mix(in srgb, var(--zone-accent) 15%, transparent)" }}>
+                <span className="text-[9px] font-mono tracking-[0.25em] uppercase opacity-50" style={{ color: "var(--zone-accent)" }}>
+                  {zoneName(depth)}
+                </span>
+                <button onClick={() => setMobileOpen(false)} className="text-white/40 hover:text-white transition-colors cursor-pointer" aria-label="Close menu">
+                  <HiX size={20} />
+                </button>
               </div>
-              <div className="flex flex-col px-6 pt-6 gap-1 flex-1">
+
+              {/* Links — scrollable so nothing clips on short screens */}
+              <div className="flex flex-col px-4 pt-5 gap-0.5 overflow-y-auto flex-1">
                 {navLinks.map(({ href, label }, i) => {
                   const isActive = active === href.replace("#", "");
                   return (
-                    <motion.div key={href} initial={{ opacity: 0, x: 24 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.08 + i * 0.06, duration: 0.25 }}>
+                    <motion.div key={href} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.06 + i * 0.05, duration: 0.22 }}>
                       <button
                         onClick={() => { scrollTo(href); setMobileOpen(false); }}
-                        className="w-full text-left flex items-center gap-3 px-4 py-3 rounded-xl text-base font-medium transition-colors cursor-pointer"
-                        style={isActive ? { color: "var(--zone-accent)", backgroundColor: "color-mix(in srgb, var(--zone-accent) 8%, transparent)", border: "1px solid color-mix(in srgb, var(--zone-accent) 20%, transparent)" } : { color: "rgba(255,255,255,0.7)" }}
+                        className="w-full text-left flex items-center gap-3 px-3 py-3.5 text-base font-medium transition-colors cursor-pointer border-b"
+                        style={{
+                          borderColor: "rgba(255,255,255,0.06)",
+                          color: isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.55)",
+                        }}
                       >
-                        <span className="text-[10px] font-mono opacity-50" style={{ color: "var(--zone-accent)" }}>{String(i + 1).padStart(2, "0")}</span>
+                        <span className="text-[10px] font-mono w-5 shrink-0 opacity-40" style={{ color: "var(--zone-accent)" }}>
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
                         {label}
+                        {isActive && (
+                          <span className="ml-auto w-1 h-4 rounded-full shrink-0" style={{ backgroundColor: "var(--zone-accent)" }} />
+                        )}
                       </button>
                     </motion.div>
                   );
                 })}
               </div>
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="px-6 py-6 border-t border-white/10 flex gap-5">
+
+              {/* Social links */}
+              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="px-5 py-5 border-t flex gap-5 shrink-0" style={{ borderColor: "color-mix(in srgb, var(--zone-accent) 15%, transparent)" }}>
                 {socialLinks.map(({ Icon, href, label }) => (
-                  <a key={label} href={href} target={href.startsWith("mailto") ? undefined : "_blank"} rel="noopener noreferrer" className="text-white/40 hover:text-white transition-colors" aria-label={label}>
-                    <Icon size={20} />
+                  <a key={label} href={href} target={href.startsWith("mailto") ? undefined : "_blank"} rel="noopener noreferrer" className="text-white/30 hover:text-white transition-colors" aria-label={label}>
+                    <Icon size={18} />
                   </a>
                 ))}
               </motion.div>

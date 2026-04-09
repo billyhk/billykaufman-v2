@@ -77,7 +77,7 @@ export default function AboutSection() {
           <FadeUp delay={0.44}>
             <div className="flex flex-wrap gap-3 pt-2">
               <ResumeButton />
-              <a href="mailto:billyhkaufman@gmail.com" className="px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold rounded-lg border border-white/20 transition-colors text-sm">
+              <a href="mailto:billyhkaufman@gmail.com" className="clip-bl px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold border border-white/20 transition-colors text-sm">
                 Hire Me
               </a>
             </div>

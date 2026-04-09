@@ -1,7 +1,9 @@
 "use client";
 
 import { useState, useEffect, useCallback } from "react";
+import { createPortal } from "react-dom";
 import { RESUME_URL } from "@/data/bio";
+import { useScrollLock } from "@/hooks/useScrollLock";
 
 const fileId = RESUME_URL.match(/\/d\/([^/]+)/)?.[1] ?? "";
 const EMBED_URL = `https://drive.google.com/file/d/${fileId}/preview`;
@@ -11,13 +13,7 @@ export default function ResumeButton() {
 
   const close = useCallback(() => setOpen(false), []);
 
-  // Lock body scroll while open
-  useEffect(() => {
-    if (!open) return;
-    const prev = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => { document.body.style.overflow = prev; };
-  }, [open]);
+  useScrollLock(open);
 
   // Close on Escape
   useEffect(() => {
@@ -31,25 +27,21 @@ export default function ResumeButton() {
     <>
       <button
         onClick={() => setOpen(true)}
-        className="btn-cta px-5 py-2.5 font-semibold rounded-lg text-sm"
+        className="btn-cta clip-tr-bl px-5 py-2.5 font-semibold text-sm cursor-pointer"
       >
         View Resume
       </button>
 
-      {open && (
-        /* cursor:auto overrides the fish-cursor's body{cursor:none} inside the modal */
+      {open && createPortal(
         <div
-          className="fixed inset-0 z-[200] flex items-center justify-center p-4 md:p-8"
+          className="fixed inset-0 z-[9999] flex items-center justify-center sm:p-8"
           style={{ cursor: "auto" }}
         >
           {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/75 backdrop-blur-sm"
-            onClick={close}
-          />
+          <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={close} />
 
-          {/* Panel */}
-          <div className="relative z-10 w-full max-w-3xl h-[88vh] bg-slate-900 rounded-2xl border border-white/15 shadow-2xl flex flex-col overflow-hidden">
+          {/* Panel — full-screen on mobile, floating card on sm+ */}
+          <div className="relative z-10 w-full h-full sm:h-[88vh] sm:max-h-[1020px] sm:max-w-3xl sm:rounded-2xl bg-slate-900 sm:border border-white/15 shadow-2xl flex flex-col overflow-hidden">
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 shrink-0">
               <span className="text-white/70 text-sm font-medium">Billy Kaufman — Resume</span>
@@ -64,7 +56,7 @@ export default function ResumeButton() {
                 </a>
                 <button
                   onClick={close}
-                  className="text-white/50 hover:text-white transition-colors text-lg leading-none"
+                  className="text-white/50 hover:text-white transition-colors text-lg leading-none cursor-pointer"
                   aria-label="Close resume"
                 >
                   ✕
@@ -81,7 +73,8 @@ export default function ResumeButton() {
               />
             </div>
           </div>
-        </div>
+        </div>,
+        document.body
       )}
     </>
   );

@@ -53,7 +53,7 @@ function ImageCarousel({ images, title }: { images: string[]; title: string }) {
 // ── Featured panel ────────────────────────────────────────────────────────────
 function FeaturedPanel({ project, onPrev, onNext }: { project: Project; onPrev: () => void; onNext: () => void }) {
   return (
-    <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden flex flex-col h-full">
+    <div className="clip-tr-lg bg-white/5 border border-white/10 overflow-hidden flex flex-col h-full">
       {/* Media */}
       <div className="shrink-0">
         {project.banners
