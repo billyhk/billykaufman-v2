@@ -3,6 +3,7 @@ import { Raleway } from "next/font/google";
 import NavBar from "@/components/NavBar";
 import ScrollProgress from "@/components/ScrollProgress";
 import DepthGauge from "@/components/ocean/DepthGauge";
+import ZoneColorSync from "@/components/ocean/ZoneColorSync";
 import HudBrackets from "@/components/HudBrackets";
 import "./globals.css";
 
@@ -27,6 +28,7 @@ export default function RootLayout({
       <body className="min-h-full flex flex-col bg-slate-950 text-white">
         <ScrollProgress />
         <NavBar />
+        <ZoneColorSync />
         <DepthGauge />
         <HudBrackets />
         {children}

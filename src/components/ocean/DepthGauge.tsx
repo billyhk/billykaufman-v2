@@ -3,10 +3,11 @@
 import { useState } from "react";
 import { useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 
-// Scroll progress stops → matching ocean depths (m)
-// Section order: Hero → About → Experience → Projects → Skills → Footer
-const STOPS = [0, 0.18, 0.38, 0.57, 0.74, 1] as const;
+const STOPS  = [0, 0.18, 0.38, 0.57, 0.74, 1] as const;
 const DEPTHS = [0, 50, 200, 500, 1000, 3800] as const;
+
+// Must match HudBrackets INSET so the gauge line continues from the bracket corner
+const LINE_RIGHT = 18; // px from viewport right edge
 
 export default function DepthGauge() {
   const [depth, setDepth] = useState(0);
@@ -20,20 +21,32 @@ export default function DepthGauge() {
 
   return (
     <div
-      className="fixed top-0 bottom-0 z-40 pointer-events-none select-none hidden md:flex flex-col items-center justify-center gap-3"
-      style={{ right: "max(0.75rem, calc((100vw - 64rem) / 2))" }}
+      className="fixed inset-y-0 z-40 pointer-events-none select-none hidden md:block"
+      style={{ right: 0, width: `${LINE_RIGHT + 20}px` }}
     >
-      {/* Fade in from top */}
-      <div className="w-px h-24 bg-gradient-to-b from-transparent to-white/20" />
+      {/* Line — at exactly LINE_RIGHT px from viewport edge, matching bracket corner */}
+      <div
+        className="absolute inset-y-0 w-px"
+        style={{
+          right: `${LINE_RIGHT}px`,
+          background: "linear-gradient(to bottom, transparent 5%, var(--zone-accent) 20%, var(--zone-accent) 80%, transparent 95%)",
+          opacity: 0.28,
+        }}
+      />
 
-      {/* Live depth readout — vertical, reads top → bottom */}
-      <div className="flex flex-col items-center gap-1.5" style={{ writingMode: "vertical-lr" }}>
-        <span className="text-white/20 text-[9px] font-mono tracking-[0.3em] uppercase">depth</span>
-        <span className="text-white/45 text-[11px] font-mono tabular-nums">{depth}m</span>
+      {/* Text — centered on the same axis as the line */}
+      <div
+        className="absolute top-1/2 -translate-y-1/2"
+        style={{
+          right: `${LINE_RIGHT}px`,
+          transform: "translateX(50%) translateY(-50%)",
+          writingMode: "vertical-lr",
+          color: "var(--zone-accent)",
+        }}
+      >
+        <span className="block text-[9px] font-mono tracking-[0.3em] uppercase opacity-40 mb-1">depth</span>
+        <span className="block text-[11px] font-mono tabular-nums opacity-70">{depth}m</span>
       </div>
-
-      {/* Fade out to bottom */}
-      <div className="w-px h-24 bg-gradient-to-t from-transparent to-white/20" />
     </div>
   );
 }

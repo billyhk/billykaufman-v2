@@ -3,6 +3,7 @@
 :root {
   --accent-blue: #3a9de4;
   --accent-purple: #5d0089;
+  --zone-accent: #67e8f9; /* default: sunlight zone cyan */
 }
 
 html, body {

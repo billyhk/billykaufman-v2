@@ -26,24 +26,26 @@ export default function DepthLabel({ depth: _depth }: { depth: string }) {
     <div ref={ref} className="flex items-center gap-2.5 mb-6 select-none">
       {/* Tick line draws in */}
       <motion.div
-        className="w-3 h-px bg-white/30"
+        className="w-3 h-px"
+        style={{ backgroundColor: "var(--zone-accent)", opacity: 0.45, transformOrigin: "left center" }}
         initial={{ scaleX: 0 }}
         animate={isInView ? { scaleX: 1 } : {}}
-        style={{ transformOrigin: "left center" }}
         transition={{ duration: 0.3, ease: EASE }}
       />
       {/* Dot pops in */}
       <motion.div
-        className="w-1.5 h-1.5 rounded-full bg-white/25"
+        className="w-1.5 h-1.5 rounded-full"
+        style={{ backgroundColor: "var(--zone-accent)" }}
         initial={{ scale: 0, opacity: 0 }}
-        animate={isInView ? { scale: 1, opacity: 1 } : {}}
+        animate={isInView ? { scale: 1, opacity: 0.4 } : {}}
         transition={{ duration: 0.2, delay: 0.15, ease: EASE }}
       />
       {/* Live gauge value — always matches the right-side readout */}
       <motion.span
-        className="text-white/30 text-[10px] tracking-[0.25em] uppercase font-mono tabular-nums"
+        className="text-[10px] tracking-[0.25em] uppercase font-mono tabular-nums"
+        style={{ color: "var(--zone-accent)" }}
         initial={{ opacity: 0 }}
-        animate={isInView ? { opacity: 1 } : {}}
+        animate={isInView ? { opacity: 0.5 } : {}}
         transition={{ duration: 0.15, delay: 0.2 }}
       >
         {current}m

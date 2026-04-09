@@ -3,61 +3,50 @@
 import { motion } from "framer-motion";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
-const ARM = 28; // px — length of each bracket arm
-const INSET = 18; // px — distance from viewport corners
+const ARM   = 28;  // px — arm length
+const INSET = 18;  // px — distance from viewport corners
+
+// All color pulled from --zone-accent so it shifts with depth
+const ARM_STYLE  = { backgroundColor: "var(--zone-accent)", opacity: 0.28 } as const;
+const DOT_STYLE  = { backgroundColor: "var(--zone-accent)", opacity: 0.45 } as const;
 
 function Corner({
-  top,
-  bottom,
-  left,
-  right,
-  delay = 0,
+  top, bottom, left, right, delay = 0,
 }: {
-  top?: boolean;
-  bottom?: boolean;
-  left?: boolean;
-  right?: boolean;
-  delay?: number;
+  top?: boolean; bottom?: boolean; left?: boolean; right?: boolean; delay?: number;
 }) {
-  const cornerStyle = {
-    top:    top    ? INSET : undefined,
-    bottom: bottom ? INSET : undefined,
-    left:   left   ? INSET : undefined,
-    right:  right  ? INSET : undefined,
-  };
-
   return (
     <motion.div
       className="absolute"
-      style={cornerStyle}
-      // Subtle slow pulse on the whole bracket
-      animate={{ opacity: [0.55, 0.85, 0.55] }}
+      style={{
+        top:    top    ? INSET : undefined,
+        bottom: bottom ? INSET : undefined,
+        left:   left   ? INSET : undefined,
+        right:  right  ? INSET : undefined,
+      }}
+      animate={{ opacity: [0.55, 0.9, 0.55] }}
       transition={{ duration: 5, repeat: Infinity, ease: "easeInOut", delay: delay * 0.4 }}
     >
       {/* Corner dot */}
       <motion.div
-        className="absolute w-1 h-1 rounded-full bg-blue-300/40"
+        className="absolute w-1 h-1 rounded-full"
         style={{
-          top:    top    ? 0 : undefined,
-          bottom: bottom ? 0 : undefined,
-          left:   left   ? 0 : undefined,
-          right:  right  ? 0 : undefined,
-          // center the dot on the corner junction
-          transform: "translate(-50%, -50%)",
-          ...(top    && { top:    0 }),
-          ...(bottom && { bottom: 0 }),
-          ...(left   && { left:   0 }),
-          ...(right  && { right:  0 }),
+          ...DOT_STYLE,
+          top:    top    ? -0.5 : undefined,
+          bottom: bottom ? -0.5 : undefined,
+          left:   left   ? -0.5 : undefined,
+          right:  right  ? -0.5 : undefined,
         }}
         initial={{ scale: 0, opacity: 0 }}
-        animate={{ scale: 1, opacity: 1 }}
+        animate={{ scale: 1, opacity: DOT_STYLE.opacity }}
         transition={{ duration: 0.25, delay: 1 + delay + 0.35, ease: EASE }}
       />
 
       {/* Horizontal arm */}
       <motion.div
-        className="absolute h-px bg-blue-200/30"
+        className="absolute h-px"
         style={{
+          ...ARM_STYLE,
           width: ARM,
           top:    top    ? 0 : undefined,
           bottom: bottom ? 0 : undefined,
@@ -72,8 +61,9 @@ function Corner({
 
       {/* Vertical arm */}
       <motion.div
-        className="absolute w-px bg-blue-200/30"
+        className="absolute w-px"
         style={{
+          ...ARM_STYLE,
           height: ARM,
           top:    top    ? 0 : undefined,
           bottom: bottom ? 0 : undefined,

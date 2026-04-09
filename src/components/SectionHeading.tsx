@@ -34,7 +34,8 @@ export default function SectionHeading({ title, subtitle }: { title: string; sub
       </div>
 
       <motion.p
-        className="text-blue-300 text-lg"
+        className="text-lg opacity-75"
+        style={{ color: "var(--zone-accent)" }}
         initial={{ opacity: 0 }}
         whileInView={{ opacity: 1 }}
         viewport={{ once: true, margin: "-80px" }}
