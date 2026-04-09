@@ -85,12 +85,7 @@ function CursorFish() {
   const actionRef    = useRef<THREE.AnimationAction | null>(null);
   const handoffStart = useRef(0);
   const introEndPos  = useRef(new THREE.Vector2(2, 0));
-  const skipIntro    = useRef(false);
-
-  // Skip intro if page wasn't at top on mount (e.g. refresh mid-scroll)
-  useEffect(() => {
-    if (window.scrollY > 10) skipIntro.current = true;
-  }, []);
+  const skipIntro    = useRef(typeof window !== "undefined" && window.scrollY > 10);
 
   // Cache materials for glow updates
   const mats = useRef<THREE.MeshStandardMaterial[]>([]);
@@ -231,6 +226,7 @@ function CursorFish() {
       if (handoffStart.current === 0) {
         if (skipIntro.current) {
           // Intro never played — snap directly to cursor, no lerp
+          fishRef.current.visible = true;
           handoffStart.current = -1;
           prevWorld.current.set(wx, wy);
         } else {
