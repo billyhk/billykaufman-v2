@@ -211,7 +211,7 @@ function CursorFish() {
         fz = 2;
         fx = THREE.MathUtils.lerp(riseTarget.current.x, wx, riseEase); // drift x to live cursor
         fy = THREE.MathUtils.lerp(-5, wy, riseEase);                   // rise up from below screen
-        targetAngle = Math.PI / 2; // point upward
+        targetAngle = THREE.MathUtils.lerp(Math.PI / 2, 0, riseP);     // arc from pointing up → pointing right
 
         if (innerRef.current)
           innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, Math.PI / 2, Math.min(delta * 10, 1));
