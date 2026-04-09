@@ -85,7 +85,6 @@ function CursorFish() {
   const actionRef    = useRef<THREE.AnimationAction | null>(null);
   const handoffStart = useRef(0);
   const introEndPos  = useRef(new THREE.Vector2(2, 0));
-  const targetInnerY = useRef(Math.PI / 2); // tracks desired facing for 3-D turn effect
 
   // Cache materials for glow updates
   const mats = useRef<THREE.MeshStandardMaterial[]>([]);
@@ -263,12 +262,12 @@ function CursorFish() {
       fishRef.current.position.set(px, py, 2);
       fishRef.current.rotation.z = smoothAngle.current;
 
-      // 3-D turn: lerp inner Y toward ±π/2 based on horizontal direction.
-      // The lerp naturally passes through 0 (fish front visible) when reversing direction.
-      if (Math.abs(vx) > 0.005)
-        targetInnerY.current = vx > 0 ? Math.PI / 2 : -Math.PI / 2;
-      if (innerRef.current)
-        innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, targetInnerY.current, Math.min(delta * 5, 1));
+      // 3-D turn: side-on when horizontal (|cos|=1), front-on when crossing vertical (cos≈0).
+      // rotation.z handles left/right flip, so π/2 is always the side-on target.
+      if (innerRef.current) {
+        const faceTarget = (Math.PI / 2) * Math.abs(Math.cos(smoothAngle.current));
+        innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, faceTarget, Math.min(delta * 6, 1));
+      }
     }
 
     // Glow + swim speed — always active
