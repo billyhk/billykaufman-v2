@@ -85,6 +85,12 @@ function CursorFish() {
   const actionRef    = useRef<THREE.AnimationAction | null>(null);
   const handoffStart = useRef(0);
   const introEndPos  = useRef(new THREE.Vector2(2, 0));
+  const skipIntro    = useRef(false);
+
+  // Skip intro if page wasn't at top on mount (e.g. refresh mid-scroll)
+  useEffect(() => {
+    if (window.scrollY > 10) skipIntro.current = true;
+  }, []);
 
   // Cache materials for glow updates
   const mats = useRef<THREE.MeshStandardMaterial[]>([]);
@@ -154,7 +160,7 @@ function CursorFish() {
     const wy = camera.position.y + _dir.y * ray_t;
 
     // ── Intro animation ──────────────────────────────────────────────────────
-    if (et < INTRO_TOTAL) {
+    if (!skipIntro.current && et < INTRO_TOTAL) {
       if (et < INTRO_DELAY) {
         fishRef.current.visible = false;
         return;
@@ -221,18 +227,20 @@ function CursorFish() {
     } else {
       const HANDOFF_DUR = 0.5;
 
-      // First frame of cursor-following: record intro end position
+      // First frame of cursor-following
       if (handoffStart.current === 0) {
-        handoffStart.current = et;
-        introEndPos.current.set(
-          fishRef.current.position.x,
-          fishRef.current.position.y
-        );
-        // Seed prevWorld to intro end so first velocity delta is near-zero
-        prevWorld.current.set(introEndPos.current.x, introEndPos.current.y);
+        if (skipIntro.current) {
+          // Intro never played — snap directly to cursor, no lerp
+          handoffStart.current = -1;
+          prevWorld.current.set(wx, wy);
+        } else {
+          handoffStart.current = et;
+          introEndPos.current.set(fishRef.current.position.x, fishRef.current.position.y);
+          prevWorld.current.set(introEndPos.current.x, introEndPos.current.y);
+        }
       }
 
-      const elapsed = et - handoffStart.current;
+      const elapsed = handoffStart.current === -1 ? HANDOFF_DUR : et - handoffStart.current;
 
       let px: number, py: number;
       if (elapsed < HANDOFF_DUR) {
