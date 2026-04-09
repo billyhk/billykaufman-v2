@@ -122,6 +122,7 @@ function CursorFish() {
 
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
+      if (!e.isTrusted) return; // ignore synthetic fish-swipe events — don't corrupt cursor position
       cursor.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       cursor.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
       const target = e.target;
