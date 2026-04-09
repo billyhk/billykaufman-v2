@@ -59,6 +59,10 @@ body {
 /* Both corners prominent */
 .clip-tr-bl { border-radius: 4px 20px 8px 20px; }
 
+/* Hide native scrollbar — replaced by HUD DepthGauge thumb */
+::-webkit-scrollbar { width: 0; }
+html { scrollbar-width: none; }
+
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }

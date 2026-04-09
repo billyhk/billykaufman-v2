@@ -92,15 +92,21 @@ function BioParticles({ count = 600 }: { count?: number }) {
 // ── Main scene ────────────────────────────────────────────────────────────────
 export default function OceanScene() {
   const { camera, gl } = useThree();
-  const [scrollProgress, setScrollProgress] = useState(0);
-  const targetCamY = useRef(0);
-  const currentCamY = useRef(0);
+
+  const getScrollProgress = () => {
+    const el = document.documentElement;
+    const p = el.scrollTop / (el.scrollHeight - el.clientHeight);
+    return isNaN(p) ? 0 : p;
+  };
+
+  const [scrollProgress, setScrollProgress] = useState(getScrollProgress);
+  const targetCamY  = useRef(-getScrollProgress() * 60);
+  const currentCamY = useRef(-getScrollProgress() * 60);
 
   useEffect(() => {
     const onScroll = () => {
-      const el = document.documentElement;
-      const progress = el.scrollTop / (el.scrollHeight - el.clientHeight);
-      setScrollProgress(isNaN(progress) ? 0 : progress);
+      const progress = getScrollProgress();
+      setScrollProgress(progress);
       targetCamY.current = -progress * 60;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
