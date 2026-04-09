@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 
 
@@ -15,22 +15,25 @@ const LINE_LEFT = 18; // px from viewport left edge
 const TICK_POSITIONS = [0.25, 0.5, 0.75];
 
 export default function HudSensorPanel() {
-  const [pressure, setPressure]     = useState(1);
-  const [scrollPct, setScrollPct]   = useState(0);
-  const [thumbReady, setThumbReady] = useState(false);
+  const [pressure, setPressure] = useState(1);
+  const thumbRef = useRef<HTMLDivElement>(null);
+
+  const getProgress = () => {
+    const el = document.documentElement;
+    return el.scrollTop / (el.scrollHeight - el.clientHeight) || 0;
+  };
+  const [initialPct] = useState(() => typeof window !== "undefined" ? getProgress() : 0);
 
   const { scrollYProgress } = useScroll();
   const pressMV = useTransform(scrollYProgress, [...STOPS], [...PRESSURES]);
   useMotionValueEvent(pressMV, "change", (v) => setPressure(Math.round(v)));
 
   useEffect(() => {
-    const el = document.documentElement;
-    const getProgress = () => el.scrollTop / (el.scrollHeight - el.clientHeight) || 0;
-    setScrollPct(getProgress());
-    const raf = requestAnimationFrame(() => setThumbReady(true));
-    const onScroll = () => setScrollPct(getProgress());
-    window.addEventListener("scroll", onScroll, { passive: true });
-    return () => { window.removeEventListener("scroll", onScroll); cancelAnimationFrame(raf); };
+    const update = () => {
+      if (thumbRef.current) thumbRef.current.style.top = `${getProgress() * 100}%`;
+    };
+    window.addEventListener("scroll", update, { passive: true });
+    return () => window.removeEventListener("scroll", update);
   }, []);
 
   return (
@@ -69,13 +72,13 @@ export default function HudSensorPanel() {
 
       {/* Scroll thumb — mirrored: brackets extend right into page */}
       <motion.div
+        ref={thumbRef}
         className="absolute"
         style={{
           left: `${LINE_LEFT - 1}px`,
-          top: `${scrollPct * 100}%`,
+          top: `${initialPct * 100}%`,
           transform: "translateY(-50%)",
           width: "3px",
-          transition: thumbReady ? "top 0.12s ease-out" : "none",
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
