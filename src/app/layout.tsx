@@ -7,6 +7,7 @@ import HudSensorPanel from "@/components/ocean/HudSensorPanel";
 import HudBottomBar from "@/components/ocean/HudBottomBar";
 import ZoneColorSync from "@/components/ocean/ZoneColorSync";
 import HudBrackets from "@/components/HudBrackets";
+import IntroLock from "@/components/IntroLock";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -15,7 +16,7 @@ const raleway = Raleway({
 });
 
 export const metadata: Metadata = {
-  title: "Billy Kaufman — SWE",
+  title: "Billy Kaufman",
   description:
     "Full-stack web engineer in NYC. TypeScript, React, Python, Django, AWS.",
 };
@@ -35,7 +36,8 @@ export default function RootLayout({
         <HudSensorPanel />
         <HudBottomBar />
         <HudBrackets />
-        {children}
+        <IntroLock />
+{children}
       </body>
     </html>
   );

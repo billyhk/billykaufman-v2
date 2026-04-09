@@ -62,7 +62,7 @@ const INTRO_DELAY    = 0.65;  // wait for HUD structure to finish drawing
 const INTRO_APPROACH = 1.6;   // swim from z=-8 to foreground while facing camera
 const INTRO_SWIPE    = 0.75;  // swipe left → right through the name
 const INTRO_FADE     = 0.5;   // lerp to actual cursor position
-const INTRO_TOTAL    = INTRO_DELAY + INTRO_APPROACH + INTRO_SWIPE + INTRO_FADE;
+export const INTRO_TOTAL = INTRO_DELAY + INTRO_APPROACH + INTRO_SWIPE + INTRO_FADE;
 
 useGLTF.preload("/models/clownfish_cursor.glb");
 
