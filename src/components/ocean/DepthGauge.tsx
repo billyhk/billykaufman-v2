@@ -21,31 +21,36 @@ export default function DepthGauge() {
     const el = document.documentElement;
     return el.scrollTop / (el.scrollHeight - el.clientHeight) || 0;
   };
-  const [initialPct] = useState(() => typeof window !== "undefined" ? getProgress() : 0);
 
-  // If the intro will play, hold animations until it finishes
-  const [show, setShow] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    return window.scrollY > window.innerHeight * 0.5; // no intro → show immediately
-  });
-  const noIntro = useRef(show); // captured once: true = no intro played
-
-  useEffect(() => {
-    if (noIntro.current) return;
-    const t = setTimeout(() => setShow(true), INTRO_TOTAL * 1000);
-    return () => clearTimeout(t);
-  }, []);
+  // Always false on SSR — avoids hydration mismatch; useEffect sets the real value
+  const [show, setShow] = useState(false);
+  const noIntro = useRef(false); // true = no intro played; set in useEffect
 
   const { scrollYProgress } = useScroll();
   const depthMV = useTransform(scrollYProgress, [...STOPS], [...DEPTHS]);
   useMotionValueEvent(depthMV, "change", (v) => setDepth(Math.round(v)));
 
   useEffect(() => {
+    const introWillPlay = window.scrollY <= window.innerHeight * 0.5;
+    noIntro.current = !introWillPlay;
+
+    // Sync thumb to real scroll position (SSR always outputs top: 0%)
     const update = () => {
       if (thumbRef.current) thumbRef.current.style.top = `${getProgress() * 100}%`;
     };
+    update();
     window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
+
+    if (!introWillPlay) {
+      setShow(true);
+      return () => window.removeEventListener("scroll", update);
+    }
+
+    const t = setTimeout(() => setShow(true), INTRO_TOTAL * 1000);
+    return () => {
+      window.removeEventListener("scroll", update);
+      clearTimeout(t);
+    };
   }, []);
 
   return (
@@ -92,7 +97,7 @@ export default function DepthGauge() {
         className="absolute"
         style={{
           right: `${LINE_RIGHT - 1}px`,
-          top: `${initialPct * 100}%`,
+          top: "0%",
           transform: "translateY(-50%)",
           width: "3px",
         }}

@@ -23,30 +23,36 @@ export default function HudSensorPanel() {
     const el = document.documentElement;
     return el.scrollTop / (el.scrollHeight - el.clientHeight) || 0;
   };
-  const [initialPct] = useState(() => typeof window !== "undefined" ? getProgress() : 0);
 
-  const [show, setShow] = useState<boolean>(() => {
-    if (typeof window === "undefined") return true;
-    return window.scrollY > window.innerHeight * 0.5;
-  });
-  const noIntro = useRef(show);
-
-  useEffect(() => {
-    if (noIntro.current) return;
-    const t = setTimeout(() => setShow(true), INTRO_TOTAL * 1000);
-    return () => clearTimeout(t);
-  }, []);
+  // Always false on SSR — avoids hydration mismatch; useEffect sets the real value
+  const [show, setShow] = useState(false);
+  const noIntro = useRef(false); // true = no intro played; set in useEffect
 
   const { scrollYProgress } = useScroll();
   const pressMV = useTransform(scrollYProgress, [...STOPS], [...PRESSURES]);
   useMotionValueEvent(pressMV, "change", (v) => setPressure(Math.round(v)));
 
   useEffect(() => {
+    const introWillPlay = window.scrollY <= window.innerHeight * 0.5;
+    noIntro.current = !introWillPlay;
+
+    // Sync thumb to real scroll position (SSR always outputs top: 0%)
     const update = () => {
       if (thumbRef.current) thumbRef.current.style.top = `${getProgress() * 100}%`;
     };
+    update();
     window.addEventListener("scroll", update, { passive: true });
-    return () => window.removeEventListener("scroll", update);
+
+    if (!introWillPlay) {
+      setShow(true);
+      return () => window.removeEventListener("scroll", update);
+    }
+
+    const t = setTimeout(() => setShow(true), INTRO_TOTAL * 1000);
+    return () => {
+      window.removeEventListener("scroll", update);
+      clearTimeout(t);
+    };
   }, []);
 
   return (
@@ -89,7 +95,7 @@ export default function HudSensorPanel() {
         className="absolute"
         style={{
           left: `${LINE_LEFT - 1}px`,
-          top: `${initialPct * 100}%`,
+          top: "0%",
           transform: "translateY(-50%)",
           width: "3px",
         }}
