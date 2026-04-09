@@ -2,11 +2,17 @@
 
 import { Canvas } from "@react-three/fiber";
 import { Suspense } from "react";
+import { motion } from "framer-motion";
 import OceanScene from "./OceanScene";
 
 export default function OceanCanvas() {
   return (
-    <div className="fixed inset-0 z-0 pointer-events-none">
+    <motion.div
+      className="fixed inset-0 z-0 pointer-events-none"
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      transition={{ duration: 1.5, delay: 0.6, ease: "easeOut" }}
+    >
       <Canvas
         camera={{ position: [0, 0, 5], fov: 75, near: 0.1, far: 200 }}
         gl={{ antialias: true, alpha: false }}
@@ -16,6 +22,6 @@ export default function OceanCanvas() {
           <OceanScene />
         </Suspense>
       </Canvas>
-    </div>
+    </motion.div>
   );
 }

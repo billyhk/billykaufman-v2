@@ -11,6 +11,7 @@ const BTM_INSET = 18; // px — bottom brackets inset from viewport bottom
 const ARM_STYLE = { backgroundColor: "var(--zone-accent)", opacity: 0.28 } as const;
 const DOT_STYLE = { backgroundColor: "var(--zone-accent)", opacity: 0.45 } as const;
 
+
 function Corner({
   topPx, bottomPx, left, right, delay = 0, noHArm = false,
 }: {
@@ -42,7 +43,7 @@ function Corner({
         }}
         initial={{ scale: 0, opacity: 0 }}
         animate={{ scale: 1, opacity: DOT_STYLE.opacity }}
-        transition={{ duration: 0.25, delay: 1 + delay + 0.35, ease: EASE }}
+        transition={{ duration: 0.25, delay: delay + 0.28, ease: EASE }}
       />
 
       {/* Horizontal arm — omitted for top brackets (nav bottom border serves this role) */}
@@ -60,7 +61,7 @@ function Corner({
           }}
           initial={{ scaleX: 0 }}
           animate={{ scaleX: 1 }}
-          transition={{ duration: 0.4, delay: 1 + delay, ease: EASE }}
+          transition={{ duration: 0.45, delay, ease: EASE }}
         />
       )}
 
@@ -78,7 +79,7 @@ function Corner({
         }}
         initial={{ scaleY: 0 }}
         animate={{ scaleY: 1 }}
-        transition={{ duration: 0.4, delay: 1 + delay + 0.1, ease: EASE }}
+        transition={{ duration: 0.45, delay: delay + 0.1, ease: EASE }}
       />
     </motion.div>
   );
@@ -88,20 +89,12 @@ export default function HudBrackets() {
   return (
     <div className="fixed inset-0 z-50 pointer-events-none select-none overflow-hidden">
       {/* Top brackets: nav border is the H-arm, so only dot + V-arm needed */}
-      <Corner topPx={NAV_H}    left  delay={0}   noHArm />
-      <Corner topPx={NAV_H}    right delay={0.5} noHArm />
+      <Corner topPx={NAV_H}    left  delay={0} noHArm />
+      <Corner topPx={NAV_H}    right delay={0} noHArm />
       {/* Bottom brackets stay at viewport corners */}
-      <Corner bottomPx={BTM_INSET} left  delay={1}   />
-      <Corner bottomPx={BTM_INSET} right delay={1.5} />
+      <Corner bottomPx={BTM_INSET} left  delay={0} />
+      <Corner bottomPx={BTM_INSET} right delay={0} />
 
-      {/* Scan line — slow sweep, barely visible, adds life to the HUD */}
-      <motion.div
-        className="absolute left-0 right-0 h-px"
-        style={{ background: "var(--zone-accent)", opacity: 0.04 }}
-        initial={{ top: "-1%" }}
-        animate={{ top: "101%" }}
-        transition={{ duration: 10, ease: "linear", repeat: Infinity, repeatDelay: 6 }}
-      />
     </div>
   );
 }

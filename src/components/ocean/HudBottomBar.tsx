@@ -23,8 +23,41 @@ function useElapsed() {
   return elapsed;
 }
 
+// GPS drift — last two decimal digits wander slowly
+function useFlickerCoords() {
+  const [lat, setLat] = useState(18);
+  const [lon, setLon] = useState(33);
+  useEffect(() => {
+    let timer: ReturnType<typeof setTimeout>;
+    const tick = () => {
+      setLat(v => Math.max(10, Math.min(29, v + Math.round((Math.random() - 0.5) * 4))));
+      setLon(v => Math.max(28, Math.min(39, v + Math.round((Math.random() - 0.5) * 4))));
+      timer = setTimeout(tick, 1800 + Math.random() * 1200);
+    };
+    timer = setTimeout(tick, 1800 + Math.random() * 1200);
+    return () => clearTimeout(timer);
+  }, []);
+  return `38°24.${String(lat).padStart(2, "0")}′N · 028°14.${String(lon).padStart(2, "0")}′E`;
+}
+
+// Rapidly incrementing hex packet counter
+function useHexCounter() {
+  const [n, setN] = useState(0); // stable SSR value — randomised on client only
+  useEffect(() => {
+    setN(Math.floor(Math.random() * 0x1000));
+    const id = setInterval(
+      () => setN(v => (v + Math.floor(Math.random() * 9) + 1) & 0xffff),
+      160,
+    );
+    return () => clearInterval(id);
+  }, []);
+  return n.toString(16).toUpperCase().padStart(4, "0");
+}
+
 export default function HudBottomBar() {
   const elapsed = useElapsed();
+  const coords  = useFlickerCoords();
+  const hex     = useHexCounter();
   const [waypoint, setWaypoint] = useState(1);
 
   const { scrollYProgress } = useScroll();
@@ -32,18 +65,22 @@ export default function HudBottomBar() {
   useMotionValueEvent(wpMV, "change", (v) => setWaypoint(Math.round(v) + 1));
 
   return (
-    <div
+    <motion.div
       className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none select-none hidden md:block"
-      style={{ bottom: "18px" }} // align with HudBrackets BTM_INSET
+      style={{ bottom: "18px" }}
+      initial={{ y: 20, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.55, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
     >
       <div
         className="flex items-center justify-between"
         style={{ paddingLeft: `${INSET}px`, paddingRight: `${INSET}px`, color: "var(--zone-accent)" }}
       >
-        {/* Left — coordinates + mission clock */}
+        {/* Left — coordinates (drifting) + mission clock + packet counter */}
         <div className="flex items-center gap-5 text-[9px] font-mono tracking-[0.22em] uppercase opacity-40">
-          <span>38°24.18′N · 028°14.33′E</span>
+          <span>{coords}</span>
           <span>{elapsed}</span>
+          <span>PKT·{hex}</span>
         </div>
 
         {/* Center — pulsing status */}
@@ -63,6 +100,6 @@ export default function HudBottomBar() {
           </span>
         </div>
       </div>
-    </div>
+    </motion.div>
   );
 }

@@ -30,25 +30,36 @@ function scrollTo(id: string) {
   document.getElementById(id.replace("#", ""))?.scrollIntoView({ behavior: "smooth" });
 }
 
-// Four corner ticks — same visual language as HudBrackets
-function BracketBadge({ children }: { children: React.ReactNode }) {
-  const corners = [
-    "top-0 left-0 border-t border-l",
-    "top-0 right-0 border-t border-r",
-    "bottom-0 left-0 border-b border-l",
-    "bottom-0 right-0 border-b border-r",
-  ];
+// Octagon polygon badge — HUD identity mark
+function BkBadge() {
   return (
-    <span className="relative inline-flex items-center justify-center px-2 py-1 group-hover:opacity-100 transition-opacity">
-      {corners.map((cls, i) => (
-        <span
-          key={i}
-          className={`absolute w-2 h-2 ${cls} opacity-50 group-hover:opacity-90 transition-opacity`}
-          style={{ borderColor: "var(--zone-accent)" }}
-        />
-      ))}
-      {children}
-    </span>
+    <svg
+      width="52" height="36" viewBox="0 0 52 36" fill="none"
+      className="opacity-65 group-hover:opacity-100 transition-opacity"
+      aria-hidden="true"
+    >
+      <polygon
+        points="6,0 46,0 52,6 52,30 46,36 6,36 0,30 0,6"
+        fill="rgba(2,8,23,0.85)"
+        stroke="var(--zone-accent)"
+        strokeWidth="1"
+        strokeOpacity="0.6"
+      />
+      {/* Corner micro-ticks */}
+      <line x1="6" y1="0"  x2="10" y2="0"  stroke="var(--zone-accent)" strokeWidth="1" strokeOpacity="0.9" />
+      <line x1="6" y1="0"  x2="6"  y2="4"  stroke="var(--zone-accent)" strokeWidth="1" strokeOpacity="0.9" />
+      <line x1="46" y1="36" x2="42" y2="36" stroke="var(--zone-accent)" strokeWidth="1" strokeOpacity="0.9" />
+      <line x1="46" y1="36" x2="46" y2="32" stroke="var(--zone-accent)" strokeWidth="1" strokeOpacity="0.9" />
+      <text
+        x="26" y="22"
+        textAnchor="middle"
+        fill="white"
+        fontSize="12"
+        fontWeight="700"
+        fontFamily="ui-monospace, monospace"
+        letterSpacing="2"
+      >BK</text>
+    </svg>
   );
 }
 
@@ -79,17 +90,21 @@ export default function NavBar() {
 
   return (
     <>
-      <nav className="fixed top-0 z-50" style={{ left: "18px", right: "18px", background: "linear-gradient(to bottom, rgba(2,8,23,0.82) 0%, rgba(2,8,23,0.55) 70%, transparent 100%)" }}>
+      <motion.nav
+        className="fixed top-0 z-50"
+        style={{ left: "18px", right: "18px", background: "linear-gradient(to bottom, rgba(2,8,23,0.82) 0%, rgba(2,8,23,0.55) 70%, transparent 100%)" }}
+        initial={{ y: -40, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.55, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+      >
         {/* Zone-accent bottom rule — ties nav into the HUD color system */}
         <div className="absolute bottom-0 left-0 right-0 h-px opacity-25" style={{ backgroundColor: "var(--zone-accent)" }} />
 
         <div className="px-5 h-16 flex items-center justify-between gap-8">
 
-          {/* BK — HUD badge with corner brackets */}
+          {/* BK — polygon HUD badge */}
           <button onClick={() => scrollTo("#home")} className="group cursor-pointer shrink-0">
-            <BracketBadge>
-              <span className="text-white font-bold text-base tracking-widest font-mono">BK</span>
-            </BracketBadge>
+            <BkBadge />
           </button>
 
           {/* Desktop nav */}
@@ -161,7 +176,7 @@ export default function NavBar() {
             </AnimatePresence>
           </button>
         </div>
-      </nav>
+      </motion.nav>
 
       {/* Mobile drawer — unchanged functionality, updated accent colors */}
       <AnimatePresence>
