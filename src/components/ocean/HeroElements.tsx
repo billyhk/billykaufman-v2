@@ -86,7 +86,7 @@ function CursorFish() {
   const handoffStart = useRef(0);
   const introEndPos  = useRef(new THREE.Vector2(2, 0));
   const riseTarget   = useRef<THREE.Vector2 | null>(null); // cursor position captured at rise start
-  const skipIntro    = useRef(typeof window !== "undefined" && window.scrollY > 10);
+  const skipIntro    = useRef(typeof window !== "undefined" && window.scrollY > window.innerHeight * 0.5);
 
   // Cache materials for glow updates
   const mats = useRef<THREE.MeshStandardMaterial[]>([]);

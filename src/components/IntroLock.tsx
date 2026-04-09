@@ -11,8 +11,9 @@ export default function IntroLock() {
   const [active, setActive] = useState(false);
 
   useEffect(() => {
-    if (window.scrollY > 10) return; // already mid-scroll — skip
+    if (window.scrollY > window.innerHeight * 0.5) return; // already mid-scroll — skip
 
+    window.scrollTo(0, 0); // ensure page starts at top for the intro
     setActive(true);
     document.documentElement.style.overflow = "hidden"; // blocks all scroll incl. keyboard
     document.body.dataset.introLocked = "1"; // signals window-level listeners to ignore real mouse events
