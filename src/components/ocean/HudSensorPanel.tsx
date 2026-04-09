@@ -29,8 +29,10 @@ export default function HudSensorPanel() {
 
   const { scrollYProgress } = useScroll();
   const depthMV = useTransform(scrollYProgress, [...STOPS], [...DEPTHS]);
-  // P = 1 ATM (surface) + 1 ATM per 10 m of seawater
-  useMotionValueEvent(depthMV, "change", (d) => setPressure(Math.round(1 + d / 10)));
+  // Absolute pressure: P_atm + ρ_sw·g·d / P₀
+  // ρ_sw = 1025 kg/m³, g = 9.81 m/s², P₀ = 101 325 Pa → ~1 ATM per 10.066 m
+  const ATM_PER_M = (1025 * 9.81) / 101325;
+  useMotionValueEvent(depthMV, "change", (d) => setPressure(Math.round(1 + d * ATM_PER_M)));
 
   useEffect(() => {
     const introWillPlay = window.scrollY <= window.innerHeight * 0.5;
