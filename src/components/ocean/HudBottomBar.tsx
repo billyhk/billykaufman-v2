@@ -1,7 +1,8 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 const SECTIONS = 6;
 // Inset must clear the bracket corner (18 px) + gauge panel (20 px)
@@ -59,18 +60,28 @@ export default function HudBottomBar() {
   const coords  = useFlickerCoords();
   const hex     = useHexCounter();
   const [waypoint, setWaypoint] = useState(1);
+  const [show, setShow] = useState(false);
+  const noIntro = useRef(false);
 
   const { scrollYProgress } = useScroll();
   const wpMV = useTransform(scrollYProgress, [0, 1], [0, SECTIONS - 1]);
   useMotionValueEvent(wpMV, "change", (v) => setWaypoint(Math.round(v) + 1));
+
+  useEffect(() => {
+    const introWillPlay = window.scrollY <= window.innerHeight * 0.5;
+    noIntro.current = !introWillPlay;
+    if (!introWillPlay) { setShow(true); return; }
+    const t = setTimeout(() => setShow(true), INTRO_TOTAL * 1000);
+    return () => clearTimeout(t);
+  }, []);
 
   return (
     <motion.div
       className="fixed bottom-0 left-0 right-0 z-40 pointer-events-none select-none hidden md:block"
       style={{ bottom: "18px" }}
       initial={{ y: 20, opacity: 0 }}
-      animate={{ y: 0, opacity: 1 }}
-      transition={{ duration: 0.55, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+      animate={show ? { y: 0, opacity: 1 } : { y: 20, opacity: 0 }}
+      transition={{ duration: 0.55, delay: noIntro.current ? 0.6 : 0.05, ease: [0.25, 0.1, 0.25, 1] }}
     >
       <div
         className="flex items-center justify-between"

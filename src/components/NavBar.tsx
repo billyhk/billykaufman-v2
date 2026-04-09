@@ -5,6 +5,7 @@ import { useScrollLock } from "@/hooks/useScrollLock";
 import { HiMenu, HiX } from "react-icons/hi";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { socialLinks } from "@/data/social";
+import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 const navLinks = [
   { href: "#home",       label: "Home"       },
@@ -30,35 +31,65 @@ function scrollTo(id: string) {
   document.getElementById(id.replace("#", ""))?.scrollIntoView({ behavior: "smooth" });
 }
 
-// Octagon polygon badge — HUD identity mark
+// BK badge — scan lines diverge from center revealing text, then corner brackets snap in
 function BkBadge() {
+  const accent = "var(--zone-accent)";
+  const D = 1.2;                        // delay: nav has delay:0.6 + duration:0.55 → fully in at ~1.15s
+  const scanDur = 0.4;
+  const afterScan = D + scanDur + 0.05;
+  const b = { stroke: accent, strokeWidth: 1.5, strokeOpacity: 0.72, strokeLinecap: "square" as const };
+
   return (
     <svg
-      width="52" height="36" viewBox="0 0 52 36" fill="none"
-      className="opacity-65 group-hover:opacity-100 transition-opacity"
+      width="54" height="30" viewBox="0 0 54 30" fill="none"
+      className="opacity-75 group-hover:opacity-100 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_var(--zone-accent)]"
       aria-hidden="true"
     >
-      <polygon
-        points="6,0 46,0 52,6 52,30 46,36 6,36 0,30 0,6"
-        fill="rgba(2,8,23,0.85)"
-        stroke="var(--zone-accent)"
-        strokeWidth="1"
-        strokeOpacity="0.6"
+      {/* BK text — fades in as scanner travels */}
+      <motion.text
+        x="27" y="20" textAnchor="middle" fill="white"
+        fontSize="14" fontWeight="800" fontFamily="ui-monospace, monospace" letterSpacing="0.12em"
+        initial={{ opacity: 0 }} animate={{ opacity: 0.88 }}
+        transition={{ delay: D + 0.08, duration: scanDur }}
+      >BK</motion.text>
+
+      {/* Top scan line — starts at center (translateY:13 offsets it from y=2 to y=15), scans up, then fades */}
+      <motion.line x1="2" y1="2" x2="52" y2="2"
+        stroke={accent} strokeWidth="1" strokeOpacity="0.45"
+        initial={{ translateY: 13, opacity: 1 }}
+        animate={{ translateY: 0, opacity: 0 }}
+        transition={{
+          translateY: { delay: D, duration: scanDur, ease: [0.4, 0, 0.2, 1] },
+          opacity: { delay: afterScan, duration: 0.2 },
+        }}
       />
-      {/* Corner micro-ticks */}
-      <line x1="6" y1="0"  x2="10" y2="0"  stroke="var(--zone-accent)" strokeWidth="1" strokeOpacity="0.9" />
-      <line x1="6" y1="0"  x2="6"  y2="4"  stroke="var(--zone-accent)" strokeWidth="1" strokeOpacity="0.9" />
-      <line x1="46" y1="36" x2="42" y2="36" stroke="var(--zone-accent)" strokeWidth="1" strokeOpacity="0.9" />
-      <line x1="46" y1="36" x2="46" y2="32" stroke="var(--zone-accent)" strokeWidth="1" strokeOpacity="0.9" />
-      <text
-        x="26" y="22"
-        textAnchor="middle"
-        fill="white"
-        fontSize="12"
-        fontWeight="700"
-        fontFamily="ui-monospace, monospace"
-        letterSpacing="2"
-      >BK</text>
+
+      {/* Bottom scan line — starts at center (translateY:-13), scans down, then fades */}
+      <motion.line x1="2" y1="28" x2="52" y2="28"
+        stroke={accent} strokeWidth="1" strokeOpacity="0.45"
+        initial={{ translateY: -13, opacity: 1 }}
+        animate={{ translateY: 0, opacity: 0 }}
+        transition={{
+          translateY: { delay: D, duration: scanDur, ease: [0.4, 0, 0.2, 1] },
+          opacity: { delay: afterScan, duration: 0.2 },
+        }}
+      />
+
+      {/* Corner brackets — scale in from center once scan completes */}
+      <motion.g
+        style={{ transformOrigin: "27px 15px" }}
+        initial={{ scale: 0 }} animate={{ scale: 1 }}
+        transition={{ delay: afterScan, duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
+      >
+        <line x1="2"  y1="2"  x2="10" y2="2"  {...b} />
+        <line x1="2"  y1="2"  x2="2"  y2="10" {...b} />
+        <line x1="44" y1="2"  x2="52" y2="2"  {...b} />
+        <line x1="52" y1="2"  x2="52" y2="10" {...b} />
+        <line x1="2"  y1="28" x2="10" y2="28" {...b} />
+        <line x1="2"  y1="20" x2="2"  y2="28" {...b} />
+        <line x1="44" y1="28" x2="52" y2="28" {...b} />
+        <line x1="52" y1="20" x2="52" y2="28" {...b} />
+      </motion.g>
     </svg>
   );
 }
@@ -67,6 +98,7 @@ export default function NavBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [active, setActive]         = useState("home");
   const [depth, setDepth]           = useState(0);
+  const [ready, setReady]           = useState(false);
 
   // Live depth — same transform as DepthGauge
   const { scrollYProgress } = useScroll();
@@ -74,6 +106,13 @@ export default function NavBar() {
   useMotionValueEvent(depthMV, "change", (v) => setDepth(Math.round(v)));
 
   useScrollLock(mobileOpen);
+
+  // Hold navbar off-screen until intro completes (mirrors DepthGauge / HudSensorPanel)
+  useEffect(() => {
+    if (window.scrollY > window.innerHeight * 0.5) { setReady(true); return; }
+    const t = setTimeout(() => setReady(true), INTRO_TOTAL * 1000);
+    return () => clearTimeout(t);
+  }, []);
 
   // Section spy
   useEffect(() => {
@@ -87,6 +126,8 @@ export default function NavBar() {
     });
     return () => observer.disconnect();
   }, []);
+
+  if (!ready) return null;
 
   return (
     <>
