@@ -14,7 +14,7 @@ export default function SectionHeading({ title, subtitle }: { title: string; sub
   });
 
   // Scroll-driven: starts shifted right, drifts slightly left as you scroll through
-  const x = useTransform(scrollYProgress, [0, 1], ["8%", "-4%"]);
+  const x = useTransform(scrollYProgress, [0, 1], ["18%", "0%"]);
 
   return (
     <div ref={ref} className="mb-10">

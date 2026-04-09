@@ -35,7 +35,7 @@ export default function ResumeButton() {
       {open && createPortal(
         <div
           className="fixed inset-0 z-[9999] flex items-center justify-center sm:p-8"
-          style={{ cursor: "auto" }}
+          style={{ cursor: "default" }}
         >
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={close} />
@@ -69,6 +69,7 @@ export default function ResumeButton() {
               <iframe
                 src={EMBED_URL}
                 className="w-full h-full border-0"
+                style={{ cursor: "default" }}
                 title="Billy Kaufman Resume"
               />
             </div>

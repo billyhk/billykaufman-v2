@@ -124,9 +124,9 @@ function FilmstripItem({ project, active, onClick }: { project: Project; active:
           {thumb ? (
             <Image src={thumb} alt={project.title} fill className={`object-cover transition-opacity duration-200 ${active ? "opacity-90" : "opacity-50 group-hover:opacity-70"}`} />
           ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-950 to-indigo-950 px-6">
+            <div className={`absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-950 to-indigo-950 px-6 transition-opacity duration-200 ${active ? "opacity-90" : "opacity-50 group-hover:opacity-70"}`}>
               {project.key === "bloomberg"
-                ? <BloombergLogo className="w-full max-h-8 object-contain opacity-80" />
+                ? <BloombergLogo className="w-full max-h-8 object-contain" />
                 : <span className="text-white/20 text-2xl font-bold">{project.client.charAt(0)}</span>
               }
             </div>
