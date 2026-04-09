@@ -49,7 +49,7 @@ export default function DepthGauge() {
       />
 
       {/* Tick marks — fade in with content */}
-      {TICK_POSITIONS.map((t) => (
+      {TICK_POSITIONS.map((t, i) => (
         <motion.div
           key={t}
           className="absolute"
@@ -60,7 +60,7 @@ export default function DepthGauge() {
           }}
           initial={{ opacity: 0, scaleX: 0 }}
           animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.3, delay: 0.65, ease: "easeOut" }}
+          transition={{ duration: 0.3, delay: 0.65 + i * 0.12, ease: "easeOut" }}
         >
           {/* Main tick */}
           <div style={{ width: "6px", height: "1px", background: "var(--zone-accent)", opacity: 0.35 }} />
