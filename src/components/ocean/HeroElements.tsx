@@ -259,14 +259,21 @@ function CursorFish() {
         smoothAngle.current += diff * Math.min(delta * 12, 1);
       }
 
+      // Tilt: fold the angle so rotation.z stays in [-π/2, π/2] — fish never goes upside-down.
+      // Left/right facing is handled separately by innerRef.rotation.y sign.
+      const tiltAngle = Math.atan2(
+        Math.sin(smoothAngle.current),
+        Math.abs(Math.cos(smoothAngle.current))
+      );
       fishRef.current.position.set(px, py, 2);
-      fishRef.current.rotation.z = smoothAngle.current;
+      fishRef.current.rotation.z = tiltAngle;
 
-      // 3-D turn: side-on when horizontal (|cos|=1), front-on when crossing vertical (cos≈0).
-      // rotation.z handles left/right flip, so π/2 is always the side-on target.
+      // 3-D turn: front-on (innerY=0) at vertical (cos≈0), side-on (±π/2) when horizontal.
+      // Sign of cos determines left vs right facing without ever flipping the outer group.
       if (innerRef.current) {
-        const faceTarget = (Math.PI / 2) * Math.abs(Math.cos(smoothAngle.current));
-        innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, faceTarget, Math.min(delta * 6, 1));
+        const horiz   = Math.abs(Math.cos(smoothAngle.current));
+        const facingY = (Math.PI / 2) * horiz * (Math.cos(smoothAngle.current) >= 0 ? 1 : -1);
+        innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, facingY, Math.min(delta * 6, 1));
       }
     }
 
