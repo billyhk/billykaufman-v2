@@ -57,6 +57,7 @@ const DAMPING   = 0.82;
 const REPEL_R   = 110;
 const REPEL_F   = 7;
 const STEP      = 5;   // logical px between samples — controls particle density
+const VPAD      = 110; // px — canvas extends this far above/below text so scattered particles don't clip
 
 // Shimmer palette — see constants/colors.ts
 const COLORS = PARTICLE_COLORS;
@@ -77,6 +78,9 @@ function NameParticles() {
   // Track mouse in canvas-local coordinates
   useEffect(() => {
     const onMove = (e: MouseEvent) => {
+      // During intro lock, ignore real cursor movement (e.isTrusted) but allow
+      // synthetic fish-swipe events (e.isTrusted === false) so particles react.
+      if (e.isTrusted && document.body.dataset.introLocked) return;
       const rect = canvasRef.current?.getBoundingClientRect();
       if (!rect) return;
       mouse.current = { x: e.clientX - rect.left, y: e.clientY - rect.top };
@@ -106,19 +110,20 @@ function NameParticles() {
       const fontSize = Math.max(56, Math.min(contentW * 0.12, 144));
       const lineH    = fontSize * 1.08;
       const H        = lineH * 2 + 12;
+      const totalH   = H + VPAD * 2; // canvas taller than text so particles can scatter freely
 
       canvas.width        = Math.round(VW * dpr);
-      canvas.height       = Math.round(H * dpr);
+      canvas.height       = Math.round(totalH * dpr);
       canvas.style.width  = `${VW}px`;
-      canvas.style.height = `${H}px`;
+      canvas.style.height = `${totalH}px`;
       // Break out of parent padding to reach viewport left edge
       canvas.style.position = "absolute";
       canvas.style.left     = `-${textOffsetX}px`;
-      canvas.style.top      = "0";
-      container.style.height = `${H}px`;
+      canvas.style.top      = `-${VPAD}px`; // extend above container
+      container.style.height = `${H}px`;   // layout height unchanged
 
       // Render text to offscreen canvas to sample particle home positions.
-      // Text is drawn at textOffsetX so particle coords are in viewport space.
+      // Text is drawn offset by VPAD so it sits in the centre of the taller canvas.
       const off    = document.createElement("canvas");
       off.width    = canvas.width;
       off.height   = canvas.height;
@@ -127,14 +132,14 @@ function NameParticles() {
       offCtx.font          = `800 ${fontSize}px Raleway, Inter, sans-serif`;
       offCtx.fillStyle     = "#fff";
       offCtx.textBaseline  = "top";
-      offCtx.fillText("Billy",   textOffsetX, 0);
-      offCtx.fillText("Kaufman", textOffsetX, lineH);
+      offCtx.fillText("Billy",   textOffsetX, VPAD);
+      offCtx.fillText("Kaufman", textOffsetX, VPAD + lineH);
 
       const { data } = offCtx.getImageData(0, 0, off.width, off.height);
       const ps: Particle[] = [];
 
       // Sample in logical px; non-text pixels (alpha=0) are skipped cheaply
-      for (let ly = 0; ly < H; ly += STEP) {
+      for (let ly = 0; ly < totalH; ly += STEP) {
         for (let lx = 0; lx < VW; lx += STEP) {
           const px = Math.round(lx * dpr);
           const py = Math.round(ly * dpr);
@@ -242,7 +247,7 @@ function NameParticles() {
 
 const container = {
   hidden: {},
-  show: { transition: { staggerChildren: 0.1, delayChildren: 0.2 } },
+  show: { transition: { staggerChildren: 0.1, delayChildren: 1.4 } },
 };
 const item = {
   hidden: { opacity: 0, y: 24 },

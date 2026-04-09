@@ -15,15 +15,18 @@ export default function IntroLock() {
 
     setActive(true);
     document.documentElement.style.overflow = "hidden"; // blocks all scroll incl. keyboard
+    document.body.dataset.introLocked = "1"; // signals window-level listeners to ignore real mouse events
 
     const timer = setTimeout(() => {
       setActive(false);
       document.documentElement.style.overflow = "";
+      delete document.body.dataset.introLocked;
     }, INTRO_TOTAL * 1000);
 
     return () => {
       clearTimeout(timer);
       document.documentElement.style.overflow = "";
+      delete document.body.dataset.introLocked;
     };
   }, []);
 
