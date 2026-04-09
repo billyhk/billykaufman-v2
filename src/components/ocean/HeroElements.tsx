@@ -205,16 +205,8 @@ function CursorFish() {
         const riseP    = Math.min((elapsed - INTRO_APPROACH - INTRO_SWIPE) / INTRO_RISE, 1);
         const riseEase = 1 - Math.pow(1 - riseP, 3); // easeOutCubic
 
-        // Capture cursor world position on first frame of rise, clamped so the
-        // rise destination is always visible (cursor may be off-screen during intro lock).
-        if (!riseTarget.current) {
-          const halfH = Math.tan(37.5 * (Math.PI / 180)) * Math.abs(camera.position.z - 2);
-          const halfW = halfH * (size.width / size.height);
-          riseTarget.current = new THREE.Vector2(
-            THREE.MathUtils.clamp(wx, -halfW + 0.9, halfW - 0.9),
-            THREE.MathUtils.clamp(wy, -halfH + 0.9, halfH - 0.1),
-          );
-        }
+        // Capture cursor world position on first frame of rise
+        if (!riseTarget.current) riseTarget.current = new THREE.Vector2(wx, wy);
 
         fz = 2;
         fx = THREE.MathUtils.lerp(riseTarget.current.x, wx, riseEase); // drift x to live cursor
