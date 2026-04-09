@@ -13,20 +13,28 @@ const LINE_RIGHT = 18; // px from viewport right edge
 const TICK_POSITIONS = [0.25, 0.5, 0.75]; // fraction of rail height
 
 export default function DepthGauge() {
-  const [depth, setDepth]       = useState(0);
-  const [scrollPct, setScrollPct] = useState(0);
+  const [depth, setDepth]             = useState(0);
+  const [scrollPct, setScrollPct]     = useState(0);
+  const [thumbReady, setThumbReady]   = useState(false); // suppress transition on first paint
 
   const { scrollYProgress } = useScroll();
   const depthMV = useTransform(scrollYProgress, [...STOPS], [...DEPTHS]);
   useMotionValueEvent(depthMV, "change", (v) => setDepth(Math.round(v)));
 
   useEffect(() => {
-    const onScroll = () => {
-      const el = document.documentElement;
-      setScrollPct(el.scrollTop / (el.scrollHeight - el.clientHeight) || 0);
-    };
+    const el = document.documentElement;
+    const getProgress = () => el.scrollTop / (el.scrollHeight - el.clientHeight) || 0;
+
+    // Snap to real position immediately, then re-enable the smooth transition next frame
+    setScrollPct(getProgress());
+    const raf = requestAnimationFrame(() => setThumbReady(true));
+
+    const onScroll = () => setScrollPct(getProgress());
     window.addEventListener("scroll", onScroll, { passive: true });
-    return () => window.removeEventListener("scroll", onScroll);
+    return () => {
+      window.removeEventListener("scroll", onScroll);
+      cancelAnimationFrame(raf);
+    };
   }, []);
 
   return (
@@ -77,7 +85,7 @@ export default function DepthGauge() {
           top: `${scrollPct * 100}%`,
           transform: "translateY(-50%)",
           width: "3px",
-          transition: "top 0.12s ease-out",
+          transition: thumbReady ? "top 0.12s ease-out" : "none",
         }}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
