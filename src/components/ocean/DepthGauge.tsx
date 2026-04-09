@@ -31,8 +31,8 @@ export default function DepthGauge() {
 
   return (
     <div
-      className="fixed bottom-0 z-40 pointer-events-none select-none hidden md:block overflow-hidden"
-      style={{ top: "64px", right: 0, width: `${LINE_RIGHT + 20}px` }}
+      className="fixed z-40 pointer-events-none select-none hidden md:block overflow-hidden"
+      style={{ top: "64px", bottom: "18px", right: 0, width: `${LINE_RIGHT + 20}px` }}
     >
       {/* Rail — draws downward from nav at t=0 */}
       <motion.div
