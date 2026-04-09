@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 
 const STOPS  = [0, 0.18, 0.38, 0.57, 0.74, 1] as const;
@@ -22,6 +23,19 @@ export default function DepthGauge() {
   };
   const [initialPct] = useState(() => typeof window !== "undefined" ? getProgress() : 0);
 
+  // If the intro will play, hold animations until it finishes
+  const [show, setShow] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return window.scrollY > window.innerHeight * 0.5; // no intro → show immediately
+  });
+  const noIntro = useRef(show); // captured once: true = no intro played
+
+  useEffect(() => {
+    if (noIntro.current) return;
+    const t = setTimeout(() => setShow(true), INTRO_TOTAL * 1000);
+    return () => clearTimeout(t);
+  }, []);
+
   const { scrollYProgress } = useScroll();
   const depthMV = useTransform(scrollYProgress, [...STOPS], [...DEPTHS]);
   useMotionValueEvent(depthMV, "change", (v) => setDepth(Math.round(v)));
@@ -39,7 +53,7 @@ export default function DepthGauge() {
       className="fixed z-40 pointer-events-none select-none hidden md:block overflow-hidden"
       style={{ top: "64px", bottom: "18px", right: 0, width: `${LINE_RIGHT + 20}px` }}
     >
-      {/* Rail — draws downward from nav at t=0 */}
+      {/* Rail */}
       <motion.div
         className="absolute inset-y-0 w-px"
         style={{
@@ -49,11 +63,11 @@ export default function DepthGauge() {
           transformOrigin: "top",
         }}
         initial={{ scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        transition={{ duration: 0.55, delay: 0, ease: [0.25, 0.1, 0.25, 1] }}
+        animate={show ? { scaleY: 1 } : { scaleY: 0 }}
+        transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
       />
 
-      {/* Tick marks — fade in with content */}
+      {/* Tick marks */}
       {TICK_POSITIONS.map((t, i) => (
         <motion.div
           key={t}
@@ -64,12 +78,10 @@ export default function DepthGauge() {
             transformOrigin: "right",
           }}
           initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.3, delay: 0.65 + i * 0.12, ease: "easeOut" }}
+          animate={show ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0 }}
+          transition={{ duration: 0.3, delay: noIntro.current ? 0.65 + i * 0.12 : i * 0.12, ease: "easeOut" }}
         >
-          {/* Main tick */}
           <div style={{ width: "6px", height: "1px", background: "var(--zone-accent)", opacity: 0.35 }} />
-          {/* Short secondary tick offset below */}
           <div style={{ width: "3px", height: "1px", background: "var(--zone-accent)", opacity: 0.2, marginTop: "3px" }} />
         </motion.div>
       ))}
@@ -85,18 +97,15 @@ export default function DepthGauge() {
           width: "3px",
         }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.65 }}
+        animate={show ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.4, delay: noIntro.current ? 0.65 : 0.1 }}
       >
-        {/* Top bracket */}
         <div style={{ width: "7px", height: "1px", background: "var(--zone-accent)", opacity: 0.9, marginLeft: "-4px" }} />
-        {/* Body */}
         <div style={{ width: "3px", height: "22px", background: "var(--zone-accent)", opacity: 0.6 }} />
-        {/* Bottom bracket */}
         <div style={{ width: "7px", height: "1px", background: "var(--zone-accent)", opacity: 0.9, marginLeft: "-4px" }} />
       </motion.div>
 
-      {/* Depth readout — fades in with content */}
+      {/* Depth readout */}
       <motion.div
         className="absolute top-1/2"
         style={{
@@ -106,8 +115,8 @@ export default function DepthGauge() {
           color: "var(--zone-accent)",
         }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+        animate={show ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.4, delay: noIntro.current ? 0.6 : 0.05, ease: [0.25, 0.1, 0.25, 1] }}
       >
         <span className="block text-[9px] font-mono tracking-[0.3em] uppercase opacity-40 mb-1">depth</span>
         <span className="block text-[11px] font-mono tabular-nums opacity-70">{depth}m</span>

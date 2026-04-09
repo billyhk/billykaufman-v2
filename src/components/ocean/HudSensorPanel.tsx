@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 
 // Must stay in sync with DepthGauge / ZoneColorSync stops
@@ -24,6 +25,18 @@ export default function HudSensorPanel() {
   };
   const [initialPct] = useState(() => typeof window !== "undefined" ? getProgress() : 0);
 
+  const [show, setShow] = useState<boolean>(() => {
+    if (typeof window === "undefined") return true;
+    return window.scrollY > window.innerHeight * 0.5;
+  });
+  const noIntro = useRef(show);
+
+  useEffect(() => {
+    if (noIntro.current) return;
+    const t = setTimeout(() => setShow(true), INTRO_TOTAL * 1000);
+    return () => clearTimeout(t);
+  }, []);
+
   const { scrollYProgress } = useScroll();
   const pressMV = useTransform(scrollYProgress, [...STOPS], [...PRESSURES]);
   useMotionValueEvent(pressMV, "change", (v) => setPressure(Math.round(v)));
@@ -41,7 +54,7 @@ export default function HudSensorPanel() {
       className="fixed z-40 pointer-events-none select-none hidden md:block overflow-hidden"
       style={{ top: "64px", bottom: "18px", left: 0, width: `${LINE_LEFT + 20}px` }}
     >
-      {/* Rail — draws downward from nav at t=0 */}
+      {/* Rail */}
       <motion.div
         className="absolute inset-y-0 w-px"
         style={{
@@ -51,26 +64,26 @@ export default function HudSensorPanel() {
           transformOrigin: "top",
         }}
         initial={{ scaleY: 0 }}
-        animate={{ scaleY: 1 }}
-        transition={{ duration: 0.55, delay: 0, ease: [0.25, 0.1, 0.25, 1] }}
+        animate={show ? { scaleY: 1 } : { scaleY: 0 }}
+        transition={{ duration: 0.55, ease: [0.25, 0.1, 0.25, 1] }}
       />
 
-      {/* Tick marks — extend right into page, staggered top→bottom */}
+      {/* Tick marks */}
       {TICK_POSITIONS.map((t, i) => (
         <motion.div
           key={t}
           className="absolute"
           style={{ top: `${t * 100}%`, left: `${LINE_LEFT}px`, transformOrigin: "left" }}
           initial={{ opacity: 0, scaleX: 0 }}
-          animate={{ opacity: 1, scaleX: 1 }}
-          transition={{ duration: 0.3, delay: 0.65 + i * 0.12, ease: "easeOut" }}
+          animate={show ? { opacity: 1, scaleX: 1 } : { opacity: 0, scaleX: 0 }}
+          transition={{ duration: 0.3, delay: noIntro.current ? 0.65 + i * 0.12 : i * 0.12, ease: "easeOut" }}
         >
           <div style={{ width: "6px", height: "1px", background: "var(--zone-accent)", opacity: 0.35 }} />
           <div style={{ width: "3px", height: "1px", background: "var(--zone-accent)", opacity: 0.2, marginTop: "3px" }} />
         </motion.div>
       ))}
 
-      {/* Scroll thumb — mirrored: brackets extend right into page */}
+      {/* Scroll thumb */}
       <motion.div
         ref={thumbRef}
         className="absolute"
@@ -81,8 +94,8 @@ export default function HudSensorPanel() {
           width: "3px",
         }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.65 }}
+        animate={show ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.4, delay: noIntro.current ? 0.65 : 0.1 }}
       >
         <div style={{ width: "7px", height: "1px", background: "var(--zone-accent)", opacity: 0.9 }} />
         <div style={{ width: "3px", height: "22px", background: "var(--zone-accent)", opacity: 0.6 }} />
@@ -99,8 +112,8 @@ export default function HudSensorPanel() {
           color: "var(--zone-accent)",
         }}
         initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.6, ease: [0.25, 0.1, 0.25, 1] }}
+        animate={show ? { opacity: 1 } : { opacity: 0 }}
+        transition={{ duration: 0.4, delay: noIntro.current ? 0.6 : 0.05, ease: [0.25, 0.1, 0.25, 1] }}
       >
         <span className="block text-[9px] font-mono tracking-[0.3em] uppercase opacity-40 mb-1">press</span>
         <span className="block text-[11px] font-mono tabular-nums opacity-70">{pressure} ATM</span>
