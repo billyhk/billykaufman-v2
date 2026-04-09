@@ -57,12 +57,12 @@ function HeroOrbs() {
 }
 
 // ── Cursor fish ───────────────────────────────────────────────────────────────
-// Intro animation: fish swims toward camera (facing front), pivots, swipes L→R, then follows cursor
+// Intro animation: swim toward camera → swipe L→R off screen → rise from bottom to cursor
 const INTRO_DELAY    = 0.65;  // wait for HUD structure to finish drawing
 const INTRO_APPROACH = 1.6;   // swim from z=-8 to foreground while facing camera
-const INTRO_SWIPE    = 0.75;  // swipe left → right through the name
-const INTRO_FADE     = 0.5;   // lerp to actual cursor position
-export const INTRO_TOTAL = INTRO_DELAY + INTRO_APPROACH + INTRO_SWIPE + INTRO_FADE;
+const INTRO_SWIPE    = 0.85;  // swipe left → right, exiting off-screen right
+const INTRO_RISE     = 0.9;   // swim up from off-screen bottom to cursor position
+export const INTRO_TOTAL = INTRO_DELAY + INTRO_APPROACH + INTRO_SWIPE + INTRO_RISE;
 
 useGLTF.preload("/models/clownfish_cursor.glb");
 
@@ -85,6 +85,7 @@ function CursorFish() {
   const actionRef    = useRef<THREE.AnimationAction | null>(null);
   const handoffStart = useRef(0);
   const introEndPos  = useRef(new THREE.Vector2(2, 0));
+  const riseTarget   = useRef<THREE.Vector2 | null>(null); // cursor position captured at rise start
   const skipIntro    = useRef(typeof window !== "undefined" && window.scrollY > 10);
 
   // Cache materials for glow updates
@@ -180,11 +181,11 @@ function CursorFish() {
           innerRef.current.rotation.y = THREE.MathUtils.lerp(0, Math.PI / 2, pivotP);
 
       } else if (elapsed < INTRO_APPROACH + INTRO_SWIPE) {
-        // Swipe left → right through the name text area
+        // Swipe left → right, exiting off-screen right
         const p    = (elapsed - INTRO_APPROACH) / INTRO_SWIPE;
         const ease = p < 0.5 ? 4*p*p*p : 1 - Math.pow(-2*p+2, 3) / 2;
         fz = 2;
-        fx = THREE.MathUtils.lerp(-5, 2, ease);
+        fx = THREE.MathUtils.lerp(-5, 9, ease); // 9 = safely off-screen right
         fy = 0;
         targetAngle = 0; // face right
 
@@ -199,11 +200,17 @@ function CursorFish() {
           bubbles: true,
         }));
       } else {
-        // Hold at swipe endpoint, smooth angle to horizontal — cursor takes over after INTRO_TOTAL
+        // Rise: snap to off-screen bottom at cursor x, swim up to cursor position
+        const riseP    = Math.min((elapsed - INTRO_APPROACH - INTRO_SWIPE) / INTRO_RISE, 1);
+        const riseEase = 1 - Math.pow(1 - riseP, 3); // easeOutCubic
+
+        // Capture cursor world position on first frame of rise
+        if (!riseTarget.current) riseTarget.current = new THREE.Vector2(wx, wy);
+
         fz = 2;
-        fx = 2;
-        fy = 0;
-        targetAngle = 0;
+        fx = THREE.MathUtils.lerp(riseTarget.current.x, wx, riseEase); // drift x to live cursor
+        fy = THREE.MathUtils.lerp(-5, wy, riseEase);                   // rise up from below screen
+        targetAngle = Math.PI / 2; // point upward
 
         if (innerRef.current)
           innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, Math.PI / 2, Math.min(delta * 10, 1));
