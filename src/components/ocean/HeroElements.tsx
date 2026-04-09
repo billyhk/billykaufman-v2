@@ -152,16 +152,9 @@ function CursorFish() {
     // Project cursor to z=2 world plane — needed for fade handoff and cursor phase
     _vec.set(cursor.current.x, cursor.current.y, 0.5).unproject(camera);
     _dir.copy(_vec).sub(camera.position).normalize();
-    const ray_t  = (2 - camera.position.z) / _dir.z;
-    const wx_raw = camera.position.x + _dir.x * ray_t;
-    const wy_raw = camera.position.y + _dir.y * ray_t;
-
-    // Clamp to viewport with per-side margins.
-    // tan(fov/2) * distance gives the half-extent at z=2 in world units.
-    const halfH = Math.tan(37.5 * (Math.PI / 180)) * Math.abs(camera.position.z - 2);
-    const halfW = halfH * (size.width / size.height);
-    const wx = THREE.MathUtils.clamp(wx_raw, -halfW + 0.9, halfW - 0.9); // left/right margin
-    const wy = THREE.MathUtils.clamp(wy_raw, -halfH + 0.9, halfH - 0.1); // generous top, clamp bottom
+    const ray_t = (2 - camera.position.z) / _dir.z;
+    const wx = camera.position.x + _dir.x * ray_t;
+    const wy = camera.position.y + _dir.y * ray_t;
 
     // ── Intro animation ──────────────────────────────────────────────────────
     if (!skipIntro.current && et < INTRO_TOTAL) {
@@ -212,8 +205,16 @@ function CursorFish() {
         const riseP    = Math.min((elapsed - INTRO_APPROACH - INTRO_SWIPE) / INTRO_RISE, 1);
         const riseEase = 1 - Math.pow(1 - riseP, 3); // easeOutCubic
 
-        // Capture cursor world position on first frame of rise
-        if (!riseTarget.current) riseTarget.current = new THREE.Vector2(wx, wy);
+        // Capture cursor world position on first frame of rise, clamped so the
+        // rise destination is always visible (cursor may be off-screen during intro lock).
+        if (!riseTarget.current) {
+          const halfH = Math.tan(37.5 * (Math.PI / 180)) * Math.abs(camera.position.z - 2);
+          const halfW = halfH * (size.width / size.height);
+          riseTarget.current = new THREE.Vector2(
+            THREE.MathUtils.clamp(wx, -halfW + 0.9, halfW - 0.9),
+            THREE.MathUtils.clamp(wy, -halfH + 0.9, halfH - 0.1),
+          );
+        }
 
         fz = 2;
         fx = THREE.MathUtils.lerp(riseTarget.current.x, wx, riseEase); // drift x to live cursor
