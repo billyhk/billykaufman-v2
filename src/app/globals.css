@@ -59,19 +59,9 @@ body {
 /* Both corners prominent */
 .clip-tr-bl { border-radius: 4px 20px 8px 20px; }
 
-/* ── Custom scrollbar — HUD aesthetic, picks up zone-accent color ── */
-::-webkit-scrollbar       { width: 4px; }
-::-webkit-scrollbar-track { background: rgba(255, 255, 255, 0.04); }
-::-webkit-scrollbar-thumb {
-  background: color-mix(in srgb, var(--zone-accent) 45%, transparent);
-  border-radius: 2px;
-}
-::-webkit-scrollbar-thumb:hover {
-  background: color-mix(in srgb, var(--zone-accent) 75%, transparent);
-}
-
-/* Firefox */
-html { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--zone-accent) 45%, transparent) rgba(255,255,255,0.04); }
+/* Hide native scrollbar — replaced by HUD DepthGauge thumb */
+::-webkit-scrollbar { width: 0; }
+html { scrollbar-width: none; }
 
 @keyframes marquee {
   from { transform: translateX(0); }
