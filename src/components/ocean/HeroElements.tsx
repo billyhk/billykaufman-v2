@@ -57,11 +57,19 @@ function HeroOrbs() {
 }
 
 // ── Cursor fish ───────────────────────────────────────────────────────────────
+// Intro animation: fish swims toward camera (facing front), pivots, swipes L→R, then follows cursor
+const INTRO_DELAY    = 0.65;  // wait for HUD structure to finish drawing
+const INTRO_APPROACH = 1.6;   // swim from z=-8 to foreground while facing camera
+const INTRO_SWIPE    = 0.75;  // swipe left → right through the name
+const INTRO_FADE     = 0.5;   // lerp to actual cursor position
+const INTRO_TOTAL    = INTRO_DELAY + INTRO_APPROACH + INTRO_SWIPE + INTRO_FADE;
+
 useGLTF.preload("/models/clownfish_cursor.glb");
 
 function CursorFish() {
-  const fishRef = useRef<THREE.Group>(null);
-  const lightRef = useRef<THREE.PointLight>(null);
+  const fishRef      = useRef<THREE.Group>(null);
+  const innerRef     = useRef<THREE.Group>(null); // inner group — Y rotation controls facing camera vs. right
+  const lightRef     = useRef<THREE.PointLight>(null);
   const { camera, size } = useThree();
   const { scene, animations } = useGLTF("/models/clownfish_cursor.glb");
   const { mixer } = useAnimations(animations, fishRef);
@@ -74,7 +82,10 @@ function CursorFish() {
   const isClickable = useRef(false);
   const glow = useRef(0);
   const scrollProgress = useRef(0);
-  const actionRef = useRef<THREE.AnimationAction | null>(null);
+  const actionRef    = useRef<THREE.AnimationAction | null>(null);
+  const handoffStart = useRef(0);
+  const introEndPos  = useRef(new THREE.Vector2(2, 0));
+  const targetInnerY = useRef(Math.PI / 2); // tracks desired facing for 3-D turn effect
 
   // Cache materials for glow updates
   const mats = useRef<THREE.MeshStandardMaterial[]>([]);
@@ -112,8 +123,10 @@ function CursorFish() {
     const onMove = (e: MouseEvent) => {
       cursor.current.x = (e.clientX / window.innerWidth) * 2 - 1;
       cursor.current.y = -(e.clientY / window.innerHeight) * 2 + 1;
+      const target = e.target;
       isClickable.current =
-        window.getComputedStyle(e.target as Element).cursor === "pointer";
+        target instanceof Element &&
+        window.getComputedStyle(target).cursor === "pointer";
     };
     window.addEventListener("mousemove", onMove);
     return () => {
@@ -129,38 +142,141 @@ function CursorFish() {
     return () => { document.body.style.cursor = ""; };
   }, [mixer, animations]);
 
-  useFrame((_, delta) => {
+  useFrame(({ clock }, delta) => {
     if (!fishRef.current) return;
 
+    const et = clock.elapsedTime;
+
+    // Project cursor to z=2 world plane — needed for fade handoff and cursor phase
     _vec.set(cursor.current.x, cursor.current.y, 0.5).unproject(camera);
     _dir.copy(_vec).sub(camera.position).normalize();
-    const t = (2 - camera.position.z) / _dir.z;
-    const wx = camera.position.x + _dir.x * t;
-    const wy = camera.position.y + _dir.y * t;
+    const ray_t = (2 - camera.position.z) / _dir.z;
+    const wx = camera.position.x + _dir.x * ray_t;
+    const wy = camera.position.y + _dir.y * ray_t;
 
-    const vx = wx - prevWorld.current.x;
-    const vy = wy - prevWorld.current.y;
-    const speed = Math.min(Math.sqrt(vx * vx + vy * vy) / delta, 150);
-    prevWorld.current.set(wx, wy);
+    // ── Intro animation ──────────────────────────────────────────────────────
+    if (et < INTRO_TOTAL) {
+      if (et < INTRO_DELAY) {
+        fishRef.current.visible = false;
+        return;
+      }
+      fishRef.current.visible = true;
 
-    if (speed > 0.3) {
-      const target = Math.atan2(vy, vx);
-      let diff = target - smoothAngle.current;
+      const elapsed = et - INTRO_DELAY;
+      let fx: number, fy: number, fz: number, targetAngle: number;
+
+      if (elapsed < INTRO_APPROACH) {
+        // Swim from z=-8 to foreground; inner Y rotates from 0 (face camera) → π/2 (face right)
+        const p    = elapsed / INTRO_APPROACH;
+        const ease = 1 - Math.pow(1 - p, 3); // easeOutCubic
+        fz = THREE.MathUtils.lerp(-8, 2, ease);
+        fx = THREE.MathUtils.lerp(0, -5, ease); // drift left so swipe starts before the name
+        fy = 0; // stay at viewport vertical centre throughout
+        targetAngle = 0; // outer stays neutral; inner handles the 3-D facing
+
+        // Pivot: face camera for first 65% of approach, then rotate to face right
+        const pivotP = Math.max(0, (p - 0.65) / 0.35);
+        if (innerRef.current)
+          innerRef.current.rotation.y = THREE.MathUtils.lerp(0, Math.PI / 2, pivotP);
+
+      } else if (elapsed < INTRO_APPROACH + INTRO_SWIPE) {
+        // Swipe left → right through the name text area
+        const p    = (elapsed - INTRO_APPROACH) / INTRO_SWIPE;
+        const ease = p < 0.5 ? 4*p*p*p : 1 - Math.pow(-2*p+2, 3) / 2;
+        fz = 2;
+        fx = THREE.MathUtils.lerp(-5, 2, ease);
+        fy = 0;
+        targetAngle = 0; // face right
+
+        if (innerRef.current)
+          innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, Math.PI / 2, Math.min(delta * 10, 1));
+
+        // Dispatch synthetic mousemove so name particles react to the fish passing through
+        _vec.set(fx, fy, fz).project(camera);
+        window.dispatchEvent(new MouseEvent("mousemove", {
+          clientX: (_vec.x + 1) / 2 * window.innerWidth,
+          clientY: (1 - _vec.y) / 2 * window.innerHeight,
+          bubbles: true,
+        }));
+      } else {
+        // Hold at swipe endpoint, smooth angle to horizontal — cursor takes over after INTRO_TOTAL
+        fz = 2;
+        fx = 2;
+        fy = 0;
+        targetAngle = 0;
+
+        if (innerRef.current)
+          innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, Math.PI / 2, Math.min(delta * 10, 1));
+      }
+
+      let diff = targetAngle - smoothAngle.current;
       while (diff >  Math.PI) diff -= Math.PI * 2;
       while (diff < -Math.PI) diff += Math.PI * 2;
-      smoothAngle.current += diff * Math.min(delta * 12, 1);
+      smoothAngle.current += diff * Math.min(delta * 5, 1);
+
+      fishRef.current.position.set(fx, fy, fz);
+      fishRef.current.rotation.z = smoothAngle.current;
+      prevWorld.current.set(wx, wy); // track real cursor so handoff is velocity-free
+
+    // ── Cursor following ─────────────────────────────────────────────────────
+    } else {
+      const HANDOFF_DUR = 0.5;
+
+      // First frame of cursor-following: record intro end position
+      if (handoffStart.current === 0) {
+        handoffStart.current = et;
+        introEndPos.current.set(
+          fishRef.current.position.x,
+          fishRef.current.position.y
+        );
+        // Seed prevWorld to intro end so first velocity delta is near-zero
+        prevWorld.current.set(introEndPos.current.x, introEndPos.current.y);
+      }
+
+      const elapsed = et - handoffStart.current;
+
+      let px: number, py: number;
+      if (elapsed < HANDOFF_DUR) {
+        // Smoothstep from intro end → cursor
+        const t = elapsed / HANDOFF_DUR;
+        const s = t * t * (3 - 2 * t);
+        px = THREE.MathUtils.lerp(introEndPos.current.x, wx, s);
+        py = THREE.MathUtils.lerp(introEndPos.current.y, wy, s);
+      } else {
+        px = wx;
+        py = wy;
+      }
+
+      const vx = px - prevWorld.current.x;
+      const vy = py - prevWorld.current.y;
+      const speed = Math.min(Math.sqrt(vx * vx + vy * vy) / delta, 150);
+      prevWorld.current.set(px, py);
+
+      if (speed > 0.3) {
+        const target = Math.atan2(vy, vx);
+        let diff = target - smoothAngle.current;
+        while (diff >  Math.PI) diff -= Math.PI * 2;
+        while (diff < -Math.PI) diff += Math.PI * 2;
+        smoothAngle.current += diff * Math.min(delta * 12, 1);
+      }
+
+      fishRef.current.position.set(px, py, 2);
+      fishRef.current.rotation.z = smoothAngle.current;
+
+      // 3-D turn: lerp inner Y toward ±π/2 based on horizontal direction.
+      // The lerp naturally passes through 0 (fish front visible) when reversing direction.
+      if (Math.abs(vx) > 0.005)
+        targetInnerY.current = vx > 0 ? Math.PI / 2 : -Math.PI / 2;
+      if (innerRef.current)
+        innerRef.current.rotation.y = THREE.MathUtils.lerp(innerRef.current.rotation.y, targetInnerY.current, Math.min(delta * 5, 1));
     }
 
-    fishRef.current.position.set(wx, wy, 2);
-    fishRef.current.rotation.z = smoothAngle.current;
-
-    // Lerp glow toward target
+    // Glow + swim speed — always active
     glow.current = THREE.MathUtils.lerp(glow.current, isClickable.current ? 1 : 0, delta * 8);
     // eslint-disable-next-line react-hooks/immutability
     for (const mat of mats.current) mat.emissiveIntensity = glow.current * 2.5;
     if (lightRef.current) lightRef.current.intensity = glow.current * 4;
 
-    // Slow animation with depth — 1.0 at surface, 0.25 at abyss
     if (actionRef.current) {
       const targetSpeed = THREE.MathUtils.lerp(1.0, 0.25, scrollProgress.current);
       actionRef.current.timeScale = THREE.MathUtils.lerp(actionRef.current.timeScale, targetSpeed, delta * 2);
@@ -169,7 +285,8 @@ function CursorFish() {
 
   return (
     <group ref={fishRef}>
-      <group rotation={[0, Math.PI / 2, 0]}>
+      {/* innerRef.rotation.y: 0 = faces camera, π/2 = faces right (cursor mode) */}
+      <group ref={innerRef} rotation={[0, 0, 0]}>
         <primitive object={scene} scale={Math.min(5, Math.max(2, 2160 / size.height))} />
       </group>
       <pointLight ref={lightRef} color="#ff6b35" intensity={0} distance={3} decay={2} />

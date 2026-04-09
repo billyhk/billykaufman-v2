@@ -255,7 +255,7 @@ export default function HeroContent() {
       variants={container}
       initial="hidden"
       animate="show"
-      className="relative z-10 w-full max-w-5xl px-8 md:px-16"
+      className="relative z-10 w-full max-w-5xl px-8 md:px-12"
     >
       <motion.p variants={item} className="text-white/40 text-sm tracking-[0.2em] uppercase mb-3">
         Hi, I&apos;m
