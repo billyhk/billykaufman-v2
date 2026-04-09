@@ -93,7 +93,7 @@ export default function NavBar() {
           </button>
 
           {/* Desktop nav */}
-          <div className="hidden lg:flex items-center gap-6 flex-1 justify-end">
+          <div className="hidden md:flex items-center gap-6 flex-1 justify-end">
 
             {/* Zone name — live, far left of link group */}
             <span
@@ -144,7 +144,7 @@ export default function NavBar() {
 
           {/* Mobile hamburger */}
           <button
-            className="lg:hidden text-white p-1 z-50 relative cursor-pointer"
+            className="md:hidden text-white p-1 z-50 relative cursor-pointer"
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle menu"
           >
@@ -167,8 +167,8 @@ export default function NavBar() {
       <AnimatePresence>
         {mobileOpen && (
           <>
-            <motion.div key="backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm lg:hidden" onClick={() => setMobileOpen(false)} />
-            <motion.div key="drawer" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 32 }} className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-[rgba(2,8,23,0.97)] backdrop-blur-xl border-l flex flex-col lg:hidden" style={{ borderColor: "color-mix(in srgb, var(--zone-accent) 25%, transparent)" }}>
+            <motion.div key="backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={() => setMobileOpen(false)} />
+            <motion.div key="drawer" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 32 }} className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-[rgba(2,8,23,0.97)] backdrop-blur-xl border-l flex flex-col md:hidden" style={{ borderColor: "color-mix(in srgb, var(--zone-accent) 25%, transparent)" }}>
 
               {/* Header */}
               <div className="h-16 flex items-center justify-between px-5 shrink-0 border-b" style={{ borderColor: "color-mix(in srgb, var(--zone-accent) 15%, transparent)" }}>
