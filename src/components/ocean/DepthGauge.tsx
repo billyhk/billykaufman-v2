@@ -21,8 +21,8 @@ export default function DepthGauge() {
 
   return (
     <div
-      className="fixed inset-y-0 z-40 pointer-events-none select-none hidden md:block"
-      style={{ right: 0, width: `${LINE_RIGHT + 20}px` }}
+      className="fixed bottom-0 z-40 pointer-events-none select-none hidden md:block"
+      style={{ top: "64px", right: 0, width: `${LINE_RIGHT + 20}px` }}
     >
       {/* Line — at exactly LINE_RIGHT px from viewport edge, matching bracket corner */}
       <div
