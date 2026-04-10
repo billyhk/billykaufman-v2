@@ -31,18 +31,76 @@ function scrollTo(id: string) {
   document.getElementById(id.replace("#", ""))?.scrollIntoView({ behavior: "smooth" });
 }
 
-// BK badge — scan lines diverge from center revealing text, then corner brackets snap in
-function BkBadge() {
+// ─── Nav link — vertical slide on hover ──────────────────────────────────────
+const SLIDE_EASE = [0.4, 0, 0.2, 1] as const;
+const SLIDE_DUR  = 0.18;
+
+function NavLinkItem({ href, label, index, isActive, onClick }: {
+  href: string; label: string; index: number; isActive: boolean; onClick: () => void;
+}) {
+  const [hovered, setHovered] = useState(false);
+
+  return (
+    <button
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+      onClick={onClick}
+      className="relative flex items-center gap-1.5 cursor-pointer"
+    >
+      {/* Index */}
+      <span
+        className="text-[9px] font-mono leading-none transition-opacity duration-150"
+        style={{ color: "var(--zone-accent)", opacity: hovered ? 0.85 : 0.4 }}
+      >
+        {String(index + 1).padStart(2, "0")}
+      </span>
+
+      {/* Text slide container */}
+      <span className="relative overflow-hidden block" style={{ height: "1.25rem" }}>
+        {/* Resting — slides out upward */}
+        <motion.span
+          className="block text-sm font-medium whitespace-nowrap"
+          animate={{ y: hovered ? "-100%" : "0%" }}
+          transition={{ duration: SLIDE_DUR, ease: SLIDE_EASE }}
+          style={{ color: isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.65)", lineHeight: "1.25rem" }}
+        >
+          {label}
+        </motion.span>
+        {/* Hover — slides in from below, accent color */}
+        <motion.span
+          className="block text-sm font-medium whitespace-nowrap absolute top-0 left-0"
+          animate={{ y: hovered ? "0%" : "100%" }}
+          transition={{ duration: SLIDE_DUR, ease: SLIDE_EASE }}
+          style={{ color: "var(--zone-accent)", lineHeight: "1.25rem" }}
+        >
+          {label}
+        </motion.span>
+      </span>
+
+      {/* Active underline */}
+      {isActive && (
+        <span
+          className="absolute -bottom-px left-0 right-0 h-px"
+          style={{ backgroundColor: "var(--zone-accent)" }}
+        />
+      )}
+    </button>
+  );
+}
+
+// BK badge — scan lines diverge from center revealing text; corners spring in/out on hover
+function BkBadge({ hovered }: { hovered: boolean }) {
   const accent = "var(--zone-accent)";
-  const D = 1.2;                        // delay: nav has delay:0.6 + duration:0.55 → fully in at ~1.15s
+  const D = 1.2;
   const scanDur = 0.4;
   const afterScan = D + scanDur + 0.05;
   const b = { stroke: accent, strokeWidth: 1.5, strokeOpacity: 0.72, strokeLinecap: "square" as const };
+  const spring = { type: "spring", stiffness: 380, damping: 22 } as const;
 
   return (
     <svg
       width="54" height="30" viewBox="0 0 54 30" fill="none"
-      className="opacity-75 group-hover:opacity-100 transition-all duration-300 group-hover:drop-shadow-[0_0_8px_var(--zone-accent)]"
+      className="opacity-75 group-hover:opacity-100 transition-opacity duration-300 group-hover:drop-shadow-[0_0_8px_var(--zone-accent)]"
       aria-hidden="true"
     >
       {/* BK text — fades in as scanner travels */}
@@ -53,7 +111,7 @@ function BkBadge() {
         transition={{ delay: D + 0.08, duration: scanDur }}
       >BK</motion.text>
 
-      {/* Top scan line — starts at center (translateY:13 offsets it from y=2 to y=15), scans up, then fades */}
+      {/* Top scan line */}
       <motion.line x1="2" y1="2" x2="52" y2="2"
         stroke={accent} strokeWidth="1" strokeOpacity="0.45"
         initial={{ translateY: 13, opacity: 1 }}
@@ -64,7 +122,7 @@ function BkBadge() {
         }}
       />
 
-      {/* Bottom scan line — starts at center (translateY:-13), scans down, then fades */}
+      {/* Bottom scan line */}
       <motion.line x1="2" y1="28" x2="52" y2="28"
         stroke={accent} strokeWidth="1" strokeOpacity="0.45"
         initial={{ translateY: -13, opacity: 1 }}
@@ -75,11 +133,11 @@ function BkBadge() {
         }}
       />
 
-      {/* Corner brackets — scale in from center once scan completes */}
+      {/* Corner brackets — spring in on hover, spring out on leave */}
       <motion.g
         style={{ transformOrigin: "27px 15px" }}
-        initial={{ scale: 0 }} animate={{ scale: 1 }}
-        transition={{ delay: afterScan, duration: 0.28, ease: [0.25, 0.1, 0.25, 1] }}
+        animate={{ scale: hovered ? 1 : 0 }}
+        transition={spring}
       >
         <line x1="2"  y1="2"  x2="10" y2="2"  {...b} />
         <line x1="2"  y1="2"  x2="2"  y2="10" {...b} />
@@ -99,6 +157,7 @@ export default function NavBar() {
   const [active, setActive]         = useState("home");
   const [depth, setDepth]           = useState(0);
   const [ready, setReady]           = useState(false);
+  const [bkHovered, setBkHovered]   = useState(false);
 
   // Live depth — same transform as DepthGauge
   const { scrollYProgress } = useScroll();
@@ -144,8 +203,13 @@ export default function NavBar() {
         <div className="px-5 h-16 flex items-center justify-between gap-8">
 
           {/* BK — polygon HUD badge */}
-          <button onClick={() => scrollTo("#home")} className="group cursor-pointer shrink-0">
-            <BkBadge />
+          <button
+            onClick={() => scrollTo("#home")}
+            onMouseEnter={() => setBkHovered(true)}
+            onMouseLeave={() => setBkHovered(false)}
+            className="group cursor-pointer shrink-0"
+          >
+            <BkBadge hovered={bkHovered} />
           </button>
 
           {/* Desktop nav */}
@@ -159,43 +223,16 @@ export default function NavBar() {
               {zoneName(depth)}
             </span>
 
-            {navLinks.map(({ href, label }, i) => {
-              const id = href.replace("#", "");
-              const isActive = active === id;
-              return (
-                <button
-                  key={href}
-                  onClick={() => scrollTo(href)}
-                  className="relative flex items-baseline gap-1.5 cursor-pointer group"
-                >
-                  {/* Section index */}
-                  <span
-                    className="text-[9px] font-mono leading-none opacity-40 group-hover:opacity-70 transition-opacity"
-                    style={{ color: "var(--zone-accent)" }}
-                  >
-                    {String(i + 1).padStart(2, "0")}
-                  </span>
-
-                  {/* Label */}
-                  <span
-                    className={`text-sm font-medium transition-colors pb-px ${
-                      isActive ? "" : "text-white/65 group-hover:text-white"
-                    }`}
-                    style={isActive ? { color: "var(--zone-accent)" } : undefined}
-                  >
-                    {label}
-                  </span>
-
-                  {/* Active underline — zone accent */}
-                  {isActive && (
-                    <span
-                      className="absolute -bottom-px left-0 right-0 h-px"
-                      style={{ backgroundColor: "var(--zone-accent)" }}
-                    />
-                  )}
-                </button>
-              );
-            })}
+            {navLinks.map(({ href, label }, i) => (
+              <NavLinkItem
+                key={href}
+                href={href}
+                label={label}
+                index={i}
+                isActive={active === href.replace("#", "")}
+                onClick={() => scrollTo(href)}
+              />
+            ))}
           </div>
 
           {/* Mobile hamburger */}
