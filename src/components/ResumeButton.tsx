@@ -32,14 +32,14 @@ export default function ResumeButton() {
 
       {open && createPortal(
         <div
-          className="fixed inset-0 z-[9999] flex items-center justify-center sm:p-8"
-          style={{ cursor: "default" }}
+          className="fixed inset-x-0 top-0 z-[9999] flex items-center justify-center sm:p-8"
+          style={{ cursor: "default", height: "100dvh" }}
         >
           {/* Backdrop */}
           <div className="absolute inset-0 bg-black/75 backdrop-blur-sm" onClick={close} />
 
           {/* Panel — full-screen on mobile, floating card on sm+ */}
-          <div className="relative z-10 w-full h-full sm:h-[88vh] sm:max-h-[1020px] sm:max-w-3xl sm:rounded-2xl bg-slate-900 sm:border border-white/15 shadow-2xl flex flex-col overflow-hidden">
+          <div className="relative z-10 w-full sm:h-[88vh] sm:max-h-[1020px] sm:max-w-3xl sm:rounded-2xl bg-slate-900 sm:border border-white/15 shadow-2xl flex flex-col overflow-hidden" style={{ height: "100dvh" }}>
             {/* Header */}
             <div className="flex items-center justify-between px-5 py-3.5 border-b border-white/10 shrink-0">
               <span className="text-white/70 text-sm font-medium">Billy Kaufman — Resume</span>
