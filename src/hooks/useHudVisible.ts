@@ -10,7 +10,9 @@ import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 export function useHudVisible(): boolean {
   const [show, setShow] = useState(false);
   useEffect(() => {
-    if (window.scrollY > window.innerHeight * 0.5) {
+    // Touch devices have no cursor-following fish intro — no need to wait for it
+    const isTouch = window.matchMedia("(pointer: coarse)").matches;
+    if (isTouch || window.scrollY > window.innerHeight * 0.5) {
       setShow(true);
       return;
     }
