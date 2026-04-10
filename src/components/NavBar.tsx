@@ -2,10 +2,10 @@
 
 import { useState, useEffect } from "react";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import { useHudVisible } from "@/hooks/useHudVisible";
 import { HiMenu, HiX } from "react-icons/hi";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { socialLinks } from "@/data/social";
-import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 const navLinks = [
   { href: "#home",       label: "Home"       },
@@ -90,7 +90,34 @@ function NavLinkItem({ href, label, index, isActive, onClick }: {
   );
 }
 
-// BK badge — scan lines diverge from center revealing text; corners spring in/out on hover
+// Mobile BK badge — corners spring in on tap, spring out after a beat
+function StaticBkBadge({ active }: { active: boolean }) {
+  const accent = "var(--zone-accent)";
+  const b = { stroke: accent, strokeWidth: 1.5, strokeOpacity: 0.72, strokeLinecap: "square" as const };
+  const spring = { type: "spring", stiffness: 380, damping: 22 } as const;
+  return (
+    <svg width="54" height="30" viewBox="0 0 54 30" fill="none" aria-hidden="true" style={{ opacity: 0.75 }}>
+      <text x="27" y="20" textAnchor="middle" fill="white" fontSize="14" fontWeight="800"
+        fontFamily="ui-monospace, monospace" letterSpacing="0.12em" fillOpacity="0.88">BK</text>
+      <motion.g
+        style={{ transformOrigin: "27px 15px" }}
+        animate={{ scale: active ? 1 : 0 }}
+        transition={spring}
+      >
+        <line x1="2"  y1="2"  x2="10" y2="2"  {...b} />
+        <line x1="2"  y1="2"  x2="2"  y2="10" {...b} />
+        <line x1="44" y1="2"  x2="52" y2="2"  {...b} />
+        <line x1="52" y1="2"  x2="52" y2="10" {...b} />
+        <line x1="2"  y1="28" x2="10" y2="28" {...b} />
+        <line x1="2"  y1="20" x2="2"  y2="28" {...b} />
+        <line x1="44" y1="28" x2="52" y2="28" {...b} />
+        <line x1="52" y1="20" x2="52" y2="28" {...b} />
+      </motion.g>
+    </svg>
+  );
+}
+
+// Desktop BK badge — scan lines diverge from center revealing text; corners spring in/out on hover
 function BkBadge({ hovered }: { hovered: boolean }) {
   const accent = "var(--zone-accent)";
   const D = 1.2;
@@ -158,8 +185,9 @@ export default function NavBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [active, setActive]         = useState("home");
   const [depth, setDepth]           = useState(0);
-  const [ready, setReady]           = useState(false);
-  const [bkHovered, setBkHovered]   = useState(false);
+  const ready                        = useHudVisible();
+  const [bkHovered, setBkHovered]       = useState(false);
+  const [mobileBkActive, setMobileBkActive] = useState(false);
   const [selectedHref, setSelectedHref] = useState<string | null>(null);
 
   const handleMobileNavClick = (href: string) => {
@@ -177,13 +205,6 @@ export default function NavBar() {
   useMotionValueEvent(depthMV, "change", (v) => setDepth(Math.round(v)));
 
   useScrollLock(mobileOpen);
-
-  // Hold navbar off-screen until intro completes (mirrors DepthGauge / HudSensorPanel)
-  useEffect(() => {
-    if (window.scrollY > window.innerHeight * 0.5) { setReady(true); return; }
-    const t = setTimeout(() => setReady(true), INTRO_TOTAL * 1000);
-    return () => clearTimeout(t);
-  }, []);
 
   // Section spy
   useEffect(() => {
@@ -216,12 +237,19 @@ export default function NavBar() {
 
           {/* BK — polygon HUD badge */}
           <button
-            onClick={() => scrollTo("#home")}
+            onClick={() => {
+              scrollTo("#home");
+              setMobileBkActive(true);
+              setTimeout(() => setMobileBkActive(false), 450);
+            }}
             onMouseEnter={() => setBkHovered(true)}
             onMouseLeave={() => setBkHovered(false)}
             className="group cursor-pointer shrink-0"
           >
-            <BkBadge hovered={bkHovered} />
+            {/* Tap-animated logo on mobile */}
+            <span className="block md:hidden"><StaticBkBadge active={mobileBkActive} /></span>
+            {/* Hover-animated logo on desktop */}
+            <span className="hidden md:block"><BkBadge hovered={bkHovered} /></span>
           </button>
 
           {/* Desktop nav */}
