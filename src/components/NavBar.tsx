@@ -158,6 +158,16 @@ export default function NavBar() {
   const [depth, setDepth]           = useState(0);
   const [ready, setReady]           = useState(false);
   const [bkHovered, setBkHovered]   = useState(false);
+  const [selectedHref, setSelectedHref] = useState<string | null>(null);
+
+  const handleMobileNavClick = (href: string) => {
+    setSelectedHref(href);
+    setTimeout(() => {
+      scrollTo(href);
+      setMobileOpen(false);
+      setSelectedHref(null);
+    }, 380);
+  };
 
   // Live depth — same transform as DepthGauge
   const { scrollYProgress } = useScroll();
@@ -276,25 +286,47 @@ export default function NavBar() {
               {/* Links — scrollable so nothing clips on short screens */}
               <div className="flex flex-col px-4 pt-5 gap-0.5 overflow-y-auto flex-1">
                 {navLinks.map(({ href, label }, i) => {
-                  const isActive = active === href.replace("#", "");
+                  const isActive   = active === href.replace("#", "");
+                  const isSelected = selectedHref === href;
+                  const isDimmed   = selectedHref !== null && !isSelected;
                   return (
                     <motion.div key={href} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.06 + i * 0.05, duration: 0.22 }}>
-                      <button
-                        onClick={() => { scrollTo(href); setMobileOpen(false); }}
-                        className="w-full text-left flex items-center gap-3 px-3 py-3.5 text-base font-medium transition-colors cursor-pointer border-b"
-                        style={{
-                          borderColor: "rgba(255,255,255,0.06)",
-                          color: isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.55)",
-                        }}
-                      >
-                        <span className="text-[10px] font-mono w-5 shrink-0 opacity-40" style={{ color: "var(--zone-accent)" }}>
-                          {String(i + 1).padStart(2, "0")}
-                        </span>
-                        {label}
-                        {isActive && (
-                          <span className="ml-auto w-1 h-4 rounded-full shrink-0" style={{ backgroundColor: "var(--zone-accent)" }} />
-                        )}
-                      </button>
+                      {/* Selection dim wrapper */}
+                      <motion.div animate={{ opacity: isDimmed ? 0.2 : 1 }} transition={{ duration: 0.15 }}>
+                        <button
+                          onClick={() => handleMobileNavClick(href)}
+                          className="w-full text-left flex items-center gap-3 px-3 py-3.5 text-base font-medium cursor-pointer border-b relative overflow-hidden"
+                          style={{
+                            borderColor: "rgba(255,255,255,0.06)",
+                            color: isSelected || isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.55)",
+                          }}
+                        >
+                          {/* Scan line on select */}
+                          <AnimatePresence>
+                            {isSelected && (
+                              <motion.span
+                                key="scan"
+                                className="absolute top-0 bottom-0 w-24 pointer-events-none"
+                                style={{ background: "linear-gradient(90deg, transparent, var(--zone-accent) 50%, transparent)", opacity: 0.28 }}
+                                initial={{ left: "-6rem" }}
+                                animate={{ left: "110%" }}
+                                transition={{ duration: 0.35, ease: "easeOut" }}
+                              />
+                            )}
+                          </AnimatePresence>
+
+                          <span
+                            className="text-[10px] font-mono w-5 shrink-0 transition-opacity"
+                            style={{ color: "var(--zone-accent)", opacity: isSelected ? 1 : 0.4 }}
+                          >
+                            {String(i + 1).padStart(2, "0")}
+                          </span>
+                          {label}
+                          {(isActive || isSelected) && (
+                            <span className="ml-auto w-1 h-4 rounded-full shrink-0" style={{ backgroundColor: "var(--zone-accent)" }} />
+                          )}
+                        </button>
+                      </motion.div>
                     </motion.div>
                   );
                 })}
