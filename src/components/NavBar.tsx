@@ -77,11 +77,13 @@ function NavLinkItem({ href, label, index, isActive, onClick }: {
         </motion.span>
       </span>
 
-      {/* Active underline */}
+      {/* Active underline — shared layoutId makes it travel between items */}
       {isActive && (
-        <span
+        <motion.span
+          layoutId="nav-underline"
           className="absolute -bottom-px left-0 right-0 h-px"
           style={{ backgroundColor: "var(--zone-accent)" }}
+          transition={{ type: "tween", duration: 0.2, ease: [0.4, 0, 0.6, 1] }}
         />
       )}
     </button>
