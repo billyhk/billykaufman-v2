@@ -239,7 +239,7 @@ function NameParticles() {
 
   return (
     <div ref={containerRef} style={{ position: "relative", width: "100%" }}>
-      <canvas ref={canvasRef} style={{ display: "block" }} />
+      <canvas ref={canvasRef} style={{ display: "block", pointerEvents: "none" }} />
       <h1 className="sr-only">Billy Kaufman</h1>
     </div>
   );

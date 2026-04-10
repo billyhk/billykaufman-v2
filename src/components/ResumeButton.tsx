@@ -5,8 +5,6 @@ import { createPortal } from "react-dom";
 import { RESUME_URL } from "@/data/bio";
 import { useScrollLock } from "@/hooks/useScrollLock";
 
-const fileId = RESUME_URL.match(/\/d\/([^/]+)/)?.[1] ?? "";
-const EMBED_URL = `https://drive.google.com/file/d/${fileId}/preview`;
 
 export default function ResumeButton() {
   const [open, setOpen] = useState(false);
@@ -48,8 +46,7 @@ export default function ResumeButton() {
               <div className="flex items-center gap-3">
                 <a
                   href={RESUME_URL}
-                  target="_blank"
-                  rel="noopener noreferrer"
+                  download="billy_kaufman_resume.pdf"
                   className="px-3.5 py-1.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-semibold rounded-lg transition-colors"
                 >
                   Download
@@ -67,7 +64,7 @@ export default function ResumeButton() {
             {/* PDF viewer */}
             <div className="flex-1 overflow-hidden">
               <iframe
-                src={EMBED_URL}
+                src={RESUME_URL}
                 className="w-full h-full border-0"
                 style={{ cursor: "default" }}
                 title="Billy Kaufman Resume"
