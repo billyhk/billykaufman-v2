@@ -119,7 +119,8 @@ function Jellyfish({
   const { scene, animations } = useGLTF("/models/liriope_jellyfish_trachymedusae.glb");
   const { actions } = useAnimations(animations, groupRef);
   const { camera } = useThree();
-  const matsRef = useRef<THREE.Material[]>([]);
+  const matsRef  = useRef<THREE.Material[]>([]);
+  const scaleRef = useRef(0);
 
   useEffect(() => {
     matsRef.current = prepareMaterials(scene);
@@ -149,10 +150,12 @@ function Jellyfish({
     const yPos   = depth - 4 + rise;
     const xDrift = xOffset + Math.sin(t * 0.13) * 2.5;
 
-    // Scroll-driven approach: scale up and move forward as camera nears
-    const zDepth   = THREE.MathUtils.lerp(-24, -13, proximity);
-    const scaleVal = THREE.MathUtils.lerp(0.3, 0.9, proximity);
-    groupRef.current.scale.set(scaleVal, scaleVal, scaleVal);
+    // Scroll-driven approach: scale up and move forward as camera nears.
+    // Scale lerps toward target so fast scrolling doesn't cause a jarring snap-down.
+    const zDepth      = THREE.MathUtils.lerp(-24, -13, proximity);
+    const targetScale = THREE.MathUtils.lerp(0.3, 0.9, proximity);
+    scaleRef.current  = THREE.MathUtils.lerp(scaleRef.current, targetScale, 0.04);
+    groupRef.current.scale.set(scaleRef.current, scaleRef.current, scaleRef.current);
 
     // Fade out near loop reset so the position jump is invisible
     const phaseOpacity = rise > 12 ? (14 - rise) / 2 : 1;
