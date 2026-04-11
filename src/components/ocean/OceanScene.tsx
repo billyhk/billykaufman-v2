@@ -5,6 +5,10 @@ import { useRef, useMemo, useEffect, useState } from "react";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 import HeroElements from "./HeroElements";
+import DeepCreatures from "./DeepCreatures";
+
+// Camera Y = -scrollProgress * SCROLL_DEPTH_SCALE. Shared with DeepCreatures depth values.
+const SCROLL_DEPTH_SCALE = 60;
 
 // Depth color stops: surface → abyss
 const DEPTH_COLORS = [
@@ -100,14 +104,14 @@ export default function OceanScene() {
   };
 
   const [scrollProgress, setScrollProgress] = useState(getScrollProgress);
-  const targetCamY  = useRef(-getScrollProgress() * 60);
-  const currentCamY = useRef(-getScrollProgress() * 60);
+  const targetCamY  = useRef(-getScrollProgress() * SCROLL_DEPTH_SCALE);
+  const currentCamY = useRef(-getScrollProgress() * SCROLL_DEPTH_SCALE);
 
   useEffect(() => {
     const onScroll = () => {
       const progress = getScrollProgress();
       setScrollProgress(progress);
-      targetCamY.current = -progress * 60;
+      targetCamY.current = -progress * SCROLL_DEPTH_SCALE;
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
@@ -128,6 +132,7 @@ export default function OceanScene() {
       <HeroElements />
       <Bubbles />
       <BioParticles />
+      <DeepCreatures />
       <fog attach="fog" args={["#020817", 30, 80]} />
       <EffectComposer>
         <Bloom
