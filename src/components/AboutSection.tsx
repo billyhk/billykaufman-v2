@@ -96,8 +96,8 @@ export default function AboutSection() {
             <Image
               src={bioData.headshotSrc}
               alt="Headshot of Billy Kaufman"
-              width={240}
-              height={240}
+              width={360}
+              height={360}
               style={{ height: "auto" }}
               priority
               className="rounded-2xl object-cover shadow-xl ring-1 ring-white/15 opacity-90"

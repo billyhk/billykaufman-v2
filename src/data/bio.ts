@@ -14,6 +14,6 @@ export const bioData = {
     "When I'm not coding, I'm training for the next road running race, playing chess, and keeping the music going!"
   ],
   generalAssemblyUrl: URLS.generalAssembly,
-  headshotSrc: "/images/headshot.jpg",
+  headshotSrc: "/images/headshot-2.jpg",
   highlights: ["NYC", `${new Date().getFullYear() - 2020}+ yrs`, "Full-stack"],
 };
