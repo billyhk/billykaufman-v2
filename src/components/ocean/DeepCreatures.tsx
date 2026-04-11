@@ -16,13 +16,14 @@ function easeOutBack(t: number): number {
 
 // Clone each mesh material so we can control opacity without mutating the
 // cached GLTF scene shared by useGLTF.
-function prepareMaterials(root: THREE.Object3D): THREE.Material[] {
+function prepareMaterials(root: THREE.Object3D, blending?: THREE.Blending): THREE.Material[] {
   const mats: THREE.Material[] = [];
   root.traverse((obj) => {
     if (obj instanceof THREE.Mesh) {
       const mat = (obj.material as THREE.Material).clone();
       mat.transparent = true;
       mat.depthWrite = false;
+      if (blending !== undefined) (mat as THREE.MeshStandardMaterial).blending = blending;
       obj.material = mat;
       mats.push(mat);
     }
@@ -184,21 +185,8 @@ function FireflySquid({ depth = -54 }: { depth: number }) {
   const rotYRef = useRef(0);
 
   useEffect(() => {
-    // Squid is fully emissive (black base + white glow). Additive blending
-    // makes the black base invisible and lets the emissive glow add to the scene,
-    // exactly like bioluminescence. Bloom will then pick it up beautifully.
-    const mats: THREE.Material[] = [];
-    scene.traverse((obj) => {
-      if (obj instanceof THREE.Mesh) {
-        const mat = (obj.material as THREE.Material).clone();
-        mat.transparent = true;
-        mat.depthWrite  = false;
-        (mat as THREE.MeshStandardMaterial).blending = THREE.AdditiveBlending;
-        obj.material = mat;
-        mats.push(mat);
-      }
-    });
-    matsRef.current = mats;
+    // AdditiveBlending: black base disappears, emissive glow adds to scene like bioluminescence.
+    matsRef.current = prepareMaterials(scene, THREE.AdditiveBlending);
   }, [scene]);
 
   useEffect(() => {

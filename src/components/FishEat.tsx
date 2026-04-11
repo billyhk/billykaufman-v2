@@ -16,6 +16,13 @@ const EDGE_PAD         = 60;
 const SPAWN_INTERVAL_MS = 1200;
 const MAX_NPC_CAP       = 80;
 
+// NPC color by size ratio relative to player: green = safe to eat, yellow = similar, red = danger
+const NPC_COLOR_TIERS: { threshold: number; rgb: readonly [number, number, number] }[] = [
+  { threshold: 0.85,          rgb: [60,  200, 160] }, // smaller
+  { threshold: 1 / EAT_RATIO, rgb: [230, 200, 60]  }, // similar
+  { threshold: Infinity,       rgb: [220, 60,  60]  }, // bigger
+];
+
 // species: 0=oval  1=torpedo  2=angler  3=puffer  4=tall  5=eel  6=lantern
 type Species = 0 | 1 | 2 | 3 | 4 | 5 | 6;
 const SPECIES_POOL: Species[] = [0,0,0,0, 1,1,1, 2,2, 3,3, 4,4,4, 5,5, 6];
@@ -301,10 +308,7 @@ function drawLantern(ctx: CanvasRenderingContext2D, s: number, r: number, g: num
 // ── NPC dispatch ──────────────────────────────────────────────────────────────
 function drawNPC(ctx: CanvasRenderingContext2D, npc: NPC, playerSize: number, t: number) {
   const ratio = npc.size / playerSize;
-  let r: number, g: number, b: number;
-  if (ratio < 0.85)             { r = 60;  g = 200; b = 160; }
-  else if (ratio < 1 / EAT_RATIO) { r = 230; g = 200; b = 60;  }
-  else                           { r = 220; g = 60;  b = 60;  }
+  const [r, g, b] = NPC_COLOR_TIERS.find(t => ratio < t.threshold)!.rgb;
 
   const tailWag = Math.sin(t * 7 + npc.wobble) * 0.3;
 

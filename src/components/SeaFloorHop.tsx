@@ -16,8 +16,6 @@ const SCORE_INTERVAL = 55; // frames per point
 
 // type 0=crab  1=urchin  2=starfish  3=hermit
 type ObsType = 0 | 1 | 2 | 3;
-const OBS_HW = [22, 13, 20, 17];   // half-width for collision
-const OBS_CH = [22, 38, 13, 28];   // collision height above floor
 
 type GameState = "idle" | "playing" | "dead";
 type Obstacle  = { x: number; type: ObsType };
@@ -173,14 +171,16 @@ function drawHermit(ctx: CanvasRenderingContext2D, cx: number) {
   ctx.fillStyle = "#fff"; ctx.fill();
 }
 
-function drawObstacle(ctx: CanvasRenderingContext2D, obs: Obstacle) {
-  switch (obs.type) {
-    case 0: drawCrab(ctx, obs.x); break;
-    case 1: drawUrchin(ctx, obs.x); break;
-    case 2: drawStarfish(ctx, obs.x); break;
-    case 3: drawHermit(ctx, obs.x); break;
-  }
-}
+// Obstacle config: hw = collision half-width, ch = collision height above floor
+const OBS_CONFIG: Record<ObsType, {
+  hw: number; ch: number;
+  draw: (ctx: CanvasRenderingContext2D, cx: number) => void;
+}> = {
+  0: { hw: 22, ch: 22, draw: drawCrab     },
+  1: { hw: 13, ch: 38, draw: drawUrchin   },
+  2: { hw: 20, ch: 13, draw: drawStarfish },
+  3: { hw: 17, ch: 28, draw: drawHermit   },
+};
 
 // ── Component ─────────────────────────────────────────────────────────────────
 export default function SeaFloorHop() {
@@ -309,8 +309,7 @@ export default function SeaFloorHop() {
           obs.x -= speed.current;
 
           // Collision
-          const hw   = OBS_HW[obs.type];
-          const ch   = OBS_CH[obs.type];
+          const { hw, ch } = OBS_CONFIG[obs.type];
           const nearX = Math.abs(FISH_X - obs.x) < FISH_R + hw - 4;
           const nearY = fishY.current + FISH_R > FLOOR_Y - ch;
           if (nearX && nearY) stateRef.current = "dead";
@@ -318,7 +317,7 @@ export default function SeaFloorHop() {
       }
 
       // Draw obstacles
-      for (const obs of obstacles.current) drawObstacle(ctx, obs);
+      for (const obs of obstacles.current) OBS_CONFIG[obs.type].draw(ctx, obs.x);
 
       // Draw fish
       drawFish(ctx, FISH_X, fishY.current, fishVY.current, t, stateRef.current === "dead" ? 0.35 : 1);
