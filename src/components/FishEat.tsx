@@ -41,6 +41,15 @@ type NPC = {
 let nextId = 0;
 
 // ── Helpers ───────────────────────────────────────────────────────────────────
+function lighten(r: number, g: number, b: number, n: number, a?: number): string {
+  const lr = Math.min(r + n, 255), lg = Math.min(g + n, 255), lb = Math.min(b + n, 255);
+  return a === undefined ? `rgb(${lr},${lg},${lb})` : `rgba(${lr},${lg},${lb},${a})`;
+}
+function darken(r: number, g: number, b: number, n: number, a?: number): string {
+  const dr = Math.max(r - n, 0), dg = Math.max(g - n, 0), db = Math.max(b - n, 0);
+  return a === undefined ? `rgb(${dr},${dg},${db})` : `rgba(${dr},${dg},${db},${a})`;
+}
+
 function spawnNPC(W: number, playerSize: number, fromEdge = true, forceSmaller = false): NPC {
   const smaller = forceSmaller || Math.random() < 0.68;
   const size = smaller
@@ -71,7 +80,7 @@ function spawnNPC(W: number, playerSize: number, fromEdge = true, forceSmaller =
 // 0 — Generic oval fish (original)
 function drawOval(ctx: CanvasRenderingContext2D, s: number, r: number, g: number, b: number, tailWag: number) {
   const col  = `rgb(${r},${g},${b})`;
-  const lite = `rgba(${Math.min(r+60,255)},${Math.min(g+60,255)},${Math.min(b+60,255)},0.4)`;
+  const lite = lighten(r, g, b, 60, 0.4);
 
   ctx.beginPath(); ctx.ellipse(0, 0, s, s * 0.6, 0, 0, Math.PI * 2);
   ctx.fillStyle = col; ctx.fill();
@@ -90,7 +99,7 @@ function drawOval(ctx: CanvasRenderingContext2D, s: number, r: number, g: number
 // 1 — Torpedo / tuna — sleek, forked tail, dorsal spike
 function drawTorpedo(ctx: CanvasRenderingContext2D, s: number, r: number, g: number, b: number, tailWag: number) {
   const col  = `rgb(${r},${g},${b})`;
-  const dark = `rgba(${Math.max(r-40,0)},${Math.max(g-40,0)},${Math.max(b-40,0)},0.9)`;
+  const dark = darken(r, g, b, 40, 0.9);
 
   // elongated body
   ctx.beginPath(); ctx.ellipse(0, 0, s * 1.4, s * 0.38, 0, 0, Math.PI * 2);
@@ -117,7 +126,7 @@ function drawTorpedo(ctx: CanvasRenderingContext2D, s: number, r: number, g: num
 
 // 2 — Anglerfish — round body, gaping jaw, glowing lure
 function drawAngler(ctx: CanvasRenderingContext2D, s: number, r: number, g: number, b: number, tailWag: number, t: number) {
-  const col  = `rgb(${Math.max(r-30,0)},${Math.max(g-30,0)},${Math.max(b-30,0)})`;
+  const col  = darken(r, g, b, 30);
 
   // body — wide and rounded
   ctx.beginPath(); ctx.ellipse(0, -s*0.1, s * 0.95, s * 0.75, 0, 0, Math.PI * 2);
@@ -146,7 +155,7 @@ function drawAngler(ctx: CanvasRenderingContext2D, s: number, r: number, g: numb
   // lure glow
   ctx.shadowBlur = 10; ctx.shadowColor = `rgb(${r},${g},${b})`;
   ctx.beginPath(); ctx.arc(s * 0.55 + lureSwing, -s * 1.38, s * 0.13, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(${Math.min(r+80,255)},${Math.min(g+80,255)},${Math.min(b+80,255)},0.95)`; ctx.fill();
+  ctx.fillStyle = lighten(r, g, b, 80, 0.95); ctx.fill();
   ctx.shadowBlur = 0;
 
   // tail
@@ -167,7 +176,7 @@ function drawAngler(ctx: CanvasRenderingContext2D, s: number, r: number, g: numb
 // 3 — Pufferfish — round, spines, spots
 function drawPuffer(ctx: CanvasRenderingContext2D, s: number, r: number, g: number, b: number) {
   const col  = `rgb(${r},${g},${b})`;
-  const spot = `rgba(${Math.max(r-50,0)},${Math.max(g-50,0)},${Math.max(b-50,0)},0.5)`;
+  const spot = darken(r, g, b, 50, 0.5);
 
   // round body
   ctx.beginPath(); ctx.arc(0, 0, s, 0, Math.PI * 2);
@@ -198,7 +207,7 @@ function drawPuffer(ctx: CanvasRenderingContext2D, s: number, r: number, g: numb
 
   // tiny mouth
   ctx.beginPath(); ctx.arc(s * 0.85, s * 0.05, s * 0.1, 0, Math.PI * 2);
-  ctx.fillStyle = `rgba(${Math.max(r-60,0)},${Math.max(g-60,0)},${Math.max(b-60,0)},0.9)`; ctx.fill();
+  ctx.fillStyle = darken(r, g, b, 60, 0.9); ctx.fill();
 
   const es = Math.max(1.5, s * 0.18);
   ctx.beginPath(); ctx.arc(s * 0.6, -s * 0.35, es, 0, Math.PI * 2);
@@ -210,7 +219,7 @@ function drawPuffer(ctx: CanvasRenderingContext2D, s: number, r: number, g: numb
 // 4 — Tall body fish (butterflyfish / surgeonfish) — tall oval, eye stripe
 function drawTall(ctx: CanvasRenderingContext2D, s: number, r: number, g: number, b: number, tailWag: number) {
   const col  = `rgb(${r},${g},${b})`;
-  const dark = `rgba(${Math.max(r-60,0)},${Math.max(g-60,0)},${Math.max(b-60,0)},0.85)`;
+  const dark = darken(r, g, b, 60, 0.85);
 
   // tall oval body
   ctx.beginPath(); ctx.ellipse(0, 0, s * 0.7, s * 1.1, 0, 0, Math.PI * 2);
@@ -272,7 +281,7 @@ function drawEel(ctx: CanvasRenderingContext2D, s: number, r: number, g: number,
 
 // 6 — Lanternfish — small round, huge eyes, glowing belly dots
 function drawLantern(ctx: CanvasRenderingContext2D, s: number, r: number, g: number, b: number, tailWag: number, t: number) {
-  const col = `rgb(${Math.max(r-20,0)},${Math.max(g-20,0)},${Math.max(b-20,0)})`;
+  const col = darken(r, g, b, 20);
 
   // body
   ctx.beginPath(); ctx.ellipse(0, 0, s, s * 0.65, 0, 0, Math.PI * 2);
@@ -286,11 +295,11 @@ function drawLantern(ctx: CanvasRenderingContext2D, s: number, r: number, g: num
   // glowing belly photophores
   const glowPulse = 0.7 + Math.sin(t * 3 + 1) * 0.3;
   ctx.shadowBlur = 8 * glowPulse;
-  ctx.shadowColor = `rgb(${Math.min(r+100,255)},${Math.min(g+100,255)},${Math.min(b+100,255)})`;
+  ctx.shadowColor = lighten(r, g, b, 100);
   for (let i = 0; i < 4; i++) {
     const dx = (i - 1.5) * s * 0.42;
     ctx.beginPath(); ctx.arc(dx, s * 0.35, Math.max(1, s * 0.09), 0, Math.PI * 2);
-    ctx.fillStyle = `rgba(${Math.min(r+120,255)},${Math.min(g+120,255)},${Math.min(b+120,255)},${glowPulse})`;
+    ctx.fillStyle = lighten(r, g, b, 120, glowPulse);
     ctx.fill();
   }
   ctx.shadowBlur = 0;

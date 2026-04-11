@@ -90,29 +90,39 @@ function NavLinkItem({ href, label, index, isActive, onClick }: {
   );
 }
 
+// Shared corner bracket lines used by both badge variants
+const BADGE_SPRING = { type: "spring", stiffness: 380, damping: 22 } as const;
+function CornerBrackets({ b, scale }: {
+  b: React.SVGProps<SVGLineElement>;
+  scale: number | boolean;
+}) {
+  return (
+    <motion.g
+      style={{ transformOrigin: "27px 15px" }}
+      animate={{ scale: scale ? 1 : 0 }}
+      transition={BADGE_SPRING}
+    >
+      <line x1="2"  y1="2"  x2="10" y2="2"  {...b} />
+      <line x1="2"  y1="2"  x2="2"  y2="10" {...b} />
+      <line x1="44" y1="2"  x2="52" y2="2"  {...b} />
+      <line x1="52" y1="2"  x2="52" y2="10" {...b} />
+      <line x1="2"  y1="28" x2="10" y2="28" {...b} />
+      <line x1="2"  y1="20" x2="2"  y2="28" {...b} />
+      <line x1="44" y1="28" x2="52" y2="28" {...b} />
+      <line x1="52" y1="20" x2="52" y2="28" {...b} />
+    </motion.g>
+  );
+}
+
 // Mobile BK badge — corners spring in on tap, spring out after a beat
 function StaticBkBadge({ active }: { active: boolean }) {
   const accent = "var(--zone-accent)";
   const b = { stroke: accent, strokeWidth: 1.5, strokeOpacity: 0.72, strokeLinecap: "square" as const };
-  const spring = { type: "spring", stiffness: 380, damping: 22 } as const;
   return (
     <svg width="54" height="30" viewBox="0 0 54 30" fill="none" aria-hidden="true" style={{ opacity: 0.75 }}>
       <text x="27" y="20" textAnchor="middle" fill="white" fontSize="14" fontWeight="800"
         fontFamily="ui-monospace, monospace" letterSpacing="0.12em" fillOpacity="0.88">BK</text>
-      <motion.g
-        style={{ transformOrigin: "27px 15px" }}
-        animate={{ scale: active ? 1 : 0 }}
-        transition={spring}
-      >
-        <line x1="2"  y1="2"  x2="10" y2="2"  {...b} />
-        <line x1="2"  y1="2"  x2="2"  y2="10" {...b} />
-        <line x1="44" y1="2"  x2="52" y2="2"  {...b} />
-        <line x1="52" y1="2"  x2="52" y2="10" {...b} />
-        <line x1="2"  y1="28" x2="10" y2="28" {...b} />
-        <line x1="2"  y1="20" x2="2"  y2="28" {...b} />
-        <line x1="44" y1="28" x2="52" y2="28" {...b} />
-        <line x1="52" y1="20" x2="52" y2="28" {...b} />
-      </motion.g>
+      <CornerBrackets b={b} scale={active} />
     </svg>
   );
 }
@@ -124,7 +134,6 @@ function BkBadge({ hovered }: { hovered: boolean }) {
   const scanDur = 0.4;
   const afterScan = D + scanDur + 0.05;
   const b = { stroke: accent, strokeWidth: 1.5, strokeOpacity: 0.72, strokeLinecap: "square" as const };
-  const spring = { type: "spring", stiffness: 380, damping: 22 } as const;
 
   return (
     <svg
@@ -146,7 +155,7 @@ function BkBadge({ hovered }: { hovered: boolean }) {
         initial={{ translateY: 13, opacity: 1 }}
         animate={{ translateY: 0, opacity: 0 }}
         transition={{
-          translateY: { delay: D, duration: scanDur, ease: [0.4, 0, 0.2, 1] },
+          translateY: { delay: D, duration: scanDur, ease: SLIDE_EASE },
           opacity: { delay: afterScan, duration: 0.2 },
         }}
       />
@@ -157,26 +166,13 @@ function BkBadge({ hovered }: { hovered: boolean }) {
         initial={{ translateY: -13, opacity: 1 }}
         animate={{ translateY: 0, opacity: 0 }}
         transition={{
-          translateY: { delay: D, duration: scanDur, ease: [0.4, 0, 0.2, 1] },
+          translateY: { delay: D, duration: scanDur, ease: SLIDE_EASE },
           opacity: { delay: afterScan, duration: 0.2 },
         }}
       />
 
       {/* Corner brackets — spring in on hover, spring out on leave */}
-      <motion.g
-        style={{ transformOrigin: "27px 15px" }}
-        animate={{ scale: hovered ? 1 : 0 }}
-        transition={spring}
-      >
-        <line x1="2"  y1="2"  x2="10" y2="2"  {...b} />
-        <line x1="2"  y1="2"  x2="2"  y2="10" {...b} />
-        <line x1="44" y1="2"  x2="52" y2="2"  {...b} />
-        <line x1="52" y1="2"  x2="52" y2="10" {...b} />
-        <line x1="2"  y1="28" x2="10" y2="28" {...b} />
-        <line x1="2"  y1="20" x2="2"  y2="28" {...b} />
-        <line x1="44" y1="28" x2="52" y2="28" {...b} />
-        <line x1="52" y1="20" x2="52" y2="28" {...b} />
-      </motion.g>
+      <CornerBrackets b={b} scale={hovered} />
     </svg>
   );
 }
