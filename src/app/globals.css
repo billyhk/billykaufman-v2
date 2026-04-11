@@ -19,6 +19,10 @@ html {
 body {
   overflow-x: hidden;
   background-color: #000408;
+  /* Tells iOS Safari the page only pans vertically — eliminates scroll-axis
+     ambiguity that causes the first-touch spring-back when horizontal overflow
+     is detectable anywhere on the page. */
+  touch-action: pan-y;
 }
 
 section[id] {
