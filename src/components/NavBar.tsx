@@ -224,7 +224,7 @@ export default function NavBar() {
   return (
     <>
       <motion.nav
-        className="fixed top-0 z-50"
+        className="fixed top-0 z-50 cursor-auto"
         style={{ left: "18px", right: "18px", background: "linear-gradient(to bottom, rgba(2,8,23,0.82) 0%, rgba(2,8,23,0.55) 70%, transparent 100%)" }}
         initial={{ y: -40, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
