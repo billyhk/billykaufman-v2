@@ -5,6 +5,7 @@ import { useRef, useMemo, useEffect, useState } from "react";
 import { EffectComposer, Bloom } from "@react-three/postprocessing";
 import * as THREE from "three";
 import HeroElements from "./HeroElements";
+import DeepCreatures from "./DeepCreatures";
 
 // Depth color stops: surface → abyss
 const DEPTH_COLORS = [
@@ -128,6 +129,7 @@ export default function OceanScene() {
       <HeroElements />
       <Bubbles />
       <BioParticles />
+      <DeepCreatures />
       <fog attach="fog" args={["#020817", 30, 80]} />
       <EffectComposer>
         <Bloom

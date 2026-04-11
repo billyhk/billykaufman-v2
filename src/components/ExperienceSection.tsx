@@ -5,7 +5,7 @@ import SectionHeading from "@/components/SectionHeading";
 
 export default function ExperienceSection() {
   return (
-    <DepthSection id="experience" variant="dip-right">
+    <DepthSection id="experience">
       <DepthLabel depth="~200m" />
       <SectionHeading title="Experience" subtitle="My journey so far" />
       <ExperienceTimeline />
