@@ -11,6 +11,7 @@ export default function IntroLock() {
   const [active, setActive] = useState(false);
 
   useEffect(() => {
+    if (window.matchMedia("(pointer: coarse)").matches) return; // touch device — no fish intro, no lock needed
     if (window.scrollY > window.innerHeight * 0.5) return; // already mid-scroll — skip
 
     window.scrollTo(0, 0); // ensure page starts at top for the intro
