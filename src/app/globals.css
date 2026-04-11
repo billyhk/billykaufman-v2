@@ -7,7 +7,9 @@
 }
 
 html {
-  scroll-behavior: smooth;
+  /* scroll-behavior: smooth removed — iOS Safari treats it as an active animation on
+     fresh page load, which intercepts the first touch gesture and causes spring-back.
+     Navbar smooth scrolling uses scrollIntoView({ behavior: 'smooth' }) in JS instead. */
   /* Matches deepest ocean canvas clear color — prevents black gap in iOS safe area */
   background-color: #000408;
   /* Do NOT set overflow-x here — iOS Safari interprets it as overflow: hidden on both
