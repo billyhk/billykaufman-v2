@@ -7,7 +7,7 @@ import SectionHeading from "@/components/SectionHeading";
 
 export default function SkillsSection() {
   return (
-    <DepthSection id="skills">
+    <DepthSection id="skills" className="max-md:pb-0">
       <DepthLabel depth="~1000m" />
       <SectionHeading title="Skills & Tools" subtitle="What I bring to the table" />
 

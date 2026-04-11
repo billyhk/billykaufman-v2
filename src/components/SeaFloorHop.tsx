@@ -369,7 +369,6 @@ export default function SeaFloorHop() {
       <canvas
         ref={canvasRef}
         style={{ width: "100%", height: H, display: "block", touchAction: "none" }}
-        className="rounded-2xl border border-white/10"
       />
     </div>
   );
