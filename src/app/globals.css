@@ -9,6 +9,8 @@
 html, body {
   scroll-behavior: smooth;
   overflow-x: hidden;
+  /* Matches deepest ocean canvas clear color — prevents black gap in iOS safe area */
+  background-color: #000408;
 }
 
 section[id] {
