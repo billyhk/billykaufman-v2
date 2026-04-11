@@ -10,7 +10,7 @@ export default function HomePage() {
   return (
     <>
       <OceanCanvas />
-      <main className="relative z-10 overflow-x-hidden">
+      <main className="relative z-10" style={{ overflowX: "clip" }}>
         <HeroSection />
         <AboutSection />
         <ClientsMarquee />

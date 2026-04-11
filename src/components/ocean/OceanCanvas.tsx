@@ -18,6 +18,7 @@ export default function OceanCanvas() {
         camera={{ position: [0, 0, 5], fov: 75, near: 0.1, far: 200 }}
         gl={{ antialias: true, alpha: false }}
         dpr={[1, 1.5]}
+        style={{ pointerEvents: "none", touchAction: "pan-y" }}
       >
         <Suspense fallback={null}>
           <OceanScene />

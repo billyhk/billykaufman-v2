@@ -12,17 +12,19 @@ html {
      Navbar smooth scrolling uses scrollIntoView({ behavior: 'smooth' }) in JS instead. */
   /* Matches deepest ocean canvas clear color — prevents black gap in iOS safe area */
   background-color: #000408;
-  /* Do NOT set overflow-x here — iOS Safari interprets it as overflow: hidden on both
-     axes and disables touch scrolling entirely. */
+  /* Do NOT set overflow-x: hidden here — iOS Safari interprets it as overflow: hidden on
+     both axes and disables touch scrolling entirely. */
+  /* pan-y on html covers fixed elements and the document root scroll container,
+     which body-level touch-action does not reach. */
+  touch-action: pan-y;
+  overscroll-behavior-x: none;
 }
 
 body {
   overflow-x: hidden;
   background-color: #000408;
-  /* Tells iOS Safari the page only pans vertically — eliminates scroll-axis
-     ambiguity that causes the first-touch spring-back when horizontal overflow
-     is detectable anywhere on the page. */
   touch-action: pan-y;
+  overscroll-behavior-x: none;
 }
 
 section[id] {
