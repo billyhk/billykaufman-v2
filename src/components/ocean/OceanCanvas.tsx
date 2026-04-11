@@ -20,10 +20,21 @@ export default function OceanCanvas() {
     };
 
     setHeight();
-    window.visualViewport?.addEventListener("resize", setHeight);
-    window.addEventListener("resize", setHeight);
+
+    // Debounce visualViewport updates — it fires continuously during iOS address-bar
+    // hide animation (triggered by first scroll), causing layout shifts that spring-back.
+    // We wait until the animation settles before resizing the canvas.
+    let debounce: ReturnType<typeof setTimeout>;
+    const onViewportResize = () => {
+      clearTimeout(debounce);
+      debounce = setTimeout(setHeight, 200);
+    };
+
+    window.visualViewport?.addEventListener("resize", onViewportResize);
+    window.addEventListener("resize", setHeight); // orientation changes — update immediately
     return () => {
-      window.visualViewport?.removeEventListener("resize", setHeight);
+      clearTimeout(debounce);
+      window.visualViewport?.removeEventListener("resize", onViewportResize);
       window.removeEventListener("resize", setHeight);
     };
   }, []);
