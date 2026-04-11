@@ -386,7 +386,7 @@ export default function FishEat() {
     playerSize.current = PLAYER_INIT_SIZE;
     score.current      = 0;
     lastSpawn.current  = performance.now();
-    npcs.current       = Array.from({ length: NPC_COUNT }, () => spawnNPC(w, PLAYER_INIT_SIZE, false));
+    npcs.current       = []; // fish drift in from edges — none on screen at start
   }, []);
 
   useEffect(() => {
@@ -472,12 +472,13 @@ export default function FishEat() {
           playerY.current = Math.max(ps, Math.min(H  - ps, playerY.current));
         }
 
-        // Continuous spawning — burst more when pool is sparse
-        if (now - lastSpawn.current > SPAWN_INTERVAL_MS && npcs.current.length < MAX_NPC_CAP) {
+        // Continuous spawning — faster during initial fill so canvas populates within ~3s
+        const spawnInterval = npcs.current.length < NPC_COUNT ? 500 : SPAWN_INTERVAL_MS;
+        if (now - lastSpawn.current > spawnInterval && npcs.current.length < MAX_NPC_CAP) {
           lastSpawn.current = now;
           const smallCount = npcs.current.filter(n => n.size < ps).length;
           const forceSmaller = smallCount < npcs.current.length * 0.5;
-          const burst = npcs.current.length < NPC_COUNT ? 3 : 1;
+          const burst = npcs.current.length < NPC_COUNT ? 5 : 1;
           for (let i = 0; i < burst && npcs.current.length < MAX_NPC_CAP; i++) {
             npcs.current.push(spawnNPC(cw, ps, true, forceSmaller));
           }
