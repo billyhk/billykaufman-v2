@@ -8,7 +8,8 @@ import OceanScene from "./OceanScene";
 export default function OceanCanvas() {
   return (
     <motion.div
-      className="fixed inset-0 z-0 pointer-events-none"
+      className="fixed inset-x-0 top-0 z-0 pointer-events-none"
+      style={{ height: "100dvh" }}
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       transition={{ duration: 1.5, delay: 0.6, ease: "easeOut" }}
