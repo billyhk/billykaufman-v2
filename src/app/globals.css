@@ -6,10 +6,16 @@
   --zone-accent: #67e8f9; /* default: sunlight zone cyan */
 }
 
-html, body {
+html {
   scroll-behavior: smooth;
-  overflow-x: hidden;
   /* Matches deepest ocean canvas clear color — prevents black gap in iOS safe area */
+  background-color: #000408;
+  /* Do NOT set overflow-x here — iOS Safari interprets it as overflow: hidden on both
+     axes and disables touch scrolling entirely. */
+}
+
+body {
+  overflow-x: hidden;
   background-color: #000408;
 }
 
