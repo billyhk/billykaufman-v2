@@ -16,6 +16,7 @@ import {
   useMotionValueEvent,
 } from "framer-motion";
 import { BloombergLogo } from "./ClientLogos";
+import Modal from "./Modal";
 
 const N = projectsData.length;
 const NAV_H = 64;
@@ -211,6 +212,7 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
 export default function ProjectsGallery() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [imageIdx, setImageIdx] = useState(0);
+  const [descModal, setDescModal] = useState(false);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -230,6 +232,10 @@ export default function ProjectsGallery() {
   });
 
   const springProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
+
+  // Close modal on project change
+  useEffect(() => { setDescModal(false); }, [activeIdx]);
+
 
   const project = projectsData[activeIdx];
   const images = project.images;
@@ -267,7 +273,8 @@ export default function ProjectsGallery() {
         </div>
 
         {/* ── LEFT: HUD Screen ── */}
-        <div className="md:w-[55%] flex items-center justify-center p-6 md:p-10 md:pl-8 shrink-0">
+        {/* max-h-[52%] on mobile caps the HUD so the info panel always gets the rest of the viewport */}
+        <div className="md:w-[55%] max-h-[52%] md:max-h-none flex items-center justify-center p-4 md:p-10 md:pl-8 shrink-0 overflow-hidden">
           <div className="w-full">
             <HudScreen
               project={project}
@@ -325,9 +332,16 @@ export default function ProjectsGallery() {
               </p>
 
               {/* Description */}
-              <p className="text-white/55 text-sm leading-relaxed mb-3 line-clamp-2">
+              <p className="text-white/55 text-sm leading-relaxed line-clamp-2 md:line-clamp-4 mb-1">
                 {project.description}
               </p>
+              <button
+                onClick={() => setDescModal(true)}
+                className="text-xs font-semibold mb-3 tracking-wide"
+                style={{ color: "var(--zone-accent)", cursor: "pointer" }}
+              >
+                more ↗
+              </button>
 
               {/* Tech pills */}
               <div className="flex flex-wrap gap-2">
@@ -384,6 +398,49 @@ export default function ProjectsGallery() {
           </div>
         </div>
       </div>
+
+      {/* ── Description modal ── */}
+      <Modal isOpen={descModal} onClose={() => setDescModal(false)}>
+        <div
+          className="w-full max-w-md max-h-[70vh] flex flex-col rounded-xl overflow-hidden"
+          style={{
+            background: "color-mix(in srgb, var(--zone-accent) 6%, #020c18)",
+            border: "1px solid color-mix(in srgb, var(--zone-accent) 25%, transparent)",
+            boxShadow: "0 24px 64px rgba(0,0,0,0.7)",
+          }}
+        >
+          {/* Header */}
+          <div
+            className="flex items-center justify-between px-5 py-3 shrink-0"
+            style={{ borderBottom: "1px solid color-mix(in srgb, var(--zone-accent) 18%, transparent)" }}
+          >
+            <span className="text-white font-semibold text-sm">{project.title}</span>
+            <button
+              onClick={() => setDescModal(false)}
+              className="text-white/40 hover:text-white transition-colors text-lg leading-none"
+              style={{ cursor: "pointer" }}
+              aria-label="Close"
+            >
+              ✕
+            </button>
+          </div>
+
+          {/* Scrollable body */}
+          <div className="overflow-y-auto px-5 py-4 space-y-4">
+            <p className="text-white/70 text-sm leading-relaxed">{project.description}</p>
+            <div className="flex flex-wrap gap-2">
+              {project.technologies.map((tech) => (
+                <span
+                  key={tech}
+                  className="text-xs px-2.5 py-1 bg-blue-500/15 text-blue-300 rounded-full border border-blue-500/20"
+                >
+                  {tech}
+                </span>
+              ))}
+            </div>
+          </div>
+        </div>
+      </Modal>
     </div>
   );
 }
