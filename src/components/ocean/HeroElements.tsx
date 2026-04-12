@@ -78,6 +78,7 @@ function CursorFish() {
   const _dir = useMemo(() => new THREE.Vector3(), []);
   const cursor = useRef({ x: 0, y: 0 });
   const prevWorld = useRef(new THREE.Vector2());
+  const prevNDC   = useRef({ x: 0, y: 0 });
   const smoothAngle = useRef(0);
   const isClickable = useRef(false);
   const glow = useRef(0);
@@ -258,17 +259,37 @@ function CursorFish() {
         py = wy;
       }
 
-      const vx = px - prevWorld.current.x;
-      const vy = py - prevWorld.current.y;
-      const speed = Math.min(Math.sqrt(vx * vx + vy * vy) / delta, 150);
+      // World-space delta — used only during handoff when the fish is traveling to the cursor
+      const dwx = px - prevWorld.current.x;
+      const dwy = py - prevWorld.current.y;
       prevWorld.current.set(px, py);
 
-      if (speed > 0.3) {
-        const target = Math.atan2(vy, vx);
-        let diff = target - smoothAngle.current;
-        while (diff >  Math.PI) diff -= Math.PI * 2;
-        while (diff < -Math.PI) diff += Math.PI * 2;
-        smoothAngle.current += diff * Math.min(delta * 12, 1);
+      // NDC-space delta — cursor viewport position, unaffected by camera scroll
+      const ndcDx = cursor.current.x - prevNDC.current.x;
+      const ndcDy = cursor.current.y - prevNDC.current.y;
+      prevNDC.current.x = cursor.current.x;
+      prevNDC.current.y = cursor.current.y;
+
+      if (elapsed < HANDOFF_DUR) {
+        // During handoff the fish travels to the cursor — world velocity drives rotation
+        const speed = Math.min(Math.sqrt(dwx * dwx + dwy * dwy) / delta, 150);
+        if (speed > 0.3) {
+          const target = Math.atan2(dwy, dwx);
+          let diff = target - smoothAngle.current;
+          while (diff >  Math.PI) diff -= Math.PI * 2;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          smoothAngle.current += diff * Math.min(delta * 12, 1);
+        }
+      } else {
+        // Normal cursor following — use NDC delta so camera Y scroll (e.g. projects sticky
+        // section) doesn't affect the fish's facing direction and reveal the page scroll
+        if (Math.abs(ndcDx) > 0.0005 || Math.abs(ndcDy) > 0.0005) {
+          const target = Math.atan2(ndcDy, ndcDx);
+          let diff = target - smoothAngle.current;
+          while (diff >  Math.PI) diff -= Math.PI * 2;
+          while (diff < -Math.PI) diff += Math.PI * 2;
+          smoothAngle.current += diff * Math.min(delta * 12, 1);
+        }
       }
 
       fishRef.current.position.set(px, py, 2);
