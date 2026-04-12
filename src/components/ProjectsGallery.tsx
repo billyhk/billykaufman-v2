@@ -200,13 +200,15 @@ export default function ProjectsGallery() {
   const handlePrev = () => setImageIdx((i) => (i === 0 ? images.length - 1 : i - 1));
   const handleNext = () => setImageIdx((i) => (i === images.length - 1 ? 0 : i + 1));
 
-  // Scroll to the position that makes project `idx` the active one
+  // Scroll to the midpoint of project `idx`'s scroll range.
+  // Targeting the exact boundary (idx/N) lands rawIdx just below idx due to the
+  // [0, N-0.0001] transform, so Math.floor gives idx-1. Midpoint is always safe.
   const scrollToProject = (idx: number) => {
     const el = sectionRef.current;
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY;
     const h = el.offsetHeight;
-    const target = top + (idx / N) * Math.max(h - window.innerHeight, 0);
+    const target = top + ((idx + 0.5) / N) * Math.max(h - window.innerHeight, 0);
     window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
   };
 
