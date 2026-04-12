@@ -62,14 +62,20 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
       {/* Screen frame — persistent, never animates */}
       <div
         className="relative overflow-hidden"
-        className="md:[transform:perspective(1200px)_rotateX(3deg)] md:[transform-origin:center_top]"
+        className="md:[transform:perspective(900px)_rotateY(8deg)_rotateX(4deg)_translateY(-6px)] md:[transform-origin:center_center]"
         style={{
           borderRadius: "4px 20px 8px 6px",
           border: "1px solid color-mix(in srgb, var(--zone-accent) 38%, transparent)",
           boxShadow: [
-            "0 0 48px color-mix(in srgb, var(--zone-accent) 14%, transparent)",
-            "0 0 0 1px color-mix(in srgb, var(--zone-accent) 6%, transparent)",
-            "inset 0 0 24px rgba(0,0,4,0.6)",
+            // Accent glow
+            "0 0 48px color-mix(in srgb, var(--zone-accent) 16%, transparent)",
+            "0 0 0 1px color-mix(in srgb, var(--zone-accent) 8%, transparent)",
+            // Inner depth
+            "inset 0 0 32px rgba(0,0,4,0.7)",
+            // Elevation shadows — simulate lifted surface
+            "0 40px 80px -12px rgba(0,0,4,0.95)",
+            "0 20px 40px -8px rgba(0,0,0,0.75)",
+            "0 8px 16px -2px rgba(0,0,0,0.5)",
           ].join(", "),
         }}
       >
