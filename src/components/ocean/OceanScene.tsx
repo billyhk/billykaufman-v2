@@ -97,19 +97,51 @@ function BioParticles({ count = 600 }: { count?: number }) {
 export default function OceanScene() {
   const { camera, gl } = useThree();
 
-  const getScrollProgress = () => {
-    const el = document.documentElement;
-    const p = el.scrollTop / (el.scrollHeight - el.clientHeight);
-    return isNaN(p) ? 0 : p;
+  // Measure the projects section so we can freeze the camera while scrolling through it.
+  // That section's scroll drives the project list only — not ocean depth.
+  const projectsRange = useRef<{ top: number; height: number } | null>(null);
+  useEffect(() => {
+    const measure = () => {
+      const el = document.getElementById("projects");
+      if (!el) return;
+      projectsRange.current = {
+        top: Math.round(el.getBoundingClientRect().top + window.scrollY),
+        height: el.offsetHeight,
+      };
+    };
+    const t = setTimeout(measure, 120); // after layout settles
+    window.addEventListener("resize", measure, { passive: true });
+    return () => { clearTimeout(t); window.removeEventListener("resize", measure); };
+  }, []);
+
+  // Returns a scroll progress value with the projects section's scroll range subtracted.
+  // Camera and background color freeze at the entry depth while inside that section.
+  const getAdjustedProgress = () => {
+    const docEl = document.documentElement;
+    const scrollTop = docEl.scrollTop;
+    const totalRange = docEl.scrollHeight - docEl.clientHeight;
+    if (totalRange === 0) return 0;
+    const pr = projectsRange.current;
+    if (!pr) return Math.min(scrollTop / totalRange, 1);
+    const projEnd = pr.top + pr.height;
+    let eff: number;
+    if (scrollTop <= pr.top) {
+      eff = scrollTop;
+    } else if (scrollTop >= projEnd) {
+      eff = pr.top + (scrollTop - projEnd);
+    } else {
+      eff = pr.top; // frozen — inside projects section
+    }
+    return Math.min(eff / Math.max(totalRange - pr.height, 1), 1);
   };
 
-  const [scrollProgress, setScrollProgress] = useState(getScrollProgress);
-  const targetCamY  = useRef(-getScrollProgress() * SCROLL_DEPTH_SCALE);
-  const currentCamY = useRef(-getScrollProgress() * SCROLL_DEPTH_SCALE);
+  const [scrollProgress, setScrollProgress] = useState(getAdjustedProgress);
+  const targetCamY  = useRef(-getAdjustedProgress() * SCROLL_DEPTH_SCALE);
+  const currentCamY = useRef(-getAdjustedProgress() * SCROLL_DEPTH_SCALE);
 
   useEffect(() => {
     const onScroll = () => {
-      const progress = getScrollProgress();
+      const progress = getAdjustedProgress();
       setScrollProgress(progress);
       targetCamY.current = -progress * SCROLL_DEPTH_SCALE;
     };
