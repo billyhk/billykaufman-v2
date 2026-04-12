@@ -281,7 +281,7 @@ export default function ProjectsGallery() {
 
         {/* ── RIGHT: Project info + rolling list ── */}
         <div
-          className="flex-1 flex flex-col justify-start md:justify-center overflow-hidden px-6 md:px-8 pt-4 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8"
+          className="flex-1 flex flex-col justify-start md:justify-center px-6 md:px-8 pt-4 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8"
         >
           {/* Info block — animates on project change */}
           <AnimatePresence mode="wait">
@@ -351,19 +351,8 @@ export default function ProjectsGallery() {
             className="relative overflow-hidden shrink-0"
             style={{ height: ITEM_H * VISIBLE }}
           >
-            {/* Fade top */}
-            <div
-              className="absolute inset-x-0 top-0 z-10 pointer-events-none"
-              style={{ height: ITEM_H * 2, background: "linear-gradient(to bottom, #000408 30%, transparent)" }}
-            />
-            {/* Fade bottom */}
-            <div
-              className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
-              style={{ height: ITEM_H * 2, background: "linear-gradient(to top, #000408 30%, transparent)" }}
-            />
-
             <motion.div
-              animate={{ y: Math.floor(VISIBLE / 2) * ITEM_H - activeIdx * ITEM_H }}
+              animate={{ y: -activeIdx * ITEM_H }}
               transition={{ type: "spring", stiffness: 280, damping: 38, mass: 0.8 }}
             >
               {projectsData.map((p, i) => {
