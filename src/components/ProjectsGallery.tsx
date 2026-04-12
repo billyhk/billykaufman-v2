@@ -68,34 +68,29 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
   const springY = useSpring(tiltY, { stiffness: 280, damping: 22 });
   const tiltTransform = useMotionTemplate`perspective(900px) rotateY(${springY}deg) rotateX(${springX}deg) translateY(-6px)`;
 
-  // Apply base desktop tilt after mount (avoids SSR mismatch)
+  // Track cursor anywhere on the viewport and tilt the screen toward it
   useEffect(() => {
-    if (window.matchMedia("(min-width: 768px)").matches) {
-      tiltX.set(TILT_BASE.x);
-      tiltY.set(TILT_BASE.y);
-    }
-  }, [tiltX, tiltY]);
+    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
+    if (!isDesktop) return;
 
-  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
-    if (!window.matchMedia("(min-width: 768px)").matches) return;
-    const rect = e.currentTarget.getBoundingClientRect();
-    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;  // -1 … 1
-    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
-    tiltY.set(TILT_BASE.y + nx * 5);   // ±5 deg horizontal
-    tiltX.set(TILT_BASE.x - ny * 4);   // ±4 deg vertical (inverted: cursor up → tilt back)
-  };
-
-  const handleMouseLeave = () => {
     tiltX.set(TILT_BASE.x);
     tiltY.set(TILT_BASE.y);
-  };
+
+    const onMove = (e: MouseEvent) => {
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;   // -1 … 1
+      const ny = (e.clientY / window.innerHeight) * 2 - 1;
+      tiltY.set(TILT_BASE.y + nx * 5);
+      tiltX.set(TILT_BASE.x - ny * 4);
+    };
+
+    window.addEventListener("mousemove", onMove, { passive: true });
+    return () => window.removeEventListener("mousemove", onMove);
+  }, [tiltX, tiltY]);
 
   return (
     <motion.div
       className="relative mx-auto w-full"
       style={{ maxWidth: 640, cursor: "default", transform: tiltTransform }}
-      onMouseMove={handleMouseMove}
-      onMouseLeave={handleMouseLeave}
     >
       {/* Screen frame */}
       <div
