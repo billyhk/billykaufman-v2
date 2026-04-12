@@ -7,24 +7,23 @@
 }
 
 html {
-  /* scroll-behavior: smooth removed — iOS Safari treats it as an active animation on
-     fresh page load, which intercepts the first touch gesture and causes spring-back.
-     Navbar smooth scrolling uses scrollIntoView({ behavior: 'smooth' }) in JS instead. */
-  /* Matches deepest ocean canvas clear color — prevents black gap in iOS safe area */
+  /* FIX A: scroll-behavior: smooth was removed from here.
+     iOS Safari treats it as an active animation on fresh page load,
+     intercepting the first touch gesture and causing spring-back.
+     Navbar uses scrollIntoView({ behavior: 'smooth' }) in JS instead. */
+  scroll-behavior: smooth; /* BROKEN: causes first-touch spring-back on iOS — comment out to fix */
   background-color: #000408;
-  /* Do NOT set overflow-x: hidden here — iOS Safari interprets it as overflow: hidden on
-     both axes and disables touch scrolling entirely. */
-  /* pan-y on html covers fixed elements and the document root scroll container,
-     which body-level touch-action does not reach. */
-  touch-action: pan-y;
-  overscroll-behavior-x: none;
+  /* FIX B: touch-action: pan-y + overscroll-behavior-x: none were added here.
+     html-level covers fixed elements whose touch-action doesn't inherit from body. */
+  /* touch-action: pan-y; */        /* FIXED version — uncomment to fix */
+  /* overscroll-behavior-x: none; */ /* FIXED version — uncomment to fix */
 }
 
 body {
   overflow-x: hidden;
   background-color: #000408;
-  touch-action: pan-y;
-  overscroll-behavior-x: none;
+  /* touch-action: pan-y; */        /* FIXED version — uncomment to fix */
+  /* overscroll-behavior-x: none; */ /* FIXED version — uncomment to fix */
 }
 
 section[id] {

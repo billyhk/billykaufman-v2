@@ -10,7 +10,10 @@ export default function HomePage() {
   return (
     <>
       <OceanCanvas />
-      <main className="relative z-10" style={{ overflowX: "clip" }}>
+      {/* FIX C: overflow-x was changed from "hidden" (creates scroll container) to "clip"
+           (does not create scroll container, so browser won't treat <main> as a horizontal
+           scrollable region). Swap the className back to overflow-x-hidden to reproduce. */}
+      <main className="relative z-10 overflow-x-hidden" /* style={{ overflowX: "clip" }} */>
         <HeroSection />
         <AboutSection />
         <ClientsMarquee />
