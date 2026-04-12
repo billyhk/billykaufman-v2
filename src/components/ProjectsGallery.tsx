@@ -4,7 +4,7 @@ import Image from "next/image";
 import { useState, useRef } from "react";
 import { projectsData, type Project } from "@/data/projects";
 import BannerShowcase from "./BannerShowcase";
-import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
+import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
 import {
   motion,
   AnimatePresence,
@@ -17,8 +17,10 @@ import { BloombergLogo } from "./ClientLogos";
 
 const N = projectsData.length;
 const NAV_H = 64;
+const ITEM_H = 52; // px — height of each rolling list row
+const VISIBLE = 5; // rows visible in the rolling list
 
-// ── Corner bracket decorations for the HUD screen ─────────────────────────────
+// ── Corner bracket decorations ─────────────────────────────────────────────────
 function ScreenBrackets() {
   const c = "var(--zone-accent)";
   const base: React.CSSProperties = { position: "absolute", opacity: 0.55, pointerEvents: "none" };
@@ -43,10 +45,17 @@ function ScreenBrackets() {
 }
 
 // ── HUD terminal screen ────────────────────────────────────────────────────────
-// The outer frame is always present; only the media content inside transitions
-// (channel-change effect — the TV stays on, the channel switches).
-function HudScreen({ project }: { project: Project }) {
-  const hasImage = project.images.length > 0;
+interface HudScreenProps {
+  project: Project;
+  imageIdx: number;
+  onPrev: () => void;
+  onNext: () => void;
+  onImageChange: (i: number) => void;
+}
+
+function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScreenProps) {
+  const hasImages = project.images.length > 0;
+  const hasMultiple = project.images.length > 1;
 
   return (
     <div className="relative mx-auto w-full" style={{ maxWidth: 640 }}>
@@ -65,24 +74,24 @@ function HudScreen({ project }: { project: Project }) {
           transformOrigin: "center center",
         }}
       >
-        {/* Media — only this transitions between projects */}
+        {/* Media — only this transitions between projects / images */}
         {project.banners ? (
           <BannerShowcase banners={project.banners} />
         ) : (
           <div className="relative aspect-video bg-black">
             <AnimatePresence mode="wait">
               <motion.div
-                key={project.key}
+                key={`${project.key}-${imageIdx}`}
                 className="absolute inset-0"
                 initial={{ opacity: 0, filter: "brightness(1.8)" }}
                 animate={{ opacity: 1, filter: "brightness(1)" }}
                 exit={{ opacity: 0 }}
                 transition={{ duration: 0.18 }}
               >
-                {hasImage ? (
+                {hasImages ? (
                   <Image
-                    src={project.images[0]}
-                    alt={project.title}
+                    src={project.images[imageIdx]}
+                    alt={`${project.title} screenshot ${imageIdx + 1}`}
                     fill
                     className="object-cover opacity-90"
                     sizes="(max-width: 768px) 100vw, 55vw"
@@ -103,15 +112,42 @@ function HudScreen({ project }: { project: Project }) {
                   "repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px)",
               }}
             />
-
             {/* Vignette */}
             <div
               className="absolute inset-0 pointer-events-none z-10"
-              style={{
-                background:
-                  "radial-gradient(ellipse at center, transparent 35%, rgba(0,0,4,0.55) 100%)",
-              }}
+              style={{ background: "radial-gradient(ellipse at center, transparent 35%, rgba(0,0,4,0.55) 100%)" }}
             />
+
+            {/* Image navigation (multi-image projects only) */}
+            {hasMultiple && (
+              <>
+                <button
+                  onClick={onPrev}
+                  className="absolute left-2 bottom-2 z-20 p-1.5 rounded bg-black/50 hover:bg-black/70 text-white/50 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Previous image"
+                >
+                  <FaChevronLeft size={11} />
+                </button>
+                <button
+                  onClick={onNext}
+                  className="absolute right-2 bottom-2 z-20 p-1.5 rounded bg-black/50 hover:bg-black/70 text-white/50 hover:text-white transition-colors cursor-pointer"
+                  aria-label="Next image"
+                >
+                  <FaChevronRight size={11} />
+                </button>
+                <div className="absolute bottom-2.5 left-1/2 -translate-x-1/2 flex gap-1 z-20">
+                  {project.images.map((_, di) => (
+                    <button
+                      key={di}
+                      onClick={() => onImageChange(di)}
+                      className="w-1 h-1 rounded-full transition-colors cursor-pointer"
+                      style={{ background: di === imageIdx ? "rgba(255,255,255,0.9)" : "rgba(255,255,255,0.25)" }}
+                      aria-label={`Image ${di + 1}`}
+                    />
+                  ))}
+                </div>
+              </>
+            )}
           </div>
         )}
 
@@ -123,17 +159,12 @@ function HudScreen({ project }: { project: Project }) {
             borderTop: "1px solid color-mix(in srgb, var(--zone-accent) 18%, transparent)",
           }}
         >
-          <span className="opacity-50" style={{ color: "var(--zone-accent)" }}>
-            ◈ SYS.DISPLAY
-          </span>
-          <span className="text-white/25 uppercase tracking-widest">
-            {project.key.replace(/_/g, ".")}
-          </span>
+          <span className="opacity-50" style={{ color: "var(--zone-accent)" }}>◈ SYS.DISPLAY</span>
+          <span className="text-white/25 uppercase tracking-widest">{project.key.replace(/_/g, ".")}</span>
           <span className="ml-auto text-white/20 tracking-widest">VISUAL.OUT</span>
         </div>
       </div>
 
-      {/* Corner bracket decorations */}
       <ScreenBrackets />
     </div>
   );
@@ -142,6 +173,7 @@ function HudScreen({ project }: { project: Project }) {
 // ── Main gallery ───────────────────────────────────────────────────────────────
 export default function ProjectsGallery() {
   const [activeIdx, setActiveIdx] = useState(0);
+  const [imageIdx, setImageIdx] = useState(0);
   const sectionRef = useRef<HTMLDivElement>(null);
 
   const { scrollYProgress } = useScroll({
@@ -153,14 +185,32 @@ export default function ProjectsGallery() {
 
   useMotionValueEvent(rawIdx, "change", (v) => {
     const next = Math.floor(v);
-    setActiveIdx((prev) => (prev !== next ? next : prev));
+    setActiveIdx((prev) => {
+      if (prev === next) return prev;
+      setImageIdx(0); // reset image carousel on project change
+      return next;
+    });
   });
 
   const springProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
   const project = projectsData[activeIdx];
-  const counterStr =
-    String(activeIdx + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0");
+  const images = project.images;
+
+  const handlePrev = () => setImageIdx((i) => (i === 0 ? images.length - 1 : i - 1));
+  const handleNext = () => setImageIdx((i) => (i === images.length - 1 ? 0 : i + 1));
+
+  // Scroll to the position that makes project `idx` the active one
+  const scrollToProject = (idx: number) => {
+    const el = sectionRef.current;
+    if (!el) return;
+    const top = el.getBoundingClientRect().top + window.scrollY;
+    const h = el.offsetHeight;
+    const target = top + (idx / N) * Math.max(h - window.innerHeight, 0);
+    window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
+  };
+
+  const counterStr = String(activeIdx + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0");
 
   return (
     <div ref={sectionRef} style={{ height: `${N * 80}vh` }}>
@@ -173,37 +223,39 @@ export default function ProjectsGallery() {
         <div className="absolute left-0 top-0 bottom-0 w-0.5 z-20 overflow-hidden">
           <motion.div
             className="absolute inset-x-0 top-0 bottom-0 opacity-50"
-            style={{
-              background: "var(--zone-accent)",
-              scaleY: springProgress,
-              transformOrigin: "top",
-            }}
+            style={{ background: "var(--zone-accent)", scaleY: springProgress, transformOrigin: "top" }}
           />
         </div>
 
         {/* ── LEFT: HUD Screen ── */}
         <div className="md:w-[55%] flex items-center justify-center p-6 md:p-10 md:pl-8 shrink-0">
           <div className="w-full">
-            <HudScreen project={project} />
+            <HudScreen
+              project={project}
+              imageIdx={imageIdx}
+              onPrev={handlePrev}
+              onNext={handleNext}
+              onImageChange={setImageIdx}
+            />
           </div>
         </div>
 
-        {/* ── RIGHT: Project info + index ── */}
+        {/* ── RIGHT: Project info + rolling list ── */}
         <div
-          className="flex-1 flex flex-col justify-start md:justify-center overflow-y-auto px-6 md:px-8 pt-4 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8"
-          style={{ scrollbarWidth: "none" }}
+          className="flex-1 flex flex-col justify-start md:justify-center overflow-hidden px-6 md:px-8 pt-4 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8"
         >
+          {/* Info block — animates on project change */}
           <AnimatePresence mode="wait">
             <motion.div
               key={project.key + "-info"}
               initial={{ opacity: 0, y: 14 }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.38 }}
+              transition={{ duration: 0.35 }}
               className="shrink-0"
             >
               {/* Counter */}
-              <p className="font-mono text-xs tracking-widest mb-4" style={{ color: "var(--zone-accent)", opacity: 0.6 }}>
+              <p className="font-mono text-xs tracking-widest mb-3" style={{ color: "var(--zone-accent)", opacity: 0.6 }}>
                 {counterStr}
               </p>
 
@@ -233,11 +285,6 @@ export default function ProjectsGallery() {
                 {project.client}
               </p>
 
-              {/* Description */}
-              <p className="text-white/60 text-sm leading-relaxed mb-4 line-clamp-4 md:line-clamp-3">
-                {project.description}
-              </p>
-
               {/* Tech pills */}
               <div className="flex flex-wrap gap-2">
                 {project.technologies.map((tech) => (
@@ -253,23 +300,59 @@ export default function ProjectsGallery() {
           </AnimatePresence>
 
           {/* Divider */}
-          <div className="h-px bg-white/8 my-5 shrink-0" />
+          <div className="h-px bg-white/8 my-4 shrink-0" />
 
-          {/* Project index — inactive items */}
-          <div className="flex flex-col gap-0.5 overflow-y-auto shrink-0" style={{ scrollbarWidth: "none" }}>
-            {projectsData.map((p, i) => (
-              <motion.div
-                key={p.key}
-                animate={{ opacity: i === activeIdx ? 0 : 0.3 }}
-                transition={{ duration: 0.3 }}
-                className="py-1"
-              >
-                <span className="font-mono text-[10px] text-white/40 mr-2 tabular-nums">
-                  {String(i + 1).padStart(2, "0")}
-                </span>
-                <span className="text-white text-xs font-medium">{p.title}</span>
-              </motion.div>
-            ))}
+          {/* Rolling project list */}
+          <div
+            className="relative overflow-hidden shrink-0"
+            style={{ height: ITEM_H * VISIBLE }}
+          >
+            {/* Fade top */}
+            <div
+              className="absolute inset-x-0 top-0 z-10 pointer-events-none"
+              style={{ height: ITEM_H * 1.2, background: "linear-gradient(to bottom, #000408, transparent)" }}
+            />
+            {/* Fade bottom */}
+            <div
+              className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
+              style={{ height: ITEM_H * 1.2, background: "linear-gradient(to top, #000408, transparent)" }}
+            />
+
+            <motion.div
+              animate={{ y: Math.floor(VISIBLE / 2) * ITEM_H - activeIdx * ITEM_H }}
+              transition={{ type: "spring", stiffness: 280, damping: 38, mass: 0.8 }}
+            >
+              {projectsData.map((p, i) => {
+                const dist = Math.abs(i - activeIdx);
+                const isActive = i === activeIdx;
+                const opacity = isActive ? 1 : dist === 1 ? 0.45 : 0.15;
+                return (
+                  <motion.div
+                    key={p.key}
+                    animate={{ opacity }}
+                    transition={{ duration: 0.3 }}
+                    style={{ height: ITEM_H, cursor: "pointer" }}
+                    onClick={() => scrollToProject(i)}
+                    className="flex flex-col justify-center gap-0.5 select-none"
+                  >
+                    <div className="flex items-center gap-2">
+                      <span
+                        className="font-mono text-[10px] tabular-nums shrink-0"
+                        style={{ color: isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.35)" }}
+                      >
+                        {String(i + 1).padStart(2, "0")}
+                      </span>
+                      <span className={`text-sm font-semibold leading-tight truncate ${isActive ? "text-white" : "text-white/60"}`}>
+                        {p.title}
+                      </span>
+                    </div>
+                    <p className="text-[11px] text-white/30 line-clamp-1 leading-snug pl-6">
+                      {p.description}
+                    </p>
+                  </motion.div>
+                );
+              })}
+            </motion.div>
           </div>
         </div>
       </div>
