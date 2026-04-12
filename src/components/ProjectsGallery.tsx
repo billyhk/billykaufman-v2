@@ -17,7 +17,7 @@ import { BloombergLogo } from "./ClientLogos";
 
 const N = projectsData.length;
 const NAV_H = 64;
-const ITEM_H = 52; // px — height of each rolling list row
+const ITEM_H = 40; // px — height of each rolling list row (title only, no description)
 const VISIBLE = 5; // rows visible in the rolling list
 
 // ── Corner bracket decorations ─────────────────────────────────────────────────
@@ -283,8 +283,13 @@ export default function ProjectsGallery() {
               </div>
 
               {/* Client */}
-              <p className="text-sm mb-3" style={{ color: "var(--zone-accent)" }}>
+              <p className="text-sm mb-2" style={{ color: "var(--zone-accent)" }}>
                 {project.client}
+              </p>
+
+              {/* Description */}
+              <p className="text-white/55 text-sm leading-relaxed mb-3 line-clamp-2">
+                {project.description}
               </p>
 
               {/* Tech pills */}
@@ -306,18 +311,18 @@ export default function ProjectsGallery() {
 
           {/* Rolling project list */}
           <div
-            className="relative overflow-hidden shrink-0"
+            className="relative overflow-hidden shrink-0 rounded-xl"
             style={{ height: ITEM_H * VISIBLE }}
           >
             {/* Fade top */}
             <div
               className="absolute inset-x-0 top-0 z-10 pointer-events-none"
-              style={{ height: ITEM_H * 1.2, background: "linear-gradient(to bottom, #000408, transparent)" }}
+              style={{ height: ITEM_H * 2, background: "linear-gradient(to bottom, #000408 30%, transparent)" }}
             />
             {/* Fade bottom */}
             <div
               className="absolute inset-x-0 bottom-0 z-10 pointer-events-none"
-              style={{ height: ITEM_H * 1.2, background: "linear-gradient(to top, #000408, transparent)" }}
+              style={{ height: ITEM_H * 2, background: "linear-gradient(to top, #000408 30%, transparent)" }}
             />
 
             <motion.div
@@ -327,7 +332,7 @@ export default function ProjectsGallery() {
               {projectsData.map((p, i) => {
                 const dist = Math.abs(i - activeIdx);
                 const isActive = i === activeIdx;
-                const opacity = isActive ? 1 : dist === 1 ? 0.45 : 0.15;
+                const opacity = isActive ? 1 : dist === 1 ? 0.5 : 0.18;
                 return (
                   <motion.div
                     key={p.key}
@@ -335,22 +340,17 @@ export default function ProjectsGallery() {
                     transition={{ duration: 0.3 }}
                     style={{ height: ITEM_H, cursor: "pointer" }}
                     onClick={() => scrollToProject(i)}
-                    className="flex flex-col justify-center gap-0.5 select-none"
+                    className={`flex items-center gap-2.5 px-2 rounded-lg select-none ${isActive ? "bg-white/5" : ""}`}
                   >
-                    <div className="flex items-center gap-2">
-                      <span
-                        className="font-mono text-[10px] tabular-nums shrink-0"
-                        style={{ color: isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.35)" }}
-                      >
-                        {String(i + 1).padStart(2, "0")}
-                      </span>
-                      <span className={`text-sm font-semibold leading-tight truncate ${isActive ? "text-white" : "text-white/60"}`}>
-                        {p.title}
-                      </span>
-                    </div>
-                    <p className="text-[11px] text-white/30 line-clamp-1 leading-snug pl-6">
-                      {p.description}
-                    </p>
+                    <span
+                      className="font-mono text-[10px] tabular-nums shrink-0"
+                      style={{ color: isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.35)" }}
+                    >
+                      {String(i + 1).padStart(2, "0")}
+                    </span>
+                    <span className={`text-sm leading-tight truncate ${isActive ? "text-white font-semibold" : "text-white/60 font-medium"}`}>
+                      {p.title}
+                    </span>
                   </motion.div>
                 );
               })}
