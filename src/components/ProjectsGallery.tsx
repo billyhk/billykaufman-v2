@@ -58,11 +58,13 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
   const hasMultiple = project.images.length > 1;
 
   return (
-    <div className="relative mx-auto w-full" style={{ maxWidth: 640, cursor: "default" }}>
-      {/* Screen frame — persistent, never animates */}
+    <div
+      className="relative mx-auto w-full md:[transform:perspective(900px)_rotateY(8deg)_rotateX(4deg)_translateY(-6px)] md:[transform-origin:center_center]"
+      style={{ maxWidth: 640, cursor: "default" }}
+    >
+      {/* Screen frame */}
       <div
         className="relative overflow-hidden"
-        className="md:[transform:perspective(900px)_rotateY(8deg)_rotateX(4deg)_translateY(-6px)] md:[transform-origin:center_center]"
         style={{
           borderRadius: "4px 20px 8px 6px",
           border: "1px solid color-mix(in srgb, var(--zone-accent) 38%, transparent)",
