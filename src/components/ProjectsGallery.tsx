@@ -62,6 +62,7 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
       {/* Screen frame — persistent, never animates */}
       <div
         className="relative overflow-hidden"
+        className="md:[transform:perspective(1100px)_rotateY(-6deg)_rotateX(2deg)] md:[transform-origin:center_center]"
         style={{
           borderRadius: "4px 20px 8px 6px",
           border: "1px solid color-mix(in srgb, var(--zone-accent) 38%, transparent)",
@@ -70,8 +71,6 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
             "0 0 0 1px color-mix(in srgb, var(--zone-accent) 6%, transparent)",
             "inset 0 0 24px rgba(0,0,4,0.6)",
           ].join(", "),
-          transform: "perspective(1100px) rotateY(-6deg) rotateX(2deg)",
-          transformOrigin: "center center",
         }}
       >
         {/* Media — only this transitions between projects / images */}
