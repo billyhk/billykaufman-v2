@@ -43,12 +43,14 @@ function ScreenBrackets() {
 }
 
 // ── HUD terminal screen ────────────────────────────────────────────────────────
+// The outer frame is always present; only the media content inside transitions
+// (channel-change effect — the TV stays on, the channel switches).
 function HudScreen({ project }: { project: Project }) {
   const hasImage = project.images.length > 0;
 
   return (
     <div className="relative mx-auto w-full" style={{ maxWidth: 640 }}>
-      {/* Screen frame */}
+      {/* Screen frame — persistent, never animates */}
       <div
         className="relative overflow-hidden"
         style={{
@@ -63,40 +65,55 @@ function HudScreen({ project }: { project: Project }) {
           transformOrigin: "center center",
         }}
       >
-        {/* Media */}
-        <div className="relative aspect-video bg-black">
-          {hasImage ? (
-            <Image
-              src={project.images[0]}
-              alt={project.title}
-              fill
-              className="object-cover opacity-90"
-              sizes="(max-width: 768px) 100vw, 55vw"
+        {/* Media — only this transitions between projects */}
+        {project.banners ? (
+          <BannerShowcase banners={project.banners} />
+        ) : (
+          <div className="relative aspect-video bg-black">
+            <AnimatePresence mode="wait">
+              <motion.div
+                key={project.key}
+                className="absolute inset-0"
+                initial={{ opacity: 0, filter: "brightness(1.8)" }}
+                animate={{ opacity: 1, filter: "brightness(1)" }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.18 }}
+              >
+                {hasImage ? (
+                  <Image
+                    src={project.images[0]}
+                    alt={project.title}
+                    fill
+                    className="object-cover opacity-90"
+                    sizes="(max-width: 768px) 100vw, 55vw"
+                  />
+                ) : (
+                  <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-950 to-indigo-950">
+                    <BloombergLogo className="w-40 max-h-10 object-contain opacity-50" />
+                  </div>
+                )}
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Scanlines */}
+            <div
+              className="absolute inset-0 pointer-events-none z-10"
+              style={{
+                backgroundImage:
+                  "repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px)",
+              }}
             />
-          ) : (
-            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-950 to-indigo-950">
-              <BloombergLogo className="w-40 max-h-10 object-contain opacity-50" />
-            </div>
-          )}
 
-          {/* Scanlines */}
-          <div
-            className="absolute inset-0 pointer-events-none z-10"
-            style={{
-              backgroundImage:
-                "repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px)",
-            }}
-          />
-
-          {/* Vignette */}
-          <div
-            className="absolute inset-0 pointer-events-none z-10"
-            style={{
-              background:
-                "radial-gradient(ellipse at center, transparent 35%, rgba(0,0,4,0.55) 100%)",
-            }}
-          />
-        </div>
+            {/* Vignette */}
+            <div
+              className="absolute inset-0 pointer-events-none z-10"
+              style={{
+                background:
+                  "radial-gradient(ellipse at center, transparent 35%, rgba(0,0,4,0.55) 100%)",
+              }}
+            />
+          </div>
+        )}
 
         {/* Status bar */}
         <div
@@ -166,37 +183,14 @@ export default function ProjectsGallery() {
 
         {/* ── LEFT: HUD Screen ── */}
         <div className="md:w-[55%] flex items-center justify-center p-6 md:p-10 md:pl-8 shrink-0">
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={project.key + "-screen"}
-              className="w-full"
-              initial={{ opacity: 0, scale: 0.97 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0, scale: 0.97 }}
-              transition={{ duration: 0.45 }}
-            >
-              {project.banners ? (
-                // Bloomberg: BannerShowcase in place of the HUD screen
-                <div
-                  className="overflow-hidden"
-                  style={{
-                    borderRadius: "4px 20px 8px 6px",
-                    border: "1px solid color-mix(in srgb, var(--zone-accent) 38%, transparent)",
-                    boxShadow: "0 0 48px color-mix(in srgb, var(--zone-accent) 14%, transparent)",
-                  }}
-                >
-                  <BannerShowcase banners={project.banners} />
-                </div>
-              ) : (
-                <HudScreen project={project} />
-              )}
-            </motion.div>
-          </AnimatePresence>
+          <div className="w-full">
+            <HudScreen project={project} />
+          </div>
         </div>
 
         {/* ── RIGHT: Project info + index ── */}
         <div
-          className="flex-1 flex flex-col justify-center overflow-y-auto px-6 md:px-8 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8"
+          className="flex-1 flex flex-col justify-start md:justify-center overflow-y-auto px-6 md:px-8 pt-4 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8"
           style={{ scrollbarWidth: "none" }}
         >
           <AnimatePresence mode="wait">
@@ -240,7 +234,7 @@ export default function ProjectsGallery() {
               </p>
 
               {/* Description */}
-              <p className="text-white/60 text-sm leading-relaxed mb-4 line-clamp-3">
+              <p className="text-white/60 text-sm leading-relaxed mb-4 line-clamp-4 md:line-clamp-3">
                 {project.description}
               </p>
 
