@@ -62,7 +62,7 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
       {/* Screen frame — persistent, never animates */}
       <div
         className="relative overflow-hidden"
-        className="md:[transform:perspective(1100px)_rotateY(-6deg)_rotateX(2deg)] md:[transform-origin:center_center]"
+        className="md:[transform:perspective(1200px)_rotateX(3deg)] md:[transform-origin:center_top]"
         style={{
           borderRadius: "4px 20px 8px 6px",
           border: "1px solid color-mix(in srgb, var(--zone-accent) 38%, transparent)",
