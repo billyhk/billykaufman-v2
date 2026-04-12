@@ -58,7 +58,7 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
   const hasMultiple = project.images.length > 1;
 
   return (
-    <div className="relative mx-auto w-full" style={{ maxWidth: 640 }}>
+    <div className="relative mx-auto w-full" style={{ maxWidth: 640, cursor: "default" }}>
       {/* Screen frame — persistent, never animates */}
       <div
         className="relative overflow-hidden"
