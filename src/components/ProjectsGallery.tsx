@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { projectsData, type Project } from "@/data/projects";
 import BannerShowcase from "./BannerShowcase";
 import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
@@ -11,6 +11,8 @@ import {
   useScroll,
   useTransform,
   useSpring,
+  useMotionValue,
+  useMotionTemplate,
   useMotionValueEvent,
 } from "framer-motion";
 import { BloombergLogo } from "./ClientLogos";
@@ -53,14 +55,47 @@ interface HudScreenProps {
   onImageChange: (i: number) => void;
 }
 
+// Base desktop tilt — leans the screen toward the info/list panel on the right
+const TILT_BASE = { x: 4, y: 8 };
+
 function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScreenProps) {
   const hasImages = project.images.length > 0;
   const hasMultiple = project.images.length > 1;
 
+  const tiltX = useMotionValue(0);
+  const tiltY = useMotionValue(0);
+  const springX = useSpring(tiltX, { stiffness: 280, damping: 22 });
+  const springY = useSpring(tiltY, { stiffness: 280, damping: 22 });
+  const tiltTransform = useMotionTemplate`perspective(900px) rotateY(${springY}deg) rotateX(${springX}deg) translateY(-6px)`;
+
+  // Apply base desktop tilt after mount (avoids SSR mismatch)
+  useEffect(() => {
+    if (window.matchMedia("(min-width: 768px)").matches) {
+      tiltX.set(TILT_BASE.x);
+      tiltY.set(TILT_BASE.y);
+    }
+  }, [tiltX, tiltY]);
+
+  const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!window.matchMedia("(min-width: 768px)").matches) return;
+    const rect = e.currentTarget.getBoundingClientRect();
+    const nx = ((e.clientX - rect.left) / rect.width) * 2 - 1;  // -1 … 1
+    const ny = ((e.clientY - rect.top) / rect.height) * 2 - 1;
+    tiltY.set(TILT_BASE.y + nx * 5);   // ±5 deg horizontal
+    tiltX.set(TILT_BASE.x - ny * 4);   // ±4 deg vertical (inverted: cursor up → tilt back)
+  };
+
+  const handleMouseLeave = () => {
+    tiltX.set(TILT_BASE.x);
+    tiltY.set(TILT_BASE.y);
+  };
+
   return (
-    <div
-      className="relative mx-auto w-full md:[transform:perspective(900px)_rotateY(8deg)_rotateX(4deg)_translateY(-6px)] md:[transform-origin:center_center]"
-      style={{ maxWidth: 640, cursor: "default" }}
+    <motion.div
+      className="relative mx-auto w-full"
+      style={{ maxWidth: 640, cursor: "default", transform: tiltTransform }}
+      onMouseMove={handleMouseMove}
+      onMouseLeave={handleMouseLeave}
     >
       {/* Screen frame */}
       <div
@@ -173,7 +208,7 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
       </div>
 
       <ScreenBrackets />
-    </div>
+    </motion.div>
   );
 }
 
