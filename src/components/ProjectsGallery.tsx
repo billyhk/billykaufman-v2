@@ -348,7 +348,7 @@ export default function ProjectsGallery() {
 
           {/* Rolling project list */}
           <div
-            className="relative overflow-hidden shrink-0 rounded-xl"
+            className="relative overflow-hidden shrink-0"
             style={{ height: ITEM_H * VISIBLE }}
           >
             {/* Fade top */}
@@ -377,7 +377,7 @@ export default function ProjectsGallery() {
                     transition={{ duration: 0.3 }}
                     style={{ height: ITEM_H, cursor: "pointer" }}
                     onClick={() => scrollToProject(i)}
-                    className={`flex items-center gap-2.5 px-2 rounded-lg select-none ${isActive ? "bg-white/5" : ""}`}
+                    className="flex items-center gap-2.5 select-none"
                   >
                     <span
                       className="font-mono text-[10px] tabular-nums shrink-0"
