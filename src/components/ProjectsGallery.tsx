@@ -1,213 +1,284 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useEffect, useRef } from "react";
+import { useState, useRef } from "react";
 import { projectsData, type Project } from "@/data/projects";
 import BannerShowcase from "./BannerShowcase";
-import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
-import { motion, AnimatePresence } from "framer-motion";
+import { FaGithub, FaExternalLinkAlt } from "react-icons/fa";
+import {
+  motion,
+  AnimatePresence,
+  useScroll,
+  useTransform,
+  useSpring,
+  useMotionValueEvent,
+} from "framer-motion";
 import { BloombergLogo } from "./ClientLogos";
 
-// ── Image carousel ────────────────────────────────────────────────────────────
-function ImageCarousel({ images, title }: { images: string[]; title: string }) {
-  const [idx, setIdx] = useState(0);
-  const prev = () => setIdx((i) => (i === 0 ? images.length - 1 : i - 1));
-  const next = () => setIdx((i) => (i === images.length - 1 ? 0 : i + 1));
+const N = projectsData.length;
+const NAV_H = 64;
 
+// ── Corner bracket decorations for the HUD screen ─────────────────────────────
+function ScreenBrackets() {
+  const c = "var(--zone-accent)";
+  const base: React.CSSProperties = { position: "absolute", opacity: 0.55, pointerEvents: "none" };
+  const s = 18;
+  const w = 1.5;
   return (
-    <div className="relative w-full aspect-video bg-black/30 rounded-xl overflow-hidden">
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={idx}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.25 }}
-          className="absolute inset-0"
-        >
-          <Image src={images[idx]} alt={`${title} screenshot ${idx + 1}`} fill className="object-cover opacity-85" />
-          <div className="absolute inset-0 bg-blue-950/25 mix-blend-multiply pointer-events-none" />
-          <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse at center, transparent 40%, rgba(2,8,23,0.6) 100%)" }} />
-        </motion.div>
-      </AnimatePresence>
-
-      {images.length > 1 && (
-        <>
-          <button onClick={prev} className="absolute left-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors" aria-label="Previous image">
-            <FaChevronLeft size={14} />
-          </button>
-          <button onClick={next} className="absolute right-2 top-1/2 -translate-y-1/2 bg-black/50 hover:bg-black/70 text-white rounded-full p-2 transition-colors" aria-label="Next image">
-            <FaChevronRight size={14} />
-          </button>
-          <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex gap-1.5">
-            {images.map((_, i) => (
-              <button key={i} onClick={() => setIdx(i)} className={`w-1.5 h-1.5 rounded-full transition-colors ${i === idx ? "bg-white" : "bg-white/40"}`} aria-label={`Go to image ${i + 1}`} />
-            ))}
-          </div>
-        </>
-      )}
-    </div>
+    <>
+      <svg style={{ ...base, top: -9, left: -9 }} width={s} height={s} viewBox="0 0 18 18">
+        <path d="M0 12 L0 0 L12 0" fill="none" stroke={c} strokeWidth={w} />
+      </svg>
+      <svg style={{ ...base, top: -9, right: -9 }} width={s} height={s} viewBox="0 0 18 18">
+        <path d="M18 12 L18 0 L6 0" fill="none" stroke={c} strokeWidth={w} />
+      </svg>
+      <svg style={{ ...base, bottom: -9, left: -9 }} width={s} height={s} viewBox="0 0 18 18">
+        <path d="M0 6 L0 18 L12 18" fill="none" stroke={c} strokeWidth={w} />
+      </svg>
+      <svg style={{ ...base, bottom: -9, right: -9 }} width={s} height={s} viewBox="0 0 18 18">
+        <path d="M18 6 L18 18 L6 18" fill="none" stroke={c} strokeWidth={w} />
+      </svg>
+    </>
   );
 }
 
-// ── Featured panel ────────────────────────────────────────────────────────────
-function FeaturedPanel({ project, onPrev, onNext }: { project: Project; onPrev: () => void; onNext: () => void }) {
-  return (
-    <div className="clip-tr-lg bg-white/5 border border-white/10 overflow-hidden flex flex-col h-full">
-      {/* Media */}
-      <div className="shrink-0">
-        {project.banners
-          ? <BannerShowcase banners={project.banners} />
-          : <ImageCarousel images={project.images} title={project.title} />
-        }
-      </div>
-
-      {/* Details */}
-      <div className="p-6 flex flex-col flex-1">
-        <div className="flex items-start justify-between gap-3 mb-1">
-          <h3 className="text-white font-bold text-xl">{project.title}</h3>
-          <div className="flex gap-3 shrink-0">
-            {project.sourceCode && (
-              <a href={project.sourceCode} target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-colors" aria-label="Source code">
-                <FaGithub size={18} />
-              </a>
-            )}
-            {project.deployment && (
-              <a href={project.deployment} target="_blank" rel="noopener noreferrer" className="text-white/50 hover:text-white transition-colors" aria-label="Live site">
-                <FaExternalLinkAlt size={16} />
-              </a>
-            )}
-          </div>
-        </div>
-
-        <p className="text-blue-300 text-sm mb-3">{project.client}</p>
-        <p className="text-white/70 text-sm leading-relaxed mb-4 flex-1">{project.description}</p>
-
-        <div className="flex flex-wrap gap-2 mb-5">
-          {project.technologies.map((tech) => (
-            <span key={tech} className="text-xs px-2.5 py-1 bg-blue-500/15 text-blue-300 rounded-full border border-blue-500/20">
-              {tech}
-            </span>
-          ))}
-        </div>
-
-        {/* Prev / Next */}
-        <div className="flex gap-2 pt-4 border-t border-white/8">
-          <button onClick={onPrev} className="flex items-center gap-1.5 text-white/40 hover:text-white text-xs transition-colors cursor-pointer">
-            <FaChevronLeft size={11} /> Prev
-          </button>
-          <button onClick={onNext} className="flex items-center gap-1.5 text-white/40 hover:text-white text-xs transition-colors ml-auto cursor-pointer">
-            Next <FaChevronRight size={11} />
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-}
-
-// ── Filmstrip item ────────────────────────────────────────────────────────────
-function FilmstripItem({ project, active, onClick }: { project: Project; active: boolean; onClick: () => void }) {
-  const thumb = project.images[0] ?? null;
+// ── HUD terminal screen ────────────────────────────────────────────────────────
+function HudScreen({ project }: { project: Project }) {
+  const hasImage = project.images.length > 0;
 
   return (
-    <button
-      onClick={onClick}
-      className={`w-full shrink-0 group text-left transition-all duration-200 rounded-xl overflow-hidden border cursor-pointer ${
-        active
-          ? "border-blue-400/60 bg-white/8 shadow-lg shadow-blue-500/10"
-          : "border-white/8 bg-white/3 hover:border-white/20 hover:bg-white/6"
-      }`}
-    >
-      {/* Thumbnail — fixed aspect ratio so all items are same height */}
-      <div className="relative w-full bg-black/30 overflow-hidden" style={{ paddingTop: "56.25%" }}>
-        <div className="absolute inset-0">
-          {thumb ? (
-            <Image src={thumb} alt={project.title} fill className={`object-cover transition-opacity duration-200 ${active ? "opacity-90" : "opacity-50 group-hover:opacity-70"}`} />
+    <div className="relative mx-auto w-full" style={{ maxWidth: 640 }}>
+      {/* Screen frame */}
+      <div
+        className="relative overflow-hidden"
+        style={{
+          borderRadius: "4px 20px 8px 6px",
+          border: "1px solid color-mix(in srgb, var(--zone-accent) 38%, transparent)",
+          boxShadow: [
+            "0 0 48px color-mix(in srgb, var(--zone-accent) 14%, transparent)",
+            "0 0 0 1px color-mix(in srgb, var(--zone-accent) 6%, transparent)",
+            "inset 0 0 24px rgba(0,0,4,0.6)",
+          ].join(", "),
+          transform: "perspective(1100px) rotateY(-6deg) rotateX(2deg)",
+          transformOrigin: "center center",
+        }}
+      >
+        {/* Media */}
+        <div className="relative aspect-video bg-black">
+          {hasImage ? (
+            <Image
+              src={project.images[0]}
+              alt={project.title}
+              fill
+              className="object-cover opacity-90"
+              sizes="(max-width: 768px) 100vw, 55vw"
+            />
           ) : (
-            <div className={`absolute inset-0 flex items-center justify-center bg-linear-to-br from-blue-950 to-indigo-950 px-6 transition-opacity duration-200 ${active ? "opacity-90" : "opacity-50 group-hover:opacity-70"}`}>
-              {project.key === "bloomberg"
-                ? <BloombergLogo className="w-full max-h-8 object-contain" />
-                : <span className="text-white/20 text-2xl font-bold">{project.client.charAt(0)}</span>
-              }
+            <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-blue-950 to-indigo-950">
+              <BloombergLogo className="w-40 max-h-10 object-contain opacity-50" />
             </div>
           )}
+
+          {/* Scanlines */}
+          <div
+            className="absolute inset-0 pointer-events-none z-10"
+            style={{
+              backgroundImage:
+                "repeating-linear-gradient(to bottom, transparent 0px, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 3px)",
+            }}
+          />
+
+          {/* Vignette */}
+          <div
+            className="absolute inset-0 pointer-events-none z-10"
+            style={{
+              background:
+                "radial-gradient(ellipse at center, transparent 35%, rgba(0,0,4,0.55) 100%)",
+            }}
+          />
         </div>
-        {active && <div className="absolute inset-0 ring-2 ring-inset ring-blue-400/40" />}
+
+        {/* Status bar */}
+        <div
+          className="flex items-center gap-3 px-3 py-1.5 text-[10px] font-mono shrink-0"
+          style={{
+            background: "color-mix(in srgb, var(--zone-accent) 5%, #000408)",
+            borderTop: "1px solid color-mix(in srgb, var(--zone-accent) 18%, transparent)",
+          }}
+        >
+          <span className="opacity-50" style={{ color: "var(--zone-accent)" }}>
+            ◈ SYS.DISPLAY
+          </span>
+          <span className="text-white/25 uppercase tracking-widest">
+            {project.key.replace(/_/g, ".")}
+          </span>
+          <span className="ml-auto text-white/20 tracking-widest">VISUAL.OUT</span>
+        </div>
       </div>
 
-      {/* Label — fixed height so all items align */}
-      <div className="px-3 py-2.5 h-13 flex flex-col justify-center">
-        <p className={`text-xs font-semibold leading-tight line-clamp-1 transition-colors ${active ? "text-white" : "text-white/55 group-hover:text-white/80"}`}>
-          {project.title}
-        </p>
-        <p className={`text-xs mt-0.5 truncate transition-colors ${active ? "text-blue-300/80" : "text-white/30 group-hover:text-white/45"}`}>
-          {project.client}
-        </p>
-      </div>
-    </button>
+      {/* Corner bracket decorations */}
+      <ScreenBrackets />
+    </div>
   );
 }
 
-// ── Main component ────────────────────────────────────────────────────────────
+// ── Main gallery ───────────────────────────────────────────────────────────────
 export default function ProjectsGallery() {
   const [activeIdx, setActiveIdx] = useState(0);
-  const total   = projectsData.length;
-  const prev    = () => setActiveIdx((i) => (i === 0 ? total - 1 : i - 1));
-  const next    = () => setActiveIdx((i) => (i === total - 1 ? 0 : i + 1));
+  const sectionRef = useRef<HTMLDivElement>(null);
+
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+
+  const rawIdx = useTransform(scrollYProgress, [0, 1], [0, N - 0.0001]);
+
+  useMotionValueEvent(rawIdx, "change", (v) => {
+    const next = Math.floor(v);
+    setActiveIdx((prev) => (prev !== next ? next : prev));
+  });
+
+  const springProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
+
   const project = projectsData[activeIdx];
-
-  const filmstripRef = useRef<HTMLDivElement>(null);
-  const itemRefs = useRef<(HTMLDivElement | null)[]>([]);
-
-  useEffect(() => {
-    const container = filmstripRef.current;
-    const item = itemRefs.current[activeIdx];
-    if (!container || !item) return;
-
-    const containerBox = container.getBoundingClientRect();
-    const itemBox = item.getBoundingClientRect();
-    const isVertical = container.scrollHeight > container.clientHeight;
-
-    if (isVertical) {
-      const offset = itemBox.top - containerBox.top - containerBox.height / 2 + itemBox.height / 2;
-      container.scrollBy({ top: offset, behavior: "smooth" });
-    } else {
-      const offset = itemBox.left - containerBox.left - containerBox.width / 2 + itemBox.width / 2;
-      container.scrollBy({ left: offset, behavior: "smooth" });
-    }
-  }, [activeIdx]);
+  const counterStr =
+    String(activeIdx + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0");
 
   return (
-    <div className="flex flex-col lg:flex-row gap-5">
-
-      {/* ── Featured panel ── */}
-      <div className="flex-1 min-w-0">
-        <AnimatePresence mode="wait">
-          <motion.div
-            key={project.key}
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.18 }}
-            className="h-full"
-          >
-            <FeaturedPanel project={project} onPrev={prev} onNext={next} />
-          </motion.div>
-        </AnimatePresence>
-      </div>
-
-      {/* ── Filmstrip ── */}
-      {/* Mobile: horizontal scroll row. Desktop: vertical scrollable column. */}
-      <div ref={filmstripRef} className="flex flex-row lg:flex-col gap-3 overflow-x-auto lg:overflow-x-hidden lg:overflow-y-auto lg:w-56 xl:w-64 pb-2 lg:pb-0 lg:max-h-160 shrink-0"
-        style={{ scrollbarWidth: "none" }}
+    <div ref={sectionRef} style={{ height: `${N * 80}vh` }}>
+      {/* ── Sticky panel ── */}
+      <div
+        className="sticky flex flex-col md:flex-row overflow-hidden"
+        style={{ top: NAV_H, height: `calc(100svh - ${NAV_H}px)` }}
       >
-        {projectsData.map((p, i) => (
-          <div key={p.key} ref={el => { itemRefs.current[i] = el; }} className="w-44 lg:w-auto shrink-0">
-            <FilmstripItem project={p} active={i === activeIdx} onClick={() => setActiveIdx(i)} />
-          </div>
-        ))}
-      </div>
+        {/* Scroll progress bar — left edge */}
+        <div className="absolute left-0 top-0 bottom-0 w-0.5 z-20 overflow-hidden">
+          <motion.div
+            className="absolute inset-x-0 top-0 bottom-0 opacity-50"
+            style={{
+              background: "var(--zone-accent)",
+              scaleY: springProgress,
+              transformOrigin: "top",
+            }}
+          />
+        </div>
 
+        {/* ── LEFT: HUD Screen ── */}
+        <div className="md:w-[55%] flex items-center justify-center p-6 md:p-10 md:pl-8 shrink-0">
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={project.key + "-screen"}
+              className="w-full"
+              initial={{ opacity: 0, scale: 0.97 }}
+              animate={{ opacity: 1, scale: 1 }}
+              exit={{ opacity: 0, scale: 0.97 }}
+              transition={{ duration: 0.45 }}
+            >
+              {project.banners ? (
+                // Bloomberg: BannerShowcase in place of the HUD screen
+                <div
+                  className="overflow-hidden"
+                  style={{
+                    borderRadius: "4px 20px 8px 6px",
+                    border: "1px solid color-mix(in srgb, var(--zone-accent) 38%, transparent)",
+                    boxShadow: "0 0 48px color-mix(in srgb, var(--zone-accent) 14%, transparent)",
+                  }}
+                >
+                  <BannerShowcase banners={project.banners} />
+                </div>
+              ) : (
+                <HudScreen project={project} />
+              )}
+            </motion.div>
+          </AnimatePresence>
+        </div>
+
+        {/* ── RIGHT: Project info + index ── */}
+        <div
+          className="flex-1 flex flex-col justify-center overflow-y-auto px-6 md:px-8 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8"
+          style={{ scrollbarWidth: "none" }}
+        >
+          <AnimatePresence mode="wait">
+            <motion.div
+              key={project.key + "-info"}
+              initial={{ opacity: 0, y: 14 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -10 }}
+              transition={{ duration: 0.38 }}
+              className="shrink-0"
+            >
+              {/* Counter */}
+              <p className="font-mono text-xs tracking-widest mb-4" style={{ color: "var(--zone-accent)", opacity: 0.6 }}>
+                {counterStr}
+              </p>
+
+              {/* Title + links */}
+              <div className="flex items-start justify-between gap-3 mb-1">
+                <h3 className="text-white font-bold text-2xl md:text-3xl leading-tight">
+                  {project.title}
+                </h3>
+                <div className="flex gap-3 shrink-0 pt-1">
+                  {project.sourceCode && (
+                    <a href={project.sourceCode} target="_blank" rel="noopener noreferrer"
+                      className="text-white/40 hover:text-white transition-colors" aria-label="Source code">
+                      <FaGithub size={18} />
+                    </a>
+                  )}
+                  {project.deployment && (
+                    <a href={project.deployment} target="_blank" rel="noopener noreferrer"
+                      className="text-white/40 hover:text-white transition-colors" aria-label="Live site">
+                      <FaExternalLinkAlt size={15} />
+                    </a>
+                  )}
+                </div>
+              </div>
+
+              {/* Client */}
+              <p className="text-sm mb-3" style={{ color: "var(--zone-accent)" }}>
+                {project.client}
+              </p>
+
+              {/* Description */}
+              <p className="text-white/60 text-sm leading-relaxed mb-4 line-clamp-3">
+                {project.description}
+              </p>
+
+              {/* Tech pills */}
+              <div className="flex flex-wrap gap-2">
+                {project.technologies.map((tech) => (
+                  <span
+                    key={tech}
+                    className="text-xs px-2.5 py-1 bg-blue-500/15 text-blue-300 rounded-full border border-blue-500/20"
+                  >
+                    {tech}
+                  </span>
+                ))}
+              </div>
+            </motion.div>
+          </AnimatePresence>
+
+          {/* Divider */}
+          <div className="h-px bg-white/8 my-5 shrink-0" />
+
+          {/* Project index — inactive items */}
+          <div className="flex flex-col gap-0.5 overflow-y-auto shrink-0" style={{ scrollbarWidth: "none" }}>
+            {projectsData.map((p, i) => (
+              <motion.div
+                key={p.key}
+                animate={{ opacity: i === activeIdx ? 0 : 0.3 }}
+                transition={{ duration: 0.3 }}
+                className="py-1"
+              >
+                <span className="font-mono text-[10px] text-white/40 mr-2 tabular-nums">
+                  {String(i + 1).padStart(2, "0")}
+                </span>
+                <span className="text-white text-xs font-medium">{p.title}</span>
+              </motion.div>
+            ))}
+          </div>
+        </div>
+      </div>
     </div>
   );
 }
