@@ -22,6 +22,13 @@ export default function Modal({ isOpen, onClose, children }: ModalProps) {
     return () => window.removeEventListener("keydown", onKey);
   }, [isOpen, onClose]);
 
+  useEffect(() => {
+    if (!isOpen) return;
+    const prev = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => { document.body.style.overflow = prev; };
+  }, [isOpen]);
+
   return (
     <AnimatePresence>
       {isOpen && (

@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useHudVisible } from "@/hooks/useHudVisible";
-import { HiMenu, HiX } from "react-icons/hi";
 import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
 import { socialLinks } from "@/data/social";
 
@@ -177,6 +176,49 @@ function BkBadge({ hovered }: { hovered: boolean }) {
   );
 }
 
+// ─── Animated 3-line hamburger → X ───────────────────────────────────────────
+// Open:  lines converge to center (phase 1), middle fades, outer two rotate into X (phase 2)
+// Close: X unrotates (phase 1), middle reappears, outer two spread back out (phase 2)
+function MenuIcon({ isOpen }: { isOpen: boolean }) {
+  const base: React.CSSProperties = {
+    position: "absolute", left: 0, height: 1.5,
+    backgroundColor: "white", borderRadius: 1, transformOrigin: "center",
+  };
+  // Container: 22×18px. Lines have staggered widths in hamburger state.
+  // All equalize to full width as they converge, then rotate into X.
+  return (
+    <div style={{ position: "relative", width: 22, height: 18 }}>
+      {/* Top line — grows then converges + rotates CW */}
+      <motion.span
+        style={{ ...base, top: 0 }}
+        animate={isOpen ? { width: [22, 28, 22], y: 8.25, rotate: 45 } : { width: 22, y: 0, rotate: 0 }}
+        transition={isOpen
+          ? { width: { duration: 0.48, times: [0, 0.35, 1], ease: "easeIn" }, y: { delay: 0.08, duration: 0.18, ease: "easeIn" }, rotate: { delay: 0.24, duration: 0.2, ease: [0.34, 1.56, 0.64, 1] } }
+          : { rotate: { duration: 0.14, ease: "easeIn" }, y: { delay: 0.12, duration: 0.22, ease: "easeOut" }, width: { delay: 0.28, duration: 0.18 } }
+        }
+      />
+      {/* Middle line — grows then fades as lines converge */}
+      <motion.span
+        style={{ ...base, top: 8.25 }}
+        animate={isOpen ? { width: [15, 28, 22], opacity: 0, scaleX: 0.2 } : { width: 15, opacity: 1, scaleX: 1 }}
+        transition={isOpen
+          ? { width: { duration: 0.48, times: [0, 0.35, 1], ease: "easeIn" }, opacity: { delay: 0.1, duration: 0.14, ease: "easeIn" }, scaleX: { delay: 0.1, duration: 0.14 } }
+          : { delay: 0.3, duration: 0.18, ease: "easeOut" }
+        }
+      />
+      {/* Bottom line — grows then converges + rotates CCW */}
+      <motion.span
+        style={{ ...base, bottom: 0 }}
+        animate={isOpen ? { width: [11, 28, 22], y: -8.25, rotate: -45 } : { width: 11, y: 0, rotate: 0 }}
+        transition={isOpen
+          ? { width: { duration: 0.48, times: [0, 0.35, 1], ease: "easeIn" }, y: { delay: 0.08, duration: 0.18, ease: "easeIn" }, rotate: { delay: 0.24, duration: 0.2, ease: [0.34, 1.56, 0.64, 1] } }
+          : { rotate: { duration: 0.14, ease: "easeIn" }, y: { delay: 0.12, duration: 0.22, ease: "easeOut" }, width: { delay: 0.28, duration: 0.18 } }
+        }
+      />
+    </div>
+  );
+}
+
 export default function NavBar() {
   const [mobileOpen, setMobileOpen] = useState(false);
   const [active, setActive]         = useState("home");
@@ -188,11 +230,13 @@ export default function NavBar() {
 
   const handleMobileNavClick = (href: string) => {
     setSelectedHref(href);
+    // Let scan line + highlight play, then start closing (icon reverts simultaneously)
+    setTimeout(() => setMobileOpen(false), 320);
+    // Scroll after the curtain has mostly closed
     setTimeout(() => {
       scrollTo(href);
-      setMobileOpen(false);
       setSelectedHref(null);
-    }, 380);
+    }, 700);
   };
 
   // Live depth — same transform as DepthGauge
@@ -277,97 +321,110 @@ export default function NavBar() {
             onClick={() => setMobileOpen((o) => !o)}
             aria-label="Toggle menu"
           >
-            <AnimatePresence mode="wait" initial={false}>
-              {mobileOpen ? (
-                <motion.span key="close" initial={{ rotate: -90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: 90, opacity: 0 }} transition={{ duration: 0.18 }} className="block">
-                  <HiX size={24} />
-                </motion.span>
-              ) : (
-                <motion.span key="open" initial={{ rotate: 90, opacity: 0 }} animate={{ rotate: 0, opacity: 1 }} exit={{ rotate: -90, opacity: 0 }} transition={{ duration: 0.18 }} className="block">
-                  <HiMenu size={24} />
-                </motion.span>
-              )}
-            </AnimatePresence>
+            <MenuIcon isOpen={mobileOpen} />
           </button>
         </div>
       </motion.nav>
 
-      {/* Mobile drawer — unchanged functionality, updated accent colors */}
+      {/* ── Mobile fullscreen menu ── */}
       <AnimatePresence>
         {mobileOpen && (
-          <>
-            <motion.div key="backdrop" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} transition={{ duration: 0.25 }} className="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" onClick={() => setMobileOpen(false)} />
-            <motion.div key="drawer" initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }} transition={{ type: "spring", stiffness: 320, damping: 32 }} className="fixed top-0 right-0 bottom-0 z-50 w-72 bg-[rgba(2,8,23,0.97)] backdrop-blur-xl border-l flex flex-col md:hidden" style={{ borderColor: "color-mix(in srgb, var(--zone-accent) 25%, transparent)" }}>
+          <motion.div
+            key="mobile-menu"
+            className="fixed inset-0 z-40 flex flex-col md:hidden"
+            style={{ background: "linear-gradient(160deg, #020817 0%, #010c1a 100%)", cursor: "default" }}
+            initial={{ clipPath: "inset(0 0 100% 0)" }}
+            animate={{ clipPath: "inset(0 0 0% 0)" }}
+            exit={{ clipPath: "inset(0 0 100% 0)" }}
+            transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
+          >
+            {/* Align with navbar */}
+            <div className="h-16 shrink-0" />
+            <div className="h-px shrink-0 opacity-20" style={{ backgroundColor: "var(--zone-accent)" }} />
 
-              {/* Header */}
-              <div className="h-16 flex items-center justify-between px-5 shrink-0 border-b" style={{ borderColor: "color-mix(in srgb, var(--zone-accent) 15%, transparent)" }}>
-                <span className="text-[9px] font-mono tracking-[0.25em] uppercase opacity-50" style={{ color: "var(--zone-accent)" }}>
-                  {zoneName(depth)}
-                </span>
-                <button onClick={() => setMobileOpen(false)} className="text-white/40 hover:text-white transition-colors cursor-pointer" aria-label="Close menu">
-                  <HiX size={20} />
-                </button>
-              </div>
-
-              {/* Links — scrollable so nothing clips on short screens */}
-              <div className="flex flex-col px-4 pt-5 gap-0.5 overflow-y-auto flex-1">
-                {navLinks.map(({ href, label }, i) => {
-                  const isActive   = active === href.replace("#", "");
-                  const isSelected = selectedHref === href;
-                  const isDimmed   = selectedHref !== null && !isSelected;
-                  return (
-                    <motion.div key={href} initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.06 + i * 0.05, duration: 0.22 }}>
-                      {/* Selection dim wrapper */}
-                      <motion.div animate={{ opacity: isDimmed ? 0.2 : 1 }} transition={{ duration: 0.15 }}>
-                        <button
-                          onClick={() => handleMobileNavClick(href)}
-                          className="w-full text-left flex items-center gap-3 px-3 py-3.5 text-base font-medium cursor-pointer border-b relative overflow-hidden"
-                          style={{
-                            borderColor: "rgba(255,255,255,0.06)",
-                            color: isSelected || isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.55)",
-                          }}
-                        >
-                          {/* Scan line on select */}
-                          <AnimatePresence>
-                            {isSelected && (
-                              <motion.span
-                                key="scan"
-                                className="absolute top-0 bottom-0 w-24 pointer-events-none"
-                                style={{ background: "linear-gradient(90deg, transparent, var(--zone-accent) 50%, transparent)", opacity: 0.28 }}
-                                initial={{ left: "-6rem" }}
-                                animate={{ left: "110%" }}
-                                transition={{ duration: 0.35, ease: "easeOut" }}
-                              />
-                            )}
-                          </AnimatePresence>
-
-                          <span
-                            className="text-[10px] font-mono w-5 shrink-0 transition-opacity"
-                            style={{ color: "var(--zone-accent)", opacity: isSelected ? 1 : 0.4 }}
-                          >
-                            {String(i + 1).padStart(2, "0")}
-                          </span>
-                          {label}
-                          {(isActive || isSelected) && (
-                            <span className="ml-auto w-1 h-4 rounded-full shrink-0" style={{ backgroundColor: "var(--zone-accent)" }} />
+            {/* Nav links — large typographic list.
+                Outer div scrolls; inner div centers when content fits,
+                scrolls without clipping when viewport is short. */}
+            <div className="flex-1 min-h-0 overflow-y-auto px-8 py-4">
+              <div className="flex flex-col justify-center min-h-full gap-1">
+              {navLinks.map(({ href, label }, i) => {
+                const isActive   = active === href.replace("#", "");
+                const isSelected = selectedHref === href;
+                const isDimmed   = selectedHref !== null && !isSelected;
+                return (
+                  <motion.div
+                    key={href}
+                    initial={{ opacity: 0, y: 28 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.2 + i * 0.07, duration: 0.45, ease: [0.16, 1, 0.3, 1] }}
+                  >
+                    <motion.div animate={{ opacity: isDimmed ? 0.1 : 1 }} transition={{ duration: 0.18 }}>
+                      <button
+                        onClick={() => handleMobileNavClick(href)}
+                        className="w-full text-left flex items-center gap-5 py-3 relative overflow-hidden cursor-pointer"
+                      >
+                        {/* Scan line sweep on select */}
+                        <AnimatePresence>
+                          {isSelected && (
+                            <motion.span
+                              key="scan"
+                              className="absolute inset-0 pointer-events-none"
+                              style={{ background: "linear-gradient(90deg, transparent 0%, color-mix(in srgb, var(--zone-accent) 22%, transparent) 50%, transparent 100%)" }}
+                              initial={{ x: "-100%" }}
+                              animate={{ x: "100%" }}
+                              transition={{ duration: 0.38, ease: "easeOut" }}
+                            />
                           )}
-                        </button>
-                      </motion.div>
-                    </motion.div>
-                  );
-                })}
-              </div>
+                        </AnimatePresence>
 
-              {/* Social links */}
-              <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 0.35 }} className="px-5 py-5 border-t flex gap-5 shrink-0" style={{ borderColor: "color-mix(in srgb, var(--zone-accent) 15%, transparent)" }}>
+                        <span
+                          className="font-mono text-[11px] tabular-nums shrink-0 w-5"
+                          style={{ color: "var(--zone-accent)", opacity: isSelected || isActive ? 0.9 : 0.3 }}
+                        >
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+
+                        <span
+                          className="text-5xl font-bold tracking-tight leading-none transition-colors duration-150"
+                          style={{ color: isSelected || isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.88)" }}
+                        >
+                          {label}
+                        </span>
+
+                        {isActive && (
+                          <motion.span
+                            layoutId="mobile-active-pip"
+                            className="ml-auto w-1.5 h-1.5 rounded-full shrink-0"
+                            style={{ backgroundColor: "var(--zone-accent)" }}
+                          />
+                        )}
+                      </button>
+                    </motion.div>
+                  </motion.div>
+                );
+              })}
+              </div>
+            </div>
+
+            {/* Footer — zone name + social */}
+            <motion.div
+              className="px-8 pb-10 flex items-center justify-between shrink-0"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.55, duration: 0.3 }}
+            >
+              <span className="text-[10px] font-mono tracking-[0.25em] uppercase opacity-35" style={{ color: "var(--zone-accent)" }}>
+                {zoneName(depth)}
+              </span>
+              <div className="flex gap-5">
                 {socialLinks.map(({ Icon, href, label }) => (
-                  <a key={label} href={href} target={href.startsWith("mailto") ? undefined : "_blank"} rel="noopener noreferrer" className="text-white/30 hover:text-white transition-colors" aria-label={label}>
+                  <a key={label} href={href} target={href.startsWith("mailto") ? undefined : "_blank"} rel="noopener noreferrer" className="text-white/25 hover:text-white transition-colors" aria-label={label}>
                     <Icon size={18} />
                   </a>
                 ))}
-              </motion.div>
+              </div>
             </motion.div>
-          </>
+          </motion.div>
         )}
       </AnimatePresence>
     </>
