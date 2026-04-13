@@ -9,7 +9,6 @@ import {
   motion,
   AnimatePresence,
   useScroll,
-  useTransform,
   useSpring,
   useMotionValue,
   useMotionTemplate,
@@ -20,8 +19,8 @@ import Modal from "./Modal";
 
 const N = projectsData.length;
 const NAV_H = 64;
-const ITEM_H = 40; // px — height of each rolling list row (title only, no description)
-const VISIBLE = 5; // rows visible in the rolling list
+const ITEM_H = 40; // px — height of each compact (non-active) list row
+const PILL_CLS = "text-xs px-2.5 py-1 bg-blue-500/15 text-blue-300 rounded-full border border-blue-500/20";
 
 // ── Corner bracket decorations ─────────────────────────────────────────────────
 function ScreenBrackets() {
@@ -220,42 +219,43 @@ export default function ProjectsGallery() {
     offset: ["start start", "end end"],
   });
 
-  const rawIdx = useTransform(scrollYProgress, [0, 1], [0, N - 0.0001]);
+  const springProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
-  useMotionValueEvent(rawIdx, "change", (v) => {
-    const next = Math.floor(v);
+  const [sectionDone, setSectionDone] = useState(false);
+
+  // Single listener drives both active-project tracking and section-done flag.
+  // rawIdx equivalent: scrollYProgress * (N - 0.0001), mapping [0,1] → [0,N).
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    setSectionDone(v >= 0.999);
+    const next = Math.floor(v * (N - 0.0001));
     setActiveIdx((prev) => {
       if (prev === next) return prev;
-      setImageIdx(0); // reset image carousel on project change
+      setImageIdx(0);
       return next;
     });
   });
 
-  const springProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
-
-  // Close modal on project change
   useEffect(() => { setDescModal(false); }, [activeIdx]);
 
-
   const project = projectsData[activeIdx];
-  const images = project.images;
 
-  const handlePrev = () => setImageIdx((i) => (i === 0 ? images.length - 1 : i - 1));
-  const handleNext = () => setImageIdx((i) => (i === images.length - 1 ? 0 : i + 1));
+  const handlePrev = () => setImageIdx((i) => (i === 0 ? project.images.length - 1 : i - 1));
+  const handleNext = () => setImageIdx((i) => (i === project.images.length - 1 ? 0 : i + 1));
 
   // Scroll to the midpoint of project `idx`'s scroll range.
   // Targeting the exact boundary (idx/N) lands rawIdx just below idx due to the
   // [0, N-0.0001] transform, so Math.floor gives idx-1. Midpoint is always safe.
+  // Target rawIdx = idx + 0.4 — the center of each project's full-opacity zone [i, i+0.8].
   const scrollToProject = (idx: number) => {
     const el = sectionRef.current;
     if (!el) return;
     const top = el.getBoundingClientRect().top + window.scrollY;
     const h = el.offsetHeight;
-    const target = top + ((idx + 0.5) / N) * Math.max(h - window.innerHeight, 0);
+    const target = top + ((idx + 0.4) / N) * Math.max(h - window.innerHeight, 0);
     window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
   };
 
-  const counterStr = String(activeIdx + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0");
+
 
   return (
     <div ref={sectionRef} style={{ height: `${N * 80}vh` }}>
@@ -286,85 +286,10 @@ export default function ProjectsGallery() {
           </div>
         </div>
 
-        {/* ── RIGHT: Project info + rolling list ── */}
-        <div
-          className="flex-1 flex flex-col justify-start md:justify-center px-6 md:px-8 pt-4 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8"
-        >
-          {/* Info block — animates on project change */}
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={project.key + "-info"}
-              initial={{ opacity: 0, y: 14 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -10 }}
-              transition={{ duration: 0.35 }}
-              className="shrink-0"
-            >
-              {/* Counter */}
-              <p className="font-mono text-xs tracking-widest mb-3" style={{ color: "var(--zone-accent)", opacity: 0.6 }}>
-                {counterStr}
-              </p>
-
-              {/* Title + links */}
-              <div className="flex items-start justify-between gap-3 mb-1">
-                <h3 className="text-white font-bold text-2xl md:text-3xl leading-tight">
-                  {project.title}
-                </h3>
-                <div className="flex gap-3 shrink-0 pt-1">
-                  {project.sourceCode && (
-                    <a href={project.sourceCode} target="_blank" rel="noopener noreferrer"
-                      className="text-white/40 hover:text-white transition-colors" aria-label="Source code">
-                      <FaGithub size={18} />
-                    </a>
-                  )}
-                  {project.deployment && (
-                    <a href={project.deployment} target="_blank" rel="noopener noreferrer"
-                      className="text-white/40 hover:text-white transition-colors" aria-label="Live site">
-                      <FaExternalLinkAlt size={15} />
-                    </a>
-                  )}
-                </div>
-              </div>
-
-              {/* Client */}
-              <p className="text-sm mb-2" style={{ color: "var(--zone-accent)" }}>
-                {project.client}
-              </p>
-
-              {/* Description */}
-              <p className="text-white/55 text-sm leading-relaxed line-clamp-2 md:line-clamp-4 mb-1">
-                {project.description}
-              </p>
-              <button
-                onClick={() => setDescModal(true)}
-                className="text-xs font-semibold mb-3 tracking-wide"
-                style={{ color: "var(--zone-accent)", cursor: "pointer" }}
-              >
-                more ↗
-              </button>
-
-              {/* Tech pills */}
-              <div className="flex flex-wrap gap-2">
-                {project.technologies.map((tech) => (
-                  <span
-                    key={tech}
-                    className="text-xs px-2.5 py-1 bg-blue-500/15 text-blue-300 rounded-full border border-blue-500/20"
-                  >
-                    {tech}
-                  </span>
-                ))}
-              </div>
-            </motion.div>
-          </AnimatePresence>
-
-          {/* Divider */}
-          <div className="h-px bg-white/8 my-4 shrink-0" />
-
-          {/* Rolling project list */}
-          <div
-            className="relative overflow-hidden shrink-0"
-            style={{ height: ITEM_H * VISIBLE }}
-          >
+        {/* ── RIGHT: Unified project list — active item expands with full info ── */}
+        <div className="flex-1 flex flex-col px-6 md:px-8 pt-4 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8 overflow-hidden">
+          {/* List scrolls so active item is always at the top */}
+          <div className="flex-1 min-h-0 relative overflow-hidden">
             <motion.div
               animate={{ y: -activeIdx * ITEM_H }}
               transition={{ type: "spring", stiffness: 280, damping: 38, mass: 0.8 }}
@@ -372,25 +297,70 @@ export default function ProjectsGallery() {
               {projectsData.map((p, i) => {
                 const dist = Math.abs(i - activeIdx);
                 const isActive = i === activeIdx;
-                const opacity = isActive ? 1 : dist === 1 ? 0.5 : 0.18;
+                const rowOpacity = isActive ? 1 : dist === 1 ? 0.5 : 0.18;
+                const counter = String(i + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0");
+
                 return (
                   <motion.div
                     key={p.key}
-                    animate={{ opacity }}
+                    animate={{ opacity: rowOpacity }}
                     transition={{ duration: 0.3 }}
-                    style={{ height: ITEM_H, cursor: "pointer" }}
-                    onClick={() => scrollToProject(i)}
-                    className="flex items-center gap-2.5 select-none"
                   >
-                    <span
-                      className="font-mono text-[10px] tabular-nums shrink-0"
-                      style={{ color: isActive ? "var(--zone-accent)" : "rgba(255,255,255,0.35)" }}
-                    >
-                      {String(i + 1).padStart(2, "0")}
-                    </span>
-                    <span className={`text-sm leading-tight truncate ${isActive ? "text-white font-semibold" : "text-white/60 font-medium"}`}>
-                      {p.title}
-                    </span>
+                    {isActive ? (
+                      /* Expanded active item */
+                      <div className="pb-5">
+                        <p className="font-mono text-xs tracking-widest mb-2" style={{ color: "var(--zone-accent)", opacity: 0.6 }}>
+                          {counter}
+                        </p>
+                        <div className="flex items-start justify-between gap-3 mb-1">
+                          <h3 className="text-white font-bold text-2xl md:text-3xl leading-tight">{p.title}</h3>
+                          <div className="flex gap-3 shrink-0 pt-1">
+                            {p.sourceCode && (
+                              <a href={p.sourceCode} target="_blank" rel="noopener noreferrer"
+                                className="text-white/40 hover:text-white transition-colors" aria-label="Source code">
+                                <FaGithub size={18} />
+                              </a>
+                            )}
+                            {p.deployment && (
+                              <a href={p.deployment} target="_blank" rel="noopener noreferrer"
+                                className="text-white/40 hover:text-white transition-colors" aria-label="Live site">
+                                <FaExternalLinkAlt size={15} />
+                              </a>
+                            )}
+                          </div>
+                        </div>
+                        <p className="text-sm mb-3" style={{ color: "var(--zone-accent)" }}>{p.client}</p>
+                        <div className="flex flex-wrap gap-2 mb-3">
+                          {p.technologies.slice(0, 3).map((tech) => (
+                            <span key={tech} className={PILL_CLS}>{tech}</span>
+                          ))}
+                          {p.technologies.length > 3 && (
+                            <span className="text-xs px-2.5 py-1 bg-white/5 text-white/40 rounded-full border border-white/10">
+                              +{p.technologies.length - 3}
+                            </span>
+                          )}
+                        </div>
+                        <button
+                          onClick={() => setDescModal(true)}
+                          className="text-xs font-semibold tracking-wide"
+                          style={{ color: "var(--zone-accent)", cursor: "pointer" }}
+                        >
+                          Read more ↗
+                        </button>
+                      </div>
+                    ) : (
+                      /* Compact non-active row */
+                      <div
+                        style={{ height: ITEM_H, cursor: "pointer" }}
+                        onClick={() => scrollToProject(i)}
+                        className="flex items-center gap-2.5 select-none"
+                      >
+                        <span className="font-mono text-[10px] tabular-nums shrink-0" style={{ color: "rgba(255,255,255,0.35)" }}>
+                          {String(i + 1).padStart(2, "0")}
+                        </span>
+                        <span className="text-sm leading-tight truncate text-white/60 font-medium">{p.title}</span>
+                      </div>
+                    )}
                   </motion.div>
                 );
               })}
@@ -401,7 +371,7 @@ export default function ProjectsGallery() {
 
       {/* ── Mobile scroll hint — visible on first project until user scrolls ── */}
       <AnimatePresence>
-        {activeIdx < N - 1 && (
+        {!sectionDone && (
           <motion.div
             className="fixed bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 z-20 md:hidden pointer-events-none"
             initial={{ opacity: 0, y: 6 }}
@@ -425,14 +395,13 @@ export default function ProjectsGallery() {
       {/* ── Description modal ── */}
       <Modal isOpen={descModal} onClose={() => setDescModal(false)}>
         <div
-          className="w-full max-w-md max-h-[70vh] flex flex-col rounded-xl overflow-hidden"
+          className="w-full max-w-sm max-h-[70vh] flex flex-col rounded-xl overflow-hidden"
           style={{
             background: "color-mix(in srgb, var(--zone-accent) 6%, #020c18)",
             border: "1px solid color-mix(in srgb, var(--zone-accent) 25%, transparent)",
             boxShadow: "0 24px 64px rgba(0,0,0,0.7)",
           }}
         >
-          {/* Header */}
           <div
             className="flex items-center justify-between px-5 py-3 shrink-0"
             style={{ borderBottom: "1px solid color-mix(in srgb, var(--zone-accent) 18%, transparent)" }}
@@ -447,18 +416,11 @@ export default function ProjectsGallery() {
               ✕
             </button>
           </div>
-
-          {/* Scrollable body */}
           <div className="overflow-y-auto px-5 py-4 space-y-4">
             <p className="text-white/70 text-sm leading-relaxed">{project.description}</p>
             <div className="flex flex-wrap gap-2">
               {project.technologies.map((tech) => (
-                <span
-                  key={tech}
-                  className="text-xs px-2.5 py-1 bg-blue-500/15 text-blue-300 rounded-full border border-blue-500/20"
-                >
-                  {tech}
-                </span>
+                <span key={tech} className={PILL_CLS}>{tech}</span>
               ))}
             </div>
           </div>

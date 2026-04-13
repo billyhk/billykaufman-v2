@@ -79,6 +79,18 @@ body {
 ::-webkit-scrollbar { width: 0; }
 html { scrollbar-width: none; }
 
+/* Opt-in styled scrollbar for elements that need it (e.g. project description panel) */
+.styled-scrollbar::-webkit-scrollbar       { width: 3px; }
+.styled-scrollbar::-webkit-scrollbar-track { background: transparent; }
+.styled-scrollbar::-webkit-scrollbar-thumb {
+  background: color-mix(in srgb, var(--zone-accent) 30%, transparent);
+  border-radius: 9999px;
+}
+.styled-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: color-mix(in srgb, var(--zone-accent) 55%, transparent);
+}
+.styled-scrollbar { scrollbar-width: thin; scrollbar-color: color-mix(in srgb, var(--zone-accent) 30%, transparent) transparent; }
+
 @keyframes marquee {
   from { transform: translateX(0); }
   to   { transform: translateX(-50%); }
