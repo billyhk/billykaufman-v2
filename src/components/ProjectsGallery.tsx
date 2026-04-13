@@ -389,16 +389,18 @@ export default function ProjectsGallery() {
                       </div>
                     ) : (
                       /* Compact non-active row */
-                      <div
+                      <button
+                        type="button"
                         style={{ height: ITEM_H, cursor: "pointer" }}
                         onClick={() => scrollToProject(i)}
-                        className="flex items-center gap-2.5 select-none"
+                        className="flex w-full items-center gap-2.5 select-none text-left"
+                        aria-label={`Go to project ${i + 1}: ${p.title}`}
                       >
                         <span className="font-mono text-[10px] tabular-nums shrink-0" style={{ color: "rgba(255,255,255,0.35)" }}>
                           {String(i + 1).padStart(2, "0")}
                         </span>
                         <span className="text-sm leading-tight truncate text-white/60 font-medium">{p.title}</span>
-                      </div>
+                      </button>
                     )}
                   </motion.div>
                 );
