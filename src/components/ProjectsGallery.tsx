@@ -274,7 +274,7 @@ export default function ProjectsGallery() {
 
         {/* ── LEFT: HUD Screen ── */}
         {/* max-h-[52%] on mobile caps the HUD so the info panel always gets the rest of the viewport */}
-        <div className="md:w-[55%] max-h-[52%] md:max-h-none flex items-center justify-center p-4 md:p-10 md:pl-8 shrink-0 overflow-hidden">
+        <div className="md:w-[55%] max-h-[52%] md:max-h-none flex items-start md:items-center justify-center p-4 md:p-10 md:pl-8 shrink-0 overflow-hidden">
           <div className="w-full">
             <HudScreen
               project={project}
@@ -398,6 +398,29 @@ export default function ProjectsGallery() {
           </div>
         </div>
       </div>
+
+      {/* ── Mobile scroll hint — visible on first project until user scrolls ── */}
+      <AnimatePresence>
+        {activeIdx < N - 1 && (
+          <motion.div
+            className="fixed bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 z-20 md:hidden pointer-events-none"
+            initial={{ opacity: 0, y: 6 }}
+            animate={{ opacity: 1, y: [0, -5, 0] }}
+            exit={{ opacity: 0, y: 6 }}
+            transition={{ duration: 0.4, delay: 0.6, y: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }}
+          >
+            <span className="text-[9px] font-mono tracking-[0.2em] uppercase" style={{ color: "var(--zone-accent)", opacity: 0.5 }}>
+              scroll
+            </span>
+            <motion.span
+              className="block w-px h-5"
+              style={{ background: "linear-gradient(to bottom, var(--zone-accent), transparent)" }}
+              animate={{ scaleY: [1, 0.4, 1], opacity: [0.5, 1, 0.5] }}
+              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
+            />
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* ── Description modal ── */}
       <Modal isOpen={descModal} onClose={() => setDescModal(false)}>
