@@ -205,15 +205,15 @@ export default function ClientsMarquee() {
                 <p className="text-white/70 text-sm leading-relaxed text-center">
                   {openClient.description}
                 </p>
-                {openClient.domain && (
+                {openClient.url && (
                   <a
-                    href={openClient.url ?? `https://${openClient.domain}`}
+                    href={openClient.url}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="text-xs transition-colors"
                     style={{ color: openClient.accentColor }}
                   >
-                    {openClient.domain} ↗
+                    {new URL(openClient.url).hostname.replace(/^www\./, "")} ↗
                   </a>
                 )}
                 <button

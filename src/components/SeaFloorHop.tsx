@@ -212,7 +212,8 @@ export default function SeaFloorHop() {
       stateRef.current = "playing";
       fishVY.current = JUMP_V;
     } else if (stateRef.current === "playing") {
-      fishVY.current = JUMP_V;
+      // Only jump when on or near the floor — prevents double jump
+      if (fishY.current >= FLOOR_Y - FISH_R - 1) fishVY.current = JUMP_V;
     } else if (stateRef.current === "dead") {
       reset();
       stateRef.current = "playing";
