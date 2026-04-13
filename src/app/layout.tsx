@@ -28,7 +28,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${raleway.variable} h-full antialiased`}>
+    <html lang="en" className={`${raleway.variable} h-full antialiased relative`}>
       <body className="min-h-full flex flex-col bg-slate-950 text-white">
         <DepthScrollProvider>
           <NavBar />
