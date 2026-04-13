@@ -1,4 +1,7 @@
+"use client";
+
 import DepthLabel from "@/components/ocean/DepthLabel";
+import Button from "@/components/Button";
 import EmploymentStatus from "@/components/EmploymentStatus";
 import { socialLinks } from "@/data/social";
 
@@ -11,9 +14,9 @@ export default function ContactFooter() {
           <p className="text-white/40 text-sm tracking-widest uppercase mb-3">— Abyss reached —</p>
           <h3 className="text-3xl font-bold text-white mb-4">Let&apos;s work together</h3>
           <p className="text-white/60 mb-8 max-w-sm">You&apos;ve made it to the bottom. If you&apos;re still here, we should probably talk.</p>
-          <a href="mailto:billyhkaufman@gmail.com" className="btn-cta clip-tr-lg px-8 py-4 font-bold text-lg">
+          <Button variant="cta-lg" href="mailto:billyhkaufman@gmail.com">
             Get in touch
-          </a>
+          </Button>
         </div>
 
         <div className="flex flex-col gap-5 md:items-end">

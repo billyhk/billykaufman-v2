@@ -7,6 +7,7 @@ import DepthSection from "@/components/ocean/DepthSection";
 import DepthLabel from "@/components/ocean/DepthLabel";
 import { bioData } from "@/data/bio";
 import ResumeButton from "@/components/ResumeButton";
+import Button from "@/components/Button";
 import SectionHeading from "@/components/SectionHeading";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
@@ -158,13 +159,9 @@ export default function AboutSection() {
           <FadeUp delay={0.44}>
             <div className="flex flex-wrap gap-3 pt-2">
               <ResumeButton />
-              <motion.a
-                href="mailto:billyhkaufman@gmail.com"
-                className="clip-bl px-5 py-2.5 bg-white/10 hover:bg-white/20 text-white font-semibold border border-white/20 transition-colors text-sm"
-                whileTap={{ scale: 0.94 }}
-              >
+              <Button variant="secondary" href="mailto:billyhkaufman@gmail.com">
                 Hire Me
-              </motion.a>
+              </Button>
             </div>
           </FadeUp>
         </div>
