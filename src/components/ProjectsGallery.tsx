@@ -300,9 +300,15 @@ export default function ProjectsGallery() {
     <div ref={sectionRef} style={{ height: `${N * 80}vh` }}>
       {/* ── Sticky panel ── */}
       <div
-        className="sticky flex flex-col md:flex-row overflow-hidden"
+        className="sticky flex items-center overflow-hidden"
         style={{ top: NAV_H, height: `calc(100svh - ${NAV_H}px)` }}
       >
+        {/* Inner panel — capped at 900px so tall viewports don't stretch the layout */}
+        <div
+          className="relative flex flex-col md:flex-row w-full overflow-hidden"
+          style={{ height: `min(calc(100svh - ${NAV_H}px), 900px)` }}
+        >
+
         {/* Scroll progress bar — left edge */}
         <div className="absolute left-0 top-0 bottom-0 w-0.5 z-20 overflow-hidden">
           <motion.div
@@ -351,9 +357,9 @@ export default function ProjectsGallery() {
                         <p className="font-mono text-xs tracking-widest mb-2" style={{ color: "var(--zone-accent)", opacity: 0.6 }}>
                           {counter}
                         </p>
-                        <div className="flex items-start justify-between gap-3 mb-1">
+                        <div className="flex items-center gap-3 mb-1 flex-wrap">
                           <h3 className="text-white font-bold text-2xl md:text-3xl leading-tight">{p.title}</h3>
-                          <div className="flex gap-3 shrink-0 pt-1">
+                          <div className="flex gap-3 shrink-0">
                             {p.sourceCode && (
                               <a href={p.sourceCode} target="_blank" rel="noopener noreferrer"
                                 className="text-white/40 hover:text-white transition-colors" aria-label="Source code">
@@ -408,6 +414,8 @@ export default function ProjectsGallery() {
             </motion.div>
           </div>
         </div>
+
+        </div>{/* end inner panel */}
       </div>
 
       {/* ── Mobile scroll hint — visible on first project until user scrolls ── */}
