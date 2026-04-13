@@ -8,15 +8,18 @@ export const skillsData: SkillCategory[] = [
     heading: "Frontend",
     skills: [
       "React", "Next.js", "TypeScript", "JavaScript",
-      "Tailwind CSS", "CSS / SCSS", "Framer Motion", "GSAP",
+      "Redux", "Tailwind CSS", "CSS / SCSS", "Framer Motion", "GSAP",
       "Three.js", "React Three Fiber", "Responsive Design",
+      "Complex State Management", "Authentication Solutions",
     ],
   },
   {
     heading: "Backend",
     skills: [
-      "Python", "Django", "Node.js", "REST API Design",
-      "PostgreSQL", "GraphQL", "WebSockets", "Auth / OAuth",
+      "Python", "Django", "Fastify", "Node.js",
+      "REST API Design", "OpenAPI", "tRPC", "GraphQL",
+      "PostgreSQL", "Redis", "WebSockets", "Auth / OAuth",
+      "Endpoint Optimization at Scale", "asyncio",
     ],
   },
   {
@@ -30,7 +33,8 @@ export const skillsData: SkillCategory[] = [
     heading: "AI & Modern Tooling",
     skills: [
       "Claude / Claude Code", "Cursor", "AWS Bedrock",
-      "Prompt Engineering", "LLM Integration",
+      "MCP (Model Context Protocol)", "Prompt Engineering",
+      "LLM Integration", "Multi-Context AI Applications",
     ],
   },
   {

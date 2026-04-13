@@ -270,30 +270,47 @@ export default function ProjectsGallery() {
     window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
   };
 
-  // On resize, scrollYProgress recalculates (viewport height changed) which can shift
-  // activeIdx. Capture the active project at resize start and restore it once settled.
+  // Restore scroll to the active project after a resize burst settles.
+  // null  = burst not started yet
+  // -1    = user was outside the section — skip restoration (handles iOS address-bar events)
+  // >= 0  = project index to restore
   useEffect(() => {
-    const resizeTarget = { idx: -1 };
+    let capturedIdx: number | null = null;
     let timeout: ReturnType<typeof setTimeout>;
+
+    const isViewportInsideSection = () => {
+      const el = sectionRef.current;
+      if (!el) return false;
+      const top = el.getBoundingClientRect().top + window.scrollY;
+      return window.scrollY >= top && window.scrollY + window.innerHeight <= top + el.offsetHeight;
+    };
+
     const onResize = () => {
-      if (resizeTarget.idx === -1) resizeTarget.idx = activeIdxRef.current;
-      isResizing.current = true; // freeze activeIdx while viewport is changing
+      if (capturedIdx === null) {
+        capturedIdx = isViewportInsideSection() ? activeIdxRef.current : -1;
+      }
+      isResizing.current = true;
       clearTimeout(timeout);
       timeout = setTimeout(() => {
-        const el = sectionRef.current;
-        if (el) {
-          const top = el.getBoundingClientRect().top + window.scrollY;
-          const h = el.offsetHeight;
-          const target = top + ((resizeTarget.idx + 0.4) / N) * Math.max(h - window.innerHeight, 0);
-          window.scrollTo({ top: Math.max(0, target), behavior: "instant" });
+        if (capturedIdx !== null && capturedIdx >= 0) {
+          const el = sectionRef.current;
+          if (el) {
+            const top = el.getBoundingClientRect().top + window.scrollY;
+            const h = el.offsetHeight;
+            window.scrollTo({
+              top: Math.max(0, top + ((capturedIdx + 0.4) / N) * Math.max(h - window.innerHeight, 0)),
+              behavior: "instant",
+            });
+          }
         }
-        resizeTarget.idx = -1;
-        isResizing.current = false; // resume normal scroll tracking
+        capturedIdx = null;
+        isResizing.current = false;
       }, 200);
     };
+
     window.addEventListener("resize", onResize);
     return () => { window.removeEventListener("resize", onResize); clearTimeout(timeout); };
-  }, []); // empty deps — only refs (sectionRef, activeIdxRef) and constant N
+  }, []);
 
 
   return (

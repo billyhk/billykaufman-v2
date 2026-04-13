@@ -4,6 +4,7 @@ import { useState, useEffect, useCallback } from "react";
 import { createPortal } from "react-dom";
 import { RESUME_URL } from "@/data/bio";
 import { useScrollLock } from "@/hooks/useScrollLock";
+import Button from "@/components/Button";
 
 
 export default function ResumeButton() {
@@ -23,12 +24,9 @@ export default function ResumeButton() {
 
   return (
     <>
-      <button
-        onClick={() => setOpen(true)}
-        className="btn-cta clip-tr-bl px-5 py-2.5 font-semibold text-sm cursor-pointer"
-      >
+      <Button variant="primary" onClick={() => setOpen(true)}>
         View Resume
-      </button>
+      </Button>
 
       {open && createPortal(
         <div

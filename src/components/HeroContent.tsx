@@ -1,11 +1,11 @@
 "use client";
 
-import Link from "next/link";
 import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { socialLinks } from "@/data/social";
 import { PARTICLE_COLORS } from "@/constants/colors";
 import ResumeButton from "@/components/ResumeButton";
+import Button from "@/components/Button";
 
 const TITLES = [
   "Software Engineer",
@@ -285,19 +285,16 @@ export default function HeroContent() {
 
       <motion.div variants={item} className="flex flex-wrap gap-3 mb-7">
         <ResumeButton />
-        <a
-          href="mailto:billyhkaufman@gmail.com"
-          className="clip-bl px-5 py-2.5 bg-white/8 hover:bg-white/15 text-white font-semibold border border-white/15 transition-colors text-sm"
-        >
+        <Button variant="secondary" href="mailto:billyhkaufman@gmail.com">
           Hire Me
-        </a>
-        <Link
+        </Button>
+        <Button
+          variant="secondary"
           href="#about"
           onClick={(e) => { e.preventDefault(); document.getElementById("about")?.scrollIntoView({ behavior: "smooth" }); }}
-          className="clip-bl px-5 py-2.5 bg-white/8 hover:bg-white/15 text-white font-semibold border border-white/15 transition-colors text-sm"
         >
           About Me
-        </Link>
+        </Button>
       </motion.div>
 
       <motion.div variants={item} className="flex gap-5">

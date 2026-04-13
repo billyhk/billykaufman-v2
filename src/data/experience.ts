@@ -111,12 +111,12 @@ export const experienceData: ExperienceEntry[] = [
     description1:
       "After years of studying classical percussion, earned a doctorate in music performance at one of the country's top conservatories.",
     description2:
-      "My dissertation applied project management frameworks to high-stakes performance auditions. Developing that kind of rigorous, structured mindset was about to influence me in a major way...",
+      "My dissertation applied project management frameworks to high-stakes audition performance. Developing that kind of rigorous, structured mindset was about to influence me in a major way...",
     link: {
       label: "Read the dissertation",
       href: URLS.dissertation,
     },
-    dateRange: "2017 – 2020",
+    dateRange: "2014 – 2020",
     logoSrc: "/images/um-logo.jpg",
     accentColor: "#dce5df",
     logoFit: "contain",

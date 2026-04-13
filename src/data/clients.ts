@@ -3,8 +3,7 @@ import { URLS } from "@/constants/urls";
 export type Client = {
   title: string;
   description: string;
-  domain?: string;  // display label
-  url?: string;     // full href — overrides https://${domain} when set
+  url?: string;      // if set, shown as a link in the card modal
   accentColor: string;
   logoBg?: string;
 };
@@ -48,14 +47,12 @@ export const clientsData: Client[] = [
   },
   {
     title: "Johnson & Johnson",
-    description: "Built custom JavaScript behavior tracking across J&J's worldwide Google Tag Manager accounts, touching tracking mechanisms across multiple global regions.",
-    url: URLS.jnj,
+    description: "Built custom JavaScript behavior tracking across Neutrogena's worldwide Google Tag Manager accounts, touching tracking mechanisms across multiple global regions. Neutrogena has since spun off into Kenvue.",
     accentColor: "#cc0000",
   },
   {
     title: "Domino's",
     description: "Contributed to the Slice the Price card web application, a promotional experience built for one of the world's most iconic pizza brands.",
-    domain: "slicethepricecard.com",
     accentColor: "#006491",
   },
 ];
