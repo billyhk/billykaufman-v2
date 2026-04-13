@@ -342,8 +342,11 @@ export default function NavBar() {
             <div className="h-16 shrink-0" />
             <div className="h-px shrink-0 opacity-20" style={{ backgroundColor: "var(--zone-accent)" }} />
 
-            {/* Nav links — large typographic list */}
-            <div className="flex-1 flex flex-col justify-center px-8 gap-1">
+            {/* Nav links — large typographic list.
+                Outer div scrolls; inner div centers when content fits,
+                scrolls without clipping when viewport is short. */}
+            <div className="flex-1 min-h-0 overflow-y-auto px-8 py-4">
+              <div className="flex flex-col justify-center min-h-full gap-1">
               {navLinks.map(({ href, label }, i) => {
                 const isActive   = active === href.replace("#", "");
                 const isSelected = selectedHref === href;
@@ -400,6 +403,7 @@ export default function NavBar() {
                   </motion.div>
                 );
               })}
+              </div>
             </div>
 
             {/* Footer — zone name + social */}
