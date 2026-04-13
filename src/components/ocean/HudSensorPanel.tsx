@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useTransform, useMotionValueEvent } from "framer-motion";
+import { useDepthScroll } from "@/context/DepthScrollContext";
 import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 
@@ -27,7 +28,7 @@ export default function HudSensorPanel() {
   const [show, setShow] = useState(false);
   const noIntro = useRef(false); // true = no intro played; set in useEffect
 
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useDepthScroll();
   const depthMV = useTransform(scrollYProgress, [...STOPS], [...DEPTHS]);
   // Absolute pressure: P_atm + ρ_sw·g·d / P₀
   // ρ_sw = 1025 kg/m³, g = 9.81 m/s², P₀ = 101 325 Pa → ~1 ATM per 10.066 m

@@ -233,17 +233,13 @@ export default function ProjectsGallery() {
 
   const springProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
-  const [sectionDone, setSectionDone] = useState(false);
-  // Refs used by the scroll listener and resize handler — declared first to avoid
-  // forward-reference confusion even though closures capture them by identity.
   const activeIdxRef = useRef(0);
   const isResizing   = useRef(false);
 
-  // Single listener: tracks active project and section-done flag.
-  // Maps scrollYProgress [0,1] → [0,N) via Math.floor(v * (N - 0.0001)).
+  // Maps scrollYProgress [0,1] → [0,N) to pick the active project.
   useMotionValueEvent(scrollYProgress, "change", (v) => {
-    if (isResizing.current) return; // freeze during resize — handler restores position
-    setSectionDone(v >= 0.999);
+    if (isResizing.current) return;
+
     const next = Math.floor(v * (N - 0.0001));
     activeIdxRef.current = next;
     setActiveIdx((prev) => {
@@ -314,7 +310,7 @@ export default function ProjectsGallery() {
 
 
   return (
-    <div ref={sectionRef} style={{ height: `${N * 80}vh` }}>
+    <div ref={sectionRef} style={{ height: `${N * 30}vh`, position: "relative" }}>
       {/* ── Sticky panel ── */}
       <div
         className="sticky flex items-center overflow-hidden"
@@ -357,9 +353,8 @@ export default function ProjectsGallery() {
               transition={{ type: "spring", stiffness: 280, damping: 38, mass: 0.8 }}
             >
               {projectsData.map((p, i) => {
-                const dist = Math.abs(i - activeIdx);
                 const isActive = i === activeIdx;
-                const rowOpacity = isActive ? 1 : dist === 1 ? 0.5 : 0.18;
+                const rowOpacity = isActive ? 1 : 0.18;
                 const counter = String(i + 1).padStart(2, "0") + " / " + String(N).padStart(2, "0");
 
                 return (
@@ -435,28 +430,6 @@ export default function ProjectsGallery() {
         </div>{/* end inner panel */}
       </div>
 
-      {/* ── Mobile scroll hint — visible on first project until user scrolls ── */}
-      <AnimatePresence>
-        {!sectionDone && (
-          <motion.div
-            className="fixed bottom-6 left-1/2 -translate-x-1/2 flex flex-col items-center gap-1 z-20 md:hidden pointer-events-none"
-            initial={{ opacity: 0, y: 6 }}
-            animate={{ opacity: 1, y: [0, -5, 0] }}
-            exit={{ opacity: 0, y: 6 }}
-            transition={{ duration: 0.4, delay: 0.6, y: { duration: 2, repeat: Infinity, ease: "easeInOut", delay: 0.6 } }}
-          >
-            <span className="text-[9px] font-mono tracking-[0.2em] uppercase" style={{ color: "var(--zone-accent)", opacity: 0.5 }}>
-              scroll
-            </span>
-            <motion.span
-              className="block w-px h-5"
-              style={{ background: "linear-gradient(to bottom, var(--zone-accent), transparent)" }}
-              animate={{ scaleY: [1, 0.4, 1], opacity: [0.5, 1, 0.5] }}
-              transition={{ duration: 1.4, repeat: Infinity, ease: "easeInOut" }}
-            />
-          </motion.div>
-        )}
-      </AnimatePresence>
 
       {/* ── Description modal ── */}
       <Modal isOpen={descModal} onClose={() => setDescModal(false)}>

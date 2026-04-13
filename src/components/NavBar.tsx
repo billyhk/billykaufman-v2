@@ -3,7 +3,8 @@
 import { useState, useEffect } from "react";
 import { useScrollLock } from "@/hooks/useScrollLock";
 import { useHudVisible } from "@/hooks/useHudVisible";
-import { motion, AnimatePresence, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, AnimatePresence, useTransform, useMotionValueEvent } from "framer-motion";
+import { useDepthScroll } from "@/context/DepthScrollContext";
 import { socialLinks } from "@/data/social";
 
 const navLinks = [
@@ -240,7 +241,7 @@ export default function NavBar() {
   };
 
   // Live depth — same transform as DepthGauge
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useDepthScroll();
   const depthMV = useTransform(scrollYProgress, [...DEPTH_STOPS], [...DEPTH_VALS]);
   useMotionValueEvent(depthMV, "change", (v) => setDepth(Math.round(v)));
 
@@ -279,6 +280,7 @@ export default function NavBar() {
           <button
             onClick={() => {
               scrollTo("#home");
+              setMobileOpen(false);
               setMobileBkActive(true);
               setTimeout(() => setMobileBkActive(false), 450);
             }}

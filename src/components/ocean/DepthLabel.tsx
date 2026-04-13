@@ -1,7 +1,8 @@
 "use client";
 
 import { useRef, useState } from "react";
-import { motion, useInView, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useInView, useTransform, useMotionValueEvent } from "framer-motion";
+import { useDepthScroll } from "@/context/DepthScrollContext";
 
 const EASE = [0.25, 0.1, 0.25, 1] as const;
 
@@ -15,7 +16,7 @@ export default function DepthLabel({ depth: _depth }: { depth: string }) {
   const [current, setCurrent] = useState(0);
 
   // Mirror the gauge — always the same value
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useDepthScroll();
   const depthMV = useTransform(scrollYProgress, [...STOPS], [...DEPTHS]);
 
   useMotionValueEvent(depthMV, "change", (v) => {
