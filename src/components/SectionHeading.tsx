@@ -17,7 +17,7 @@ export default function SectionHeading({ title, subtitle }: { title: string; sub
   const x = useTransform(scrollYProgress, [0, 1], ["18%", "0%"]);
 
   return (
-    <div ref={ref} className="mb-10">
+    <div ref={ref} className="relative mb-10">
       {/* Perspective wrapper for 3D fold */}
       <div style={{ perspective: "900px", perspectiveOrigin: "50% 100%" }}>
         <motion.h2

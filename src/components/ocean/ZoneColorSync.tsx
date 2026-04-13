@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect } from "react";
-import { useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { useTransform, useMotionValueEvent } from "framer-motion";
+import { useDepthScroll } from "@/context/DepthScrollContext";
 
 // Must stay in sync with DepthGauge.tsx scroll stops
 const STOPS = [0, 0.18, 0.38, 0.57, 0.74, 1] as const;
@@ -21,7 +22,7 @@ const COLORS = [
 export const ZONE_COLORS = COLORS;
 
 export default function ZoneColorSync() {
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useDepthScroll();
 
   // Framer Motion interpolates hex colors natively
   const accent = useTransform(scrollYProgress, [...STOPS], [...COLORS]);

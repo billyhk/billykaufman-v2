@@ -7,6 +7,8 @@ import HudBottomBar from "@/components/ocean/HudBottomBar";
 import ZoneColorSync from "@/components/ocean/ZoneColorSync";
 import HudBrackets from "@/components/HudBrackets";
 import IntroLock from "@/components/IntroLock";
+import ScrollHint from "@/components/ScrollHint";
+import DepthScrollProvider from "@/context/DepthScrollContext";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -28,14 +30,17 @@ export default function RootLayout({
   return (
     <html lang="en" className={`${raleway.variable} h-full antialiased`}>
       <body className="min-h-full flex flex-col bg-slate-950 text-white">
-        <NavBar />
-        <ZoneColorSync />
-        <DepthGauge />
-        <HudSensorPanel />
-        <HudBottomBar />
-        <HudBrackets />
-        <IntroLock />
-{children}
+        <DepthScrollProvider>
+          <NavBar />
+          <ZoneColorSync />
+          <DepthGauge />
+          <HudSensorPanel />
+          <HudBottomBar />
+          <HudBrackets />
+          <IntroLock />
+          <ScrollHint />
+          {children}
+        </DepthScrollProvider>
       </body>
     </html>
   );

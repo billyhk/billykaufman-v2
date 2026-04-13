@@ -139,6 +139,7 @@ function TimelineRow({
             alt={entry.institutionName}
             width={40}
             height={40}
+            priority={index < 4}
             className={`w-full h-full ${entry.logoFit === "contain" ? "object-contain" : "object-cover"} ${entry.logoPadding ?? ""}`}
           />
         ) : (

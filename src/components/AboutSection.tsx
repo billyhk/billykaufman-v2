@@ -98,7 +98,6 @@ function HeadshotCard() {
           alt="Headshot of Billy Kaufman"
           width={360}
           height={360}
-          style={{ height: "auto" }}
           priority
           className="rounded-2xl object-cover shadow-xl ring-1 ring-white/15 opacity-90 block"
         />

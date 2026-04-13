@@ -1,7 +1,8 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useTransform, useMotionValueEvent } from "framer-motion";
+import { useDepthScroll } from "@/context/DepthScrollContext";
 import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 
@@ -26,7 +27,7 @@ export default function DepthGauge() {
   const [show, setShow] = useState(false);
   const noIntro = useRef(false); // true = no intro played; set in useEffect
 
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useDepthScroll();
   const depthMV = useTransform(scrollYProgress, [...STOPS], [...DEPTHS]);
   useMotionValueEvent(depthMV, "change", (v) => setDepth(Math.round(v)));
 
