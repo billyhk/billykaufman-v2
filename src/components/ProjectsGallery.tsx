@@ -68,30 +68,28 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
   const springY = useSpring(tiltY, { stiffness: 280, damping: 22 });
   const tiltTransform = useMotionTemplate`perspective(900px) rotateY(${springY}deg) rotateX(${springX}deg) translateY(-6px)`;
 
-  const [isDesktop, setIsDesktop] = useState(false);
-
-  // Track cursor anywhere on the viewport and tilt the screen toward it
+  // Track cursor anywhere on the viewport and tilt the screen toward it.
+  // Always keep tiltTransform wired to the motion.div — MotionValues must be
+  // subscribed from the first render. Straightening on mobile is done by zeroing
+  // the values, not by removing the style prop.
   useEffect(() => {
     const mq = window.matchMedia("(min-width: 768px)");
-    setIsDesktop(mq.matches);
 
-    if (!mq.matches) return;
-
-    tiltX.set(TILT_BASE.x);
-    tiltY.set(TILT_BASE.y);
+    const applyBase = (desktop: boolean) => {
+      tiltX.set(desktop ? TILT_BASE.x : 0);
+      tiltY.set(desktop ? TILT_BASE.y : 0);
+    };
+    applyBase(mq.matches);
 
     const onMove = (e: MouseEvent) => {
-      const nx = (e.clientX / window.innerWidth) * 2 - 1;   // -1 … 1
+      if (!mq.matches) return;
+      const nx = (e.clientX / window.innerWidth) * 2 - 1;
       const ny = (e.clientY / window.innerHeight) * 2 - 1;
       tiltY.set(TILT_BASE.y + nx * 5);
       tiltX.set(TILT_BASE.x - ny * 4);
     };
 
-    const onMqChange = (e: MediaQueryListEvent) => {
-      setIsDesktop(e.matches);
-      if (!e.matches) { tiltX.set(0); tiltY.set(0); }
-      else { tiltX.set(TILT_BASE.x); tiltY.set(TILT_BASE.y); }
-    };
+    const onMqChange = (e: MediaQueryListEvent) => applyBase(e.matches);
 
     window.addEventListener("mousemove", onMove, { passive: true });
     mq.addEventListener("change", onMqChange);
@@ -104,7 +102,7 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
   return (
     <motion.div
       className="relative mx-auto w-full"
-      style={{ maxWidth: 640, cursor: "default", transform: isDesktop ? tiltTransform : undefined }}
+      style={{ maxWidth: 640, cursor: "default", transform: tiltTransform }}
     >
       {/* Screen frame */}
       <div
