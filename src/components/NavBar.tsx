@@ -176,7 +176,6 @@ function BkBadge({ hovered }: { hovered: boolean }) {
   );
 }
 
-// ─── Animated 2-line hamburger / X ───────────────────────────────────────────
 // ─── Animated 3-line hamburger → X ───────────────────────────────────────────
 // Open:  lines converge to center (phase 1), middle fades, outer two rotate into X (phase 2)
 // Close: X unrotates (phase 1), middle reappears, outer two spread back out (phase 2)

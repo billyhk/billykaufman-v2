@@ -236,13 +236,15 @@ export default function ProjectsGallery() {
   const springProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
 
   const [sectionDone, setSectionDone] = useState(false);
+  // Refs used by the scroll listener and resize handler — declared first to avoid
+  // forward-reference confusion even though closures capture them by identity.
+  const activeIdxRef = useRef(0);
+  const isResizing   = useRef(false);
 
-  // Single listener drives both active-project tracking and section-done flag.
-  // rawIdx equivalent: scrollYProgress * (N - 0.0001), mapping [0,1] → [0,N).
-  const isResizing = useRef(false);
-
+  // Single listener: tracks active project and section-done flag.
+  // Maps scrollYProgress [0,1] → [0,N) via Math.floor(v * (N - 0.0001)).
   useMotionValueEvent(scrollYProgress, "change", (v) => {
-    if (isResizing.current) return; // ignore scroll position changes caused by resize
+    if (isResizing.current) return; // freeze during resize — handler restores position
     setSectionDone(v >= 0.999);
     const next = Math.floor(v * (N - 0.0001));
     activeIdxRef.current = next;
@@ -260,10 +262,7 @@ export default function ProjectsGallery() {
   const handlePrev = () => setImageIdx((i) => (i === 0 ? project.images.length - 1 : i - 1));
   const handleNext = () => setImageIdx((i) => (i === project.images.length - 1 ? 0 : i + 1));
 
-  // Scroll to the midpoint of project `idx`'s scroll range.
-  // Targeting the exact boundary (idx/N) lands rawIdx just below idx due to the
-  // [0, N-0.0001] transform, so Math.floor gives idx-1. Midpoint is always safe.
-  // Target rawIdx = idx + 0.4 — the center of each project's full-opacity zone [i, i+0.8].
+  // Scroll to idx + 0.4 within its scroll band (midpoint avoids boundary rounding issues).
   const scrollToProject = (idx: number) => {
     const el = sectionRef.current;
     if (!el) return;
@@ -275,7 +274,6 @@ export default function ProjectsGallery() {
 
   // On resize, scrollYProgress recalculates (viewport height changed) which can shift
   // activeIdx. Capture the active project at resize start and restore it once settled.
-  const activeIdxRef = useRef(0);
   useEffect(() => {
     const resizeTarget = { idx: -1 };
     let timeout: ReturnType<typeof setTimeout>;
