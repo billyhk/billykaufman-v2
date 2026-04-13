@@ -68,10 +68,14 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
   const springY = useSpring(tiltY, { stiffness: 280, damping: 22 });
   const tiltTransform = useMotionTemplate`perspective(900px) rotateY(${springY}deg) rotateX(${springX}deg) translateY(-6px)`;
 
+  const [isDesktop, setIsDesktop] = useState(false);
+
   // Track cursor anywhere on the viewport and tilt the screen toward it
   useEffect(() => {
-    const isDesktop = window.matchMedia("(min-width: 768px)").matches;
-    if (!isDesktop) return;
+    const mq = window.matchMedia("(min-width: 768px)");
+    setIsDesktop(mq.matches);
+
+    if (!mq.matches) return;
 
     tiltX.set(TILT_BASE.x);
     tiltY.set(TILT_BASE.y);
@@ -83,14 +87,24 @@ function HudScreen({ project, imageIdx, onPrev, onNext, onImageChange }: HudScre
       tiltX.set(TILT_BASE.x - ny * 4);
     };
 
+    const onMqChange = (e: MediaQueryListEvent) => {
+      setIsDesktop(e.matches);
+      if (!e.matches) { tiltX.set(0); tiltY.set(0); }
+      else { tiltX.set(TILT_BASE.x); tiltY.set(TILT_BASE.y); }
+    };
+
     window.addEventListener("mousemove", onMove, { passive: true });
-    return () => window.removeEventListener("mousemove", onMove);
+    mq.addEventListener("change", onMqChange);
+    return () => {
+      window.removeEventListener("mousemove", onMove);
+      mq.removeEventListener("change", onMqChange);
+    };
   }, [tiltX, tiltY]);
 
   return (
     <motion.div
       className="relative mx-auto w-full"
-      style={{ maxWidth: 640, cursor: "default", transform: tiltTransform }}
+      style={{ maxWidth: 640, cursor: "default", transform: isDesktop ? tiltTransform : undefined }}
     >
       {/* Screen frame */}
       <div
@@ -225,9 +239,13 @@ export default function ProjectsGallery() {
 
   // Single listener drives both active-project tracking and section-done flag.
   // rawIdx equivalent: scrollYProgress * (N - 0.0001), mapping [0,1] → [0,N).
+  const isResizing = useRef(false);
+
   useMotionValueEvent(scrollYProgress, "change", (v) => {
+    if (isResizing.current) return; // ignore scroll position changes caused by resize
     setSectionDone(v >= 0.999);
     const next = Math.floor(v * (N - 0.0001));
+    activeIdxRef.current = next;
     setActiveIdx((prev) => {
       if (prev === next) return prev;
       setImageIdx(0);
@@ -255,6 +273,31 @@ export default function ProjectsGallery() {
     window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
   };
 
+  // On resize, scrollYProgress recalculates (viewport height changed) which can shift
+  // activeIdx. Capture the active project at resize start and restore it once settled.
+  const activeIdxRef = useRef(0);
+  useEffect(() => {
+    const resizeTarget = { idx: -1 };
+    let timeout: ReturnType<typeof setTimeout>;
+    const onResize = () => {
+      if (resizeTarget.idx === -1) resizeTarget.idx = activeIdxRef.current;
+      isResizing.current = true; // freeze activeIdx while viewport is changing
+      clearTimeout(timeout);
+      timeout = setTimeout(() => {
+        const el = sectionRef.current;
+        if (el) {
+          const top = el.getBoundingClientRect().top + window.scrollY;
+          const h = el.offsetHeight;
+          const target = top + ((resizeTarget.idx + 0.4) / N) * Math.max(h - window.innerHeight, 0);
+          window.scrollTo({ top: Math.max(0, target), behavior: "instant" });
+        }
+        resizeTarget.idx = -1;
+        isResizing.current = false; // resume normal scroll tracking
+      }, 200);
+    };
+    window.addEventListener("resize", onResize);
+    return () => { window.removeEventListener("resize", onResize); clearTimeout(timeout); };
+  }, []); // empty deps — only refs (sectionRef, activeIdxRef) and constant N
 
 
   return (
