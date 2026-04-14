@@ -1,24 +1,21 @@
 "use client";
 
 import Image from "next/image";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { projectsData, type Project } from "@/data/projects";
 import BannerShowcase from "./BannerShowcase";
-import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight } from "react-icons/fa";
+import { FaGithub, FaExternalLinkAlt, FaChevronLeft, FaChevronRight, FaChevronUp, FaChevronDown } from "react-icons/fa";
 import {
   motion,
   AnimatePresence,
-  useScroll,
-  useSpring,
   useMotionValue,
   useMotionTemplate,
-  useMotionValueEvent,
+  useSpring,
 } from "framer-motion";
 import { BloombergLogo } from "./ClientLogos";
 import Modal from "./Modal";
 
 const N = projectsData.length;
-const NAV_H = 64;
 const ITEM_H = 40; // px — height of each compact (non-active) list row
 const PILL_CLS = "text-xs px-2.5 py-1 bg-blue-500/15 text-blue-300 rounded-full border border-blue-500/20";
 
@@ -224,114 +221,28 @@ export default function ProjectsGallery() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [imageIdx, setImageIdx] = useState(0);
   const [descModal, setDescModal] = useState(false);
-  const sectionRef = useRef<HTMLDivElement>(null);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start start", "end end"],
-  });
-
-  const springProgress = useSpring(scrollYProgress, { stiffness: 100, damping: 30 });
-
-  const activeIdxRef = useRef(0);
-  const isResizing   = useRef(false);
-
-  // Maps scrollYProgress [0,1] → [0,N) to pick the active project.
-  useMotionValueEvent(scrollYProgress, "change", (v) => {
-    if (isResizing.current) return;
-
-    const next = Math.floor(v * (N - 0.0001));
-    activeIdxRef.current = next;
-    setActiveIdx((prev) => {
-      if (prev === next) return prev;
-      setImageIdx(0);
-      return next;
-    });
-  });
-
-  useEffect(() => { setDescModal(false); }, [activeIdx]);
+  const goTo = (idx: number) => {
+    setActiveIdx(idx);
+    setImageIdx(0);
+    setDescModal(false);
+  };
+  const goPrev = () => goTo((activeIdx - 1 + N) % N);
+  const goNext = () => goTo((activeIdx + 1) % N);
 
   const project = projectsData[activeIdx];
 
   const handlePrev = () => setImageIdx((i) => (i === 0 ? project.images.length - 1 : i - 1));
   const handleNext = () => setImageIdx((i) => (i === project.images.length - 1 ? 0 : i + 1));
 
-  // Scroll to idx + 0.4 within its scroll band (midpoint avoids boundary rounding issues).
-  const scrollToProject = (idx: number) => {
-    const el = sectionRef.current;
-    if (!el) return;
-    const top = el.getBoundingClientRect().top + window.scrollY;
-    const h = el.offsetHeight;
-    const target = top + ((idx + 0.4) / N) * Math.max(h - window.innerHeight, 0);
-    window.scrollTo({ top: Math.max(0, target), behavior: "smooth" });
-  };
-
-  // Restore scroll to the active project after a resize burst settles.
-  // null  = burst not started yet
-  // -1    = user was outside the section — skip restoration (handles iOS address-bar events)
-  // >= 0  = project index to restore
-  useEffect(() => {
-    let capturedIdx: number | null = null;
-    let timeout: ReturnType<typeof setTimeout>;
-
-    const isViewportInsideSection = () => {
-      const el = sectionRef.current;
-      if (!el) return false;
-      const top = el.getBoundingClientRect().top + window.scrollY;
-      return window.scrollY >= top && window.scrollY + window.innerHeight <= top + el.offsetHeight;
-    };
-
-    const onResize = () => {
-      if (capturedIdx === null) {
-        capturedIdx = isViewportInsideSection() ? activeIdxRef.current : -1;
-      }
-      isResizing.current = true;
-      clearTimeout(timeout);
-      timeout = setTimeout(() => {
-        if (capturedIdx !== null && capturedIdx >= 0) {
-          const el = sectionRef.current;
-          if (el) {
-            const top = el.getBoundingClientRect().top + window.scrollY;
-            const h = el.offsetHeight;
-            window.scrollTo({
-              top: Math.max(0, top + ((capturedIdx + 0.4) / N) * Math.max(h - window.innerHeight, 0)),
-              behavior: "instant",
-            });
-          }
-        }
-        capturedIdx = null;
-        isResizing.current = false;
-      }, 200);
-    };
-
-    window.addEventListener("resize", onResize);
-    return () => { window.removeEventListener("resize", onResize); clearTimeout(timeout); };
-  }, []);
-
-
   return (
-    <div ref={sectionRef} style={{ height: `${N * 30}vh`, position: "relative" }}>
-      {/* ── Sticky panel ── */}
+    <div className="relative">
       <div
-        className="sticky flex items-center overflow-hidden"
-        style={{ top: NAV_H, height: `calc(100svh - ${NAV_H}px)` }}
+        className="flex flex-col md:flex-row w-full overflow-hidden"
+        style={{ height: "clamp(600px, 78svh, 820px)" }}
       >
-        {/* Inner panel — capped at 900px so tall viewports don't stretch the layout */}
-        <div
-          className="relative flex flex-col md:flex-row w-full overflow-hidden"
-          style={{ height: `min(calc(100svh - ${NAV_H}px), 900px)` }}
-        >
-
-        {/* Scroll progress bar — left edge */}
-        <div className="absolute left-0 top-0 bottom-0 w-0.5 z-20 overflow-hidden">
-          <motion.div
-            className="absolute inset-x-0 top-0 bottom-0 opacity-50"
-            style={{ background: "var(--zone-accent)", scaleY: springProgress, transformOrigin: "top" }}
-          />
-        </div>
 
         {/* ── LEFT: HUD Screen ── */}
-        {/* max-h-[52%] on mobile caps the HUD so the info panel always gets the rest of the viewport */}
         <div className="md:w-[55%] max-h-[52%] md:max-h-none flex items-start md:items-center justify-center p-4 md:p-10 md:pl-8 shrink-0 overflow-hidden">
           <div className="w-full">
             <HudScreen
@@ -344,9 +255,12 @@ export default function ProjectsGallery() {
           </div>
         </div>
 
-        {/* ── RIGHT: Unified project list — active item expands with full info ── */}
-        <div className="flex-1 flex flex-col px-6 md:px-8 pt-4 pb-6 md:py-10 border-t md:border-t-0 md:border-l border-white/8 overflow-hidden">
-          {/* List scrolls so active item is always at the top */}
+        {/* ── RIGHT: project list + info ── */}
+        <div className="flex-1 flex flex-col px-6 md:px-8 pt-4 pb-4 md:py-10 border-t md:border-t-0 md:border-l border-white/8 overflow-hidden">
+
+          {/* Scrolling list — active item stays at top.
+              TODO: if the project list grows to the point where it overflows this container,
+              replace this with a searchable/filterable list (search input + filtered projectsData). */}
           <div className="flex-1 min-h-0 relative overflow-hidden">
             <motion.div
               animate={{ y: -activeIdx * ITEM_H }}
@@ -406,11 +320,11 @@ export default function ProjectsGallery() {
                         </button>
                       </div>
                     ) : (
-                      /* Compact non-active row */
+                      /* Compact non-active row — click to select */
                       <button
                         type="button"
                         style={{ height: ITEM_H, cursor: "pointer" }}
-                        onClick={() => scrollToProject(i)}
+                        onClick={() => goTo(i)}
                         className="flex w-full items-center gap-2.5 select-none text-left"
                         aria-label={`Go to project ${i + 1}: ${p.title}`}
                       >
@@ -425,11 +339,56 @@ export default function ProjectsGallery() {
               })}
             </motion.div>
           </div>
+
+          {/* ── Prev / Next navigation ── */}
+          <div
+            className="flex items-center justify-between shrink-0 pt-3"
+            style={{ borderTop: "1px solid rgba(255,255,255,0.08)" }}
+          >
+            <button
+              onClick={goPrev}
+              className="flex items-center gap-2 text-xs font-mono tracking-wider transition-colors cursor-pointer"
+              style={{ color: "var(--zone-accent)", opacity: 0.5 }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+              onMouseLeave={e => (e.currentTarget.style.opacity = "0.5")}
+              aria-label="Previous project"
+            >
+              <FaChevronUp size={10} /> PREV
+            </button>
+
+            {/* Dot indicators */}
+            <div className="flex items-center gap-1.5">
+              {projectsData.map((_, i) => (
+                <button
+                  key={i}
+                  onClick={() => goTo(i)}
+                  aria-label={`Project ${i + 1}`}
+                  className="transition-all duration-200 rounded-full cursor-pointer"
+                  style={{
+                    width: i === activeIdx ? 16 : 4,
+                    height: 4,
+                    background: "var(--zone-accent)",
+                    opacity: i === activeIdx ? 0.9 : 0.25,
+                  }}
+                />
+              ))}
+            </div>
+
+            <button
+              onClick={goNext}
+              className="flex items-center gap-2 text-xs font-mono tracking-wider transition-colors cursor-pointer"
+              style={{ color: "var(--zone-accent)", opacity: 0.5 }}
+              onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
+              onMouseLeave={e => (e.currentTarget.style.opacity = "0.5")}
+              aria-label="Next project"
+            >
+              NEXT <FaChevronDown size={10} />
+            </button>
+          </div>
+
         </div>
 
-        </div>{/* end inner panel */}
-      </div>
-
+      </div>{/* end panel */}
 
       {/* ── Description modal ── */}
       <Modal isOpen={descModal} onClose={() => setDescModal(false)}>
