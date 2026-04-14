@@ -53,6 +53,7 @@ export const clientsData: Client[] = [
   {
     title: "Domino's",
     description: "Contributed to the Slice the Price card web application, a promotional experience built for one of the world's most iconic pizza brands.",
+    url: URLS.dominos,
     accentColor: "#006491",
   },
 ];

@@ -1,7 +1,8 @@
 "use client";
 
 import { useState, useEffect, useRef } from "react";
-import { motion, useScroll, useTransform, useMotionValueEvent } from "framer-motion";
+import { motion, useTransform, useMotionValueEvent } from "framer-motion";
+import { useDepthScroll } from "@/context/DepthScrollContext";
 import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 const SECTIONS = 6;
@@ -63,7 +64,7 @@ export default function HudBottomBar() {
   const [show, setShow] = useState(false);
   const noIntro = useRef(false);
 
-  const { scrollYProgress } = useScroll();
+  const { scrollYProgress } = useDepthScroll();
   const wpMV = useTransform(scrollYProgress, [0, 1], [0, SECTIONS - 1]);
   useMotionValueEvent(wpMV, "change", (v) => setWaypoint(Math.round(v) + 1));
 
