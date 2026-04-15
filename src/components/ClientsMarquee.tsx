@@ -45,7 +45,7 @@ const LOGO_KEYS: LogoKey[] = [
 ];
 
 const LOGO_MAP: Record<LogoKey, React.ReactNode> = {
-  bloomberg: <BloombergLogo className="w-full max-h-8 object-contain" />,
+  bloomberg: <BloombergLogo className="h-7 w-auto max-w-full" />,
   westrock: <WestrockLogo className="max-h-20 w-full" />,
   sebpo: <SebpoLogo className="w-12 h-12" />,
   pharmacare: <PharmacareLogo className="w-full max-h-8 object-contain" />,

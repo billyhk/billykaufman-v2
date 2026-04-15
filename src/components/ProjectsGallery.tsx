@@ -347,10 +347,8 @@ export default function ProjectsGallery() {
           >
             <button
               onClick={goPrev}
-              className="flex items-center gap-2 text-xs font-mono tracking-wider transition-colors cursor-pointer"
-              style={{ color: "var(--zone-accent)", opacity: 0.5 }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
-              onMouseLeave={e => (e.currentTarget.style.opacity = "0.5")}
+              className="flex items-center gap-2 text-xs font-mono tracking-wider cursor-pointer opacity-50 hover:opacity-100 active:opacity-100 transition-opacity"
+              style={{ color: "var(--zone-accent)" }}
               aria-label="Previous project"
             >
               <FaChevronUp size={10} /> PREV
@@ -376,10 +374,8 @@ export default function ProjectsGallery() {
 
             <button
               onClick={goNext}
-              className="flex items-center gap-2 text-xs font-mono tracking-wider transition-colors cursor-pointer"
-              style={{ color: "var(--zone-accent)", opacity: 0.5 }}
-              onMouseEnter={e => (e.currentTarget.style.opacity = "1")}
-              onMouseLeave={e => (e.currentTarget.style.opacity = "0.5")}
+              className="flex items-center gap-2 text-xs font-mono tracking-wider cursor-pointer opacity-50 hover:opacity-100 active:opacity-100 transition-opacity"
+              style={{ color: "var(--zone-accent)" }}
               aria-label="Next project"
             >
               NEXT <FaChevronDown size={10} />
