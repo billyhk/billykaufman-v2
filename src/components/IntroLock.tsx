@@ -1,23 +1,30 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { useScenePhase } from "@/context/ScenePhaseContext";
 import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 /**
- * Blocks all user interaction (scroll, mouse, keyboard scroll) for the
- * duration of the fish intro animation. No-ops when page loads mid-scroll.
+ * Blocks pointer events (and optionally scroll) for the duration of the fish
+ * intro animation, starting the moment the visitor enters the underwater phase.
+ *
+ * Unlike the old version, this no longer fires on page load — the ScenePhaseContext
+ * already holds scroll during the surface/diving phases. This lock specifically
+ * covers the INTRO_TOTAL window after the camera arrives underwater.
  */
 export default function IntroLock() {
+  const { phase } = useScenePhase();
   const [active, setActive] = useState(false);
+  const triggered = useRef(false);
 
   useEffect(() => {
-    if (window.matchMedia("(pointer: coarse)").matches) return; // touch device — no fish intro, no lock needed
-    if (window.scrollY > window.innerHeight * 0.5) return; // already mid-scroll — skip
+    if (phase !== "underwater" || triggered.current) return;
+    if (typeof window !== "undefined" && window.matchMedia("(pointer: coarse)").matches) return;
 
-    window.scrollTo(0, 0); // ensure page starts at top for the intro
+    triggered.current = true;
     setActive(true);
-    document.documentElement.style.overflow = "hidden"; // blocks all scroll incl. keyboard
-    document.body.dataset.introLocked = "1"; // signals window-level listeners to ignore real mouse events
+    document.documentElement.style.overflow = "hidden";
+    document.body.dataset.introLocked = "1";
 
     const timer = setTimeout(() => {
       setActive(false);
@@ -30,10 +37,9 @@ export default function IntroLock() {
       document.documentElement.style.overflow = "";
       delete document.body.dataset.introLocked;
     };
-  }, []);
+  }, [phase]);
 
   if (!active) return null;
 
-  // Full-screen transparent overlay absorbs all pointer events (hover, click, select)
   return <div className="fixed inset-0" style={{ zIndex: 99999, cursor: "none" }} />;
 }
