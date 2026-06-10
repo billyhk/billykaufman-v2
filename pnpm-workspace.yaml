@@ -1,3 +1,9 @@
-ignoredBuiltDependencies:
+# Approve native build scripts so pnpm runs them at install time.
+#
+# Previously these were under `ignoredBuiltDependencies`, which older pnpm
+# honored as a silent skip. Newer pnpm treats ignored build scripts as a
+# fatal ERR_PNPM_IGNORED_BUILDS, so installs broke on CI (Amplify installs
+# pnpm unpinned). Allowing them to build is the approved, version-stable fix.
+onlyBuiltDependencies:
   - sharp
   - unrs-resolver
