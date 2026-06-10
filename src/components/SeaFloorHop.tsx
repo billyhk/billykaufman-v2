@@ -207,17 +207,14 @@ export default function SeaFloorHop() {
   }, []);
 
   const jump = useCallback(() => {
-    if (stateRef.current === "idle") {
+    if (stateRef.current === "idle" || stateRef.current === "dead") {
+      // Start (or restart) play without an immediate jump — the fish rests on
+      // the floor and the next tap is the first hop.
       reset();
       stateRef.current = "playing";
-      fishVY.current = JUMP_V;
     } else if (stateRef.current === "playing") {
       // Only jump when on or near the floor — prevents double jump
       if (fishY.current >= FLOOR_Y - FISH_R - 1) fishVY.current = JUMP_V;
-    } else if (stateRef.current === "dead") {
-      reset();
-      stateRef.current = "playing";
-      fishVY.current = JUMP_V;
     }
   }, [reset]);
 
