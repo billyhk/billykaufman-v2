@@ -268,7 +268,7 @@ export default function HeroContent() {
 
       <motion.div variants={item} className="mb-5">
         {/* Particle canvas — desktop only */}
-        <div className="hidden md:block">
+        <div id="name-particles" className="hidden md:block">
           <NameParticles />
         </div>
         {/* Static text — mobile only */}

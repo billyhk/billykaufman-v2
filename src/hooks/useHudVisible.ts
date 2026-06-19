@@ -2,17 +2,19 @@ import { useState, useEffect } from "react";
 import { INTRO_TOTAL } from "@/components/ocean/HeroElements";
 
 /**
- * Returns true once the HUD should be visible.
- * If the intro animation will play, waits for it to finish.
- * If the page is already scrolled past the hero, shows immediately.
- * Use this everywhere instead of duplicating the INTRO_TOTAL timeout logic.
+ * Returns true once the HUD should animate into view.
+ *
+ * HudLayer only mounts when phase === "underwater", so by the time this hook
+ * runs, the visitor has already dived in. We wait INTRO_TOTAL seconds to let
+ * the fish intro animation play before the HUD panels slide in.
+ *
+ * Touch devices skip the fish intro, so they show the HUD immediately.
  */
 export function useHudVisible(): boolean {
   const [show, setShow] = useState(false);
   useEffect(() => {
-    // Touch devices have no cursor-following fish intro — no need to wait for it
     const isTouch = window.matchMedia("(pointer: coarse)").matches;
-    if (isTouch || window.scrollY > window.innerHeight * 0.5) {
+    if (isTouch) {
       setShow(true);
       return;
     }

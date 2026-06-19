@@ -1,14 +1,11 @@
 import type { Metadata } from "next";
 import { Raleway } from "next/font/google";
-import NavBar from "@/components/NavBar";
-import DepthGauge from "@/components/ocean/DepthGauge";
-import HudSensorPanel from "@/components/ocean/HudSensorPanel";
-import HudBottomBar from "@/components/ocean/HudBottomBar";
 import ZoneColorSync from "@/components/ocean/ZoneColorSync";
-import HudBrackets from "@/components/HudBrackets";
 import IntroLock from "@/components/IntroLock";
-import ScrollHint from "@/components/ScrollHint";
+import DiveInButton from "@/components/DiveInButton";
+import HudLayer from "@/components/HudLayer";
 import DepthScrollProvider from "@/context/DepthScrollContext";
+import { ScenePhaseProvider } from "@/context/ScenePhaseContext";
 import "./globals.css";
 
 const raleway = Raleway({
@@ -31,15 +28,13 @@ export default function RootLayout({
     <html lang="en" className={`${raleway.variable} h-full antialiased relative`}>
       <body className="min-h-full flex flex-col bg-slate-950 text-white">
         <DepthScrollProvider>
-          <NavBar />
-          <ZoneColorSync />
-          <DepthGauge />
-          <HudSensorPanel />
-          <HudBottomBar />
-          <HudBrackets />
-          <IntroLock />
-          <ScrollHint />
-          {children}
+          <ScenePhaseProvider>
+            <ZoneColorSync />
+            <DiveInButton />
+            <HudLayer />
+            <IntroLock />
+            {children}
+          </ScenePhaseProvider>
         </DepthScrollProvider>
       </body>
     </html>
